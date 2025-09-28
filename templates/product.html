@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Apna Swad{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark text-light shadow-sm border-0">
+                <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}">
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h2 class="text-warning">{{ product.name }}</h2>
+            <p class="text-light fs-5">₹{{ product.price }}</p>
+            <p class="text-muted">Category: 
+                <a href="{{ url_for('category', category_name=product.category) }}" class="text-warning">{{ product.category }}</a>
+            </p>
+
+            <!-- Quantity & Add to Cart -->
+            <form method="POST" action="{{ url_for('add_to_cart', pid=product.id) }}" class="d-flex align-items-center mb-3">
+                <input type="number" name="quantity" value="1" min="1" class="form-control me-2" style="width: 80px;">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-cart3 me-1"></i> Add to Cart
+                </button>
+            </form>
+
+            <!-- Product Tabs -->
+            <ul class="nav nav-tabs bg-black text-light border-0" id="productTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active text-warning" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-warning" id="ingredients-tab" data-bs-toggle="tab" data-bs-target="#ingredients" type="button" role="tab">Ingredients</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-warning" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button>
+                </li>
+            </ul>
+            <div class="tab-content bg-dark text-light p-3 border border-secondary border-top-0 rounded-bottom" id="productTabContent">
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <p>{{ product.description }}</p>
+                </div>
+                <div class="tab-pane fade" id="ingredients" role="tabpanel">
+                    <ul>
+                        {% for ingredient in product.ingredients %}
+                        <li>{{ ingredient }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    {% if product.reviews %}
+                        {% for review in product.reviews %}
+                        <div class="mb-3 border-bottom border-secondary pb-2">
+                            <strong class="text-warning">{{ review.user }}</strong>
+                            <span class="text-muted">- {{ review.date }}</span>
+                            <p class="mb-0">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No reviews yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="mt-5">
+        <h3 class="text-warning mb-4">Related Products</h3>
+        <div class="row g-4">
+            {% for rel_product in related_products %}
+            <div class="col-md-3 col-sm-6">
+                <div class="card bg-dark text-light border-0 shadow product-card text-center">
+                    <img src="{{ rel_product.image_url }}" class="card-img-top p-3" alt="{{ rel_product.name }}">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ rel_product.name }}</h6>
+                        <p class="card-text">₹{{ rel_product.price }}</p>
+                        <a href="{{ url_for('product', pid=rel_product.id) }}" class="btn btn-warning btn-sm">
+                            View Product
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

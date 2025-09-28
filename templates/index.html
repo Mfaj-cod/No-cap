@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Apna Swad{% endblock %}
+
+{% block head %}
+<style>
+/* Hero Animations */
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.hero-text {
+    animation: fadeInUp 1s ease forwards;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    transition: 0.3s;
+}
+
+.category-card:hover {
+    transform: scale(1.05);
+    transition: 0.3s;
+}
+
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s ease-out;
+}
+
+.scroll-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center py-5 bg-transparent position-relative">
+    <div class="container">
+        <h1 class="display-4 fw-bold text-warning hero-text">Experience the Rich Flavors of Bihar</h1>
+        <p class="lead text-light mt-3 hero-text" style="animation-delay: 0.3s;">Fresh, Authentic Spices Delivered to Your Doorstep</p>
+        <a href="#products" class="btn btn-warning btn-lg mt-4 hero-text" style="animation-delay: 0.6s;">
+            Shop Now <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</section>
+
+<!-- Featured Products Carousel -->
+<section id="products" class="py-5">
+    <div class="container">
+        <h2 class="mb-4 text-warning text-center">Featured Products</h2>
+        <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for product in featured_products %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card bg-dark text-light shadow product-card text-center border-0">
+                                <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}">
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('add_to_cart', pid=product.id) }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-warning btn-sm">
+                                            <i class="bi bi-cart3 me-1"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5 bg-transparent">
+    <div class="container">
+        <h2 class="mb-4 text-warning text-center">Shop by Category</h2>
+        <div class="row g-4">
+            {% for category in categories %}
+            <div class="col-md-3 col-sm-6 scroll-reveal">
+                <a href="{{ url_for('category', category_name=category.name) }}" class="text-decoration-none">
+                    <div class="card bg-dark text-light text-center category-card shadow border-0">
+                        <img src="{{ category.image_url }}" class="card-img-top p-3" alt="{{ category.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ category.name }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="py-5">
+    <div class="container scroll-reveal">
+        <h2 class="mb-4 text-warning text-center">About Apna Swad Spices</h2>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <img src="/static/images/about-spices.jpg" class="img-fluid rounded shadow" alt="About Spices">
+            </div>
+            <div class="col-md-6 text-light">
+                <p>Bihar is known as the land of spices. At Apna Swad Store, we bring you authentic spices 
+                sourced directly from local farms. Our range includes whole spices, ground spices, and unique blends 
+                that add flavor and aroma to every dish.</p>
+                <a href="#products" class="btn btn-warning mt-3">Browse Products</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-transparent text-center scroll-reveal">
+    <div class="container">
+        <h3 class="text-warning mb-3">Subscribe to Our Newsletter</h3>
+        <p class="text-light mb-4">Get exclusive offers and updates on new spices and blends.</p>
+        <form method="POST" action="{{ url_for('subscribe') }}" class="row justify-content-center">
+            <div class="col-md-5 mb-2">
+                <input type="email" class="form-control form-control-lg" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="col-md-2 mb-2">
+                <button type="submit" class="btn btn-warning btn-lg w-100">Subscribe</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Scroll Reveal Animation
+const revealElements = document.querySelectorAll('.scroll-reveal');
+function revealOnScroll() {
+    const windowHeight = window.innerHeight;
+    revealElements.forEach(el => {
+        const elementTop = el.getBoundingClientRect().top;
+        if (elementTop < windowHeight - 100) {
+            el.classList.add('visible');
+        }
+    });
+}
+window.addEventListener('scroll', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+</script>
+{% endblock %}

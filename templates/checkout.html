@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Apna Swad{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4 text-warning">
+        <i class="bi bi-credit-card me-2"></i>Checkout
+    </h2>
+
+    {% if cart_items %}
+    <div class="row">
+        <!-- Billing Details Form -->
+        <div class="col-lg-7 mb-4">
+            <div class="card bg-dark text-light shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Billing Details</h5>
+                    <form method="POST" action="{{ url_for('checkout') }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Delivery Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" id="state" name="state" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pincode" class="form-label">Pincode</label>
+                            <input type="text" class="form-control" id="pincode" name="pincode" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <select class="form-select" id="payment_method" name="payment_method" required>
+                                <option value="cod">Cash on Delivery</option>
+                                <option value="upi">UPI</option>
+                                <option value="card">Credit/Debit Card</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-lg mt-3">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-5 mb-4">
+            <div class="card bg-dark text-light shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Order Summary</h5>
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for item in cart_items %}
+                        <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ item.product.name }}</strong>
+                                <form method="POST" action="{{ url_for('update_cart', pid=item.product.id) }}" class="d-inline-flex ms-2">
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm me-2" style="width: 70px;">
+                                    <button type="submit" class="btn btn-sm btn-warning">Update</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('remove_from_cart', pid=item.product.id) }}" class="d-inline ms-2">
+                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                </form>
+                            </div>
+                            <span>₹{{ item.product.price * item.quantity }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <hr class="border-secondary">
+                    <h5 class="d-flex justify-content-between">
+                        <span>Total:</span>
+                        <span class="text-warning">₹{{ cart_total }}</span>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x fs-1 mb-3"></i>
+            <h4>Your cart is empty</h4>
+            <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Continue Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

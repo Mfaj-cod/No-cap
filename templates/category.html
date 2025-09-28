@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category_name }} - Apna Swad{% endblock %}
+
+{% block head %}
+<style>
+/* Scroll & Hover Animations */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s ease-out;
+}
+.scroll-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    transition: 0.3s;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4 text-warning text-center">Category: {{ category_name }}</h2>
+
+    {% if products %}
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-md-3 col-sm-6 scroll-reveal">
+            <div class="card bg-dark text-light border-0 shadow product-card text-center">
+                <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}">
+                <div class="card-body">
+                    <h6 class="card-title">{{ product.name }}</h6>
+                    <p class="card-text">₹{{ product.price }}</p>
+                    <form method="POST" action="{{ url_for('add_to_cart', pid=product.id) }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            <i class="bi bi-cart3 me-1"></i> Add to Cart
+                        </button>
+                    </form>
+                    <a href="{{ url_for('product', pid=product.id) }}" class="btn btn-outline-warning btn-sm mt-2">
+                        View Product
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-exclamation-circle fs-1 mb-3 text-warning"></i>
+            <h4 class="text-light">No products found in this category.</h4>
+            <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Back to Home</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Scroll Reveal Animation
+const revealElements = document.querySelectorAll('.scroll-reveal');
+function revealOnScroll() {
+    const windowHeight = window.innerHeight;
+    revealElements.forEach(el => {
+        const elementTop = el.getBoundingClientRect().top;
+        if (elementTop < windowHeight - 100) {
+            el.classList.add('visible');
+        }
+    });
+}
+window.addEventListener('scroll', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+</script>
+{% endblock %}
