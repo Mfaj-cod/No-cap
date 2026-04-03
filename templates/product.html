@@ -4,30 +4,77 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-6 mb-4">
-            <div class="card bg-dark text-light shadow-sm border-0">
-                <img src="{{ product.image_url }}" class="card-img-top p-3 product-image" alt="{{ product.name }}">
+            <div class="card bg-dark text-light shadow-sm border-0 product-zoom-shell">
+                <img src="{{ product.media_gallery[0] if product.media_gallery else product.image_url }}" id="mainProductImage" class="card-img-top p-3 product-image" alt="{{ product.name }}" fetchpriority="high">
             </div>
+            {% if product.media_gallery|length > 1 %}
+            <div class="d-flex gap-2 flex-wrap mt-3">
+                {% for image in product.media_gallery %}
+                <button type="button" class="gallery-thumb {% if loop.first %}active{% endif %}" data-product-image="{{ image }}" aria-label="View image {{ loop.index }}">
+                    <img src="{{ image }}" alt="{{ product.name }} image {{ loop.index }}">
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
         <div class="col-md-6">
-            <h2 class="text-warning">{{ product.name }}</h2>
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                <div>
+                    <h2 class="text-warning mb-1">{{ product.name }}</h2>
+                    <p class="text-muted mb-0">Category:
+                        <a href="{{ url_for('category', category_name=product.category) }}" class="text-warning">{{ product.category }}</a>
+                    </p>
+                </div>
+                {% if product.average_rating %}
+                <div class="text-end">
+                    <div class="text-warning fw-semibold">{{ product.average_rating }}/5</div>
+                    <div class="small text-muted">{{ product.review_count }} verified review{% if product.review_count != 1 %}s{% endif %}</div>
+                </div>
+                {% else %}
+                <div class="small text-muted text-end">Freshly added style</div>
+                {% endif %}
+            </div>
+
             <p class="text-light fs-5 mb-1">Retail: {{ product.normal_price|money }}</p>
             <p class="text-muted mb-3">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
-            <p class="text-muted">Category:
-                <a href="{{ url_for('category', category_name=product.category) }}" class="text-warning">{{ product.category }}</a>
-            </p>
 
-            <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="d-flex align-items-center mb-3">
-                <input type="number" name="quantity" value="1" min="1" class="form-control me-2" style="width: 90px;">
-                <button type="submit" class="btn btn-warning">
-                    <i class="bi bi-cart3 me-1"></i> Add to Cart
-                </button>
+            <div class="row g-2 mb-3">
+                <div class="col-sm-4"><div class="trust-tile h-100"><i class="bi bi-person-check text-warning me-2"></i>Guest checkout ready</div></div>
+                <div class="col-sm-4"><div class="trust-tile h-100"><i class="bi bi-arrow-repeat text-warning me-2"></i>7-day issue reporting</div></div>
+                <div class="col-sm-4"><div class="trust-tile h-100"><i class="bi bi-box-seam text-warning me-2"></i><span id="variantStockStatus">{{ product.total_stock }} total in stock</span></div></div>
+            </div>
+
+            <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="mb-3" id="productPurchaseForm">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="variant_sku" class="form-label">Variant</label>
+                        <select id="variant_sku" name="variant_sku" class="form-select form-select-lg">
+                            {% for variant in product.variants %}
+                            <option value="{{ variant.sku }}" data-stock="{{ variant.stock_quantity }}" {% if product.default_variant and variant.sku == product.default_variant.sku %}selected{% endif %} {% if variant.stock_quantity == 0 %}disabled{% endif %}>
+                                {{ variant.color }} / {{ variant.size }}{% if variant.stock_quantity == 0 %} - Sold out{% elif variant.stock_quantity <= 5 %} - Only {{ variant.stock_quantity }} left{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control form-control-lg" inputmode="numeric">
+                    </div>
+                    <div class="col-md-4 d-grid">
+                        <button type="submit" class="btn btn-warning btn-lg"><i class="bi bi-cart3 me-1"></i> Add to Cart</button>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap mt-3">
+                    <button type="submit" formaction="{{ url_for('add_to_cart', product_id=product.id) }}?next=checkout" class="btn btn-outline-warning btn-lg">Buy Now</button>
+                    <span class="small text-muted align-self-center">Select a variant first. Quantity will be capped by live stock.</span>
+                </div>
             </form>
 
             <div class="alert alert-info border-0">
-                Shop owners with 25 or more caps in the cart automatically receive {{ wholesale_discount_percent }}% off every item in the order.
+                Shop owners with 25 or more caps in the cart automatically receive {{ wholesale_discount_percent }}% off every item in the order. Retail buyers can use guest checkout without creating an account.
             </div>
 
             <ul class="nav nav-tabs bg-black text-light border-0" id="productTab" role="tablist">
@@ -35,7 +82,7 @@
                     <button class="nav-link active text-warning" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link text-warning" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">Details</button>
+                    <button class="nav-link text-warning" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Specs</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link text-warning" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button>
@@ -44,21 +91,38 @@
             <div class="tab-content bg-dark text-light p-3 border border-secondary border-top-0 rounded-bottom" id="productTabContent">
                 <div class="tab-pane fade show active" id="description" role="tabpanel">
                     <p>{{ product.description }}</p>
-                </div>
-                <div class="tab-pane fade" id="details" role="tabpanel">
                     <ul>
                         {% for detail in product.details %}
                         <li>{{ detail }}</li>
                         {% endfor %}
                     </ul>
                 </div>
+                <div class="tab-pane fade" id="specs" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-sm align-middle mb-0">
+                            <tbody>
+                                {% for label, value in product.attributes.items() %}
+                                <tr>
+                                    <th class="text-warning" style="width: 35%;">{{ label }}</th>
+                                    <td>{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <div class="tab-pane fade" id="reviews" role="tabpanel">
                     {% if product.reviews %}
                         {% for review in product.reviews %}
                         <div class="mb-3 border-bottom border-secondary pb-2">
-                            <strong class="text-warning">{{ review.user }}</strong>
-                            <span class="text-muted">- {{ review.date }}</span>
-                            <p class="mb-0">{{ review.comment }}</p>
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <strong class="text-warning">{{ review.user }}</strong>
+                                {% if review.rating %}
+                                <span class="small text-warning">{{ review.rating }}/5</span>
+                                {% endif %}
+                            </div>
+                            <span class="text-muted small">{{ review.date }}</span>
+                            <p class="mb-0 mt-2">{{ review.comment }}</p>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -69,15 +133,31 @@
         </div>
     </div>
 
+    <div class="mobile-cta-bar d-md-none">
+        <div>
+            <div class="small text-muted">Retail</div>
+            <div class="text-warning fw-semibold">{{ product.normal_price|money }}</div>
+        </div>
+        <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="d-flex gap-2 align-items-center" id="mobileQuickAddForm">
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="variant_sku" id="mobileVariantSku" value="{{ product.default_variant.sku if product.default_variant else '' }}">
+            <button type="submit" class="btn btn-warning" {% if not product.in_stock %}disabled{% endif %}>Add to Cart</button>
+        </form>
+    </div>
+
     <div class="mt-5">
-        <h3 class="text-warning mb-4">Related Products</h3>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h3 class="text-warning mb-0">Related Products</h3>
+            <span class="small text-muted">Secure checkout, live stock, and visible pricing stay consistent across the store.</span>
+        </div>
         <div class="row g-4">
             {% for rel_product in related_products %}
             <div class="col-md-3 col-sm-6">
                 <div class="card bg-dark text-light border-0 shadow product-card text-center h-100">
-                    <img src="{{ rel_product.image_url }}" class="card-img-top p-3" alt="{{ rel_product.name }}">
+                    <img src="{{ rel_product.image_url }}" class="card-img-top p-3" alt="{{ rel_product.name }}" loading="lazy">
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title">{{ rel_product.name }}</h6>
+                        <p class="small text-muted mb-1">{{ rel_product.variant_count }} variants | {{ rel_product.total_stock }} in stock</p>
                         <p class="card-text mb-1">{{ rel_product.normal_price|money }}</p>
                         <p class="small text-muted">Wholesale: {{ rel_product.shop_owner_price|money }}</p>
                         <a href="{{ url_for('product', product_id=rel_product.id) }}" class="btn btn-warning btn-sm mt-auto">View Product</a>
@@ -88,4 +168,40 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const mainProductImage = document.getElementById('mainProductImage');
+const thumbnailButtons = document.querySelectorAll('[data-product-image]');
+const variantSelect = document.getElementById('variant_sku');
+const quantityInput = document.getElementById('quantity');
+const stockStatus = document.getElementById('variantStockStatus');
+const mobileVariantInput = document.getElementById('mobileVariantSku');
+
+thumbnailButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const image = button.getAttribute('data-product-image');
+        mainProductImage.src = image;
+        thumbnailButtons.forEach((thumb) => thumb.classList.remove('active'));
+        button.classList.add('active');
+    });
+});
+
+function updateVariantState() {
+    const selectedOption = variantSelect.options[variantSelect.selectedIndex];
+    const stock = Number(selectedOption.dataset.stock || '0');
+    quantityInput.max = stock || 1;
+    if (Number(quantityInput.value) > stock && stock > 0) {
+        quantityInput.value = stock;
+    }
+    stockStatus.textContent = stock > 0 ? `${stock} pieces left in ${selectedOption.textContent.split(' - ')[0]}` : 'Selected variant is sold out';
+    mobileVariantInput.value = selectedOption.value;
+}
+
+if (variantSelect) {
+    variantSelect.addEventListener('change', updateVariantState);
+    updateVariantState();
+}
+</script>
 {% endblock %}

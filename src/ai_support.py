@@ -1,3 +1,12 @@
+try:
+    from langchain_core.output_parsers import StrOutputParser
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_groq import ChatGroq
+except ImportError as exc:
+    raise RuntimeError(
+        "LangChain Groq dependencies are missing. Install the updated requirements first."
+    ) from exc
+
 from src.config import settings
 from src.data import SUPPORT_POLICIES
 from src.db import list_products
@@ -23,15 +32,6 @@ def _catalog_snapshot() -> str:
 def generate_support_response(message: str) -> str:
     if not settings.groq_api_key:
         raise RuntimeError("Customer Care AI is not configured yet. Add GROQ_API_KEY to enable chat.")
-
-    try:
-        from langchain_core.output_parsers import StrOutputParser
-        from langchain_core.prompts import ChatPromptTemplate
-        from langchain_groq import ChatGroq
-    except ImportError as exc:
-        raise RuntimeError(
-            "LangChain Groq dependencies are missing. Install the updated requirements first."
-        ) from exc
 
     prompt = ChatPromptTemplate.from_messages(
         [

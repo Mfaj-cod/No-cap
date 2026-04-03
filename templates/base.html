@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ store_name }}{% endblock %}</title>
+    <meta name="description" content="Shop caps for retail and wholesale with guest checkout, UPI, cards, wallets, COD, and shop-owner pricing at 25+ pieces.">
 
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://checkout.razorpay.com">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
@@ -31,6 +34,9 @@
                         <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('index') }}">Home</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('index') }}#discover">Discover</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('about') }}">About</a>
                     </li>
                     <li class="nav-item">
@@ -49,9 +55,7 @@
                     </li>
                     {% if current_user %}
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('account') }}">
-                            {{ current_user.name }}
-                        </a>
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('account') }}">{{ current_user.name }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-warning text-dark ms-lg-2 px-3" href="{{ url_for('logout') }}">Logout</a>
@@ -68,6 +72,15 @@
             </div>
         </div>
     </nav>
+
+    <div class="trust-strip border-top border-bottom border-secondary py-2">
+        <div class="container d-flex flex-wrap justify-content-center justify-content-lg-between gap-2 small text-center text-lg-start">
+            <span><i class="bi bi-person-check me-1 text-warning"></i>Guest checkout enabled</span>
+            <span><i class="bi bi-shield-check me-1 text-warning"></i>UPI, cards, wallets, and COD</span>
+            <span><i class="bi bi-arrow-repeat me-1 text-warning"></i>7-day issue reporting on unworn items</span>
+            <span><i class="bi bi-truck me-1 text-warning"></i>Fast dispatch across India</span>
+        </div>
+    </div>
 
     {% if current_user %}
     <div class="container mt-3">
@@ -120,7 +133,7 @@
                     <h6 class="text-warning mb-3">Browse</h6>
                     <ul class="list-unstyled small">
                         <li><a href="{{ url_for('index') }}" class="text-light text-decoration-none hover-effect">Home</a></li>
-                        <li><a href="#products" class="text-light text-decoration-none hover-effect">Products</a></li>
+                        <li><a href="{{ url_for('index') }}#discover" class="text-light text-decoration-none hover-effect">Search and Filters</a></li>
                         <li><a href="{{ url_for('about') }}" class="text-light text-decoration-none hover-effect">About Us</a></li>
                         <li><a href="{{ url_for('customer_care_page') }}" class="text-light text-decoration-none hover-effect">Customer Care AI</a></li>
                     </ul>
@@ -131,7 +144,7 @@
                     <div class="small">
                         <p class="mb-2">Shop owners unlock {{ wholesale_discount_percent }}% off automatically at 25+ caps in one cart.</p>
                         <p class="mb-2">Mixed cap styles count toward the threshold.</p>
-                        <p class="mb-0">Retail pricing still works for smaller test orders.</p>
+                        <p class="mb-0">Guest checkout stays available for normal retail orders.</p>
                     </div>
                 </div>
 
@@ -170,3 +183,5 @@
     {% block scripts %}{% endblock %}
 </body>
 </html>
+
+

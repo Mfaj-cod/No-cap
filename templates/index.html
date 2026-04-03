@@ -41,11 +41,12 @@
     <div class="container">
         <h1 class="display-4 fw-bold text-warning hero-text">Caps for Daily Wear, Teams, and Retail Shelves</h1>
         <p class="lead text-light mt-3 hero-text" style="animation-delay: 0.3s;">
-            Shop sports, casual, snapback, trucker, dad cap, and beanie styles with automatic wholesale pricing for shop owners.
+            Shop sports, casual, snapback, trucker, dad cap, and beanie styles with guest checkout for retail buyers and automatic wholesale pricing for shop owners.
         </p>
-        <a href="#products" class="btn btn-warning btn-lg mt-4 hero-text" style="animation-delay: 0.6s;">
-            Shop Now <i class="bi bi-arrow-right"></i>
-        </a>
+        <div class="d-flex justify-content-center gap-2 flex-wrap mt-4 hero-text" style="animation-delay: 0.6s;">
+            <a href="#discover" class="btn btn-warning btn-lg">Find the Right Cap <i class="bi bi-arrow-right"></i></a>
+            <a href="{{ url_for('checkout') }}" class="btn btn-outline-warning btn-lg">Guest Checkout</a>
+        </div>
     </div>
 </section>
 
@@ -55,30 +56,115 @@
             <div class="col-md-4">
                 <div class="card bg-dark text-light border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <i class="bi bi-person-heart text-warning fs-2"></i>
-                        <h5 class="mt-3">Retail Friendly</h5>
-                        <p class="small text-muted mb-0">Buy a single cap or build your everyday collection with the same clean storefront flow.</p>
+                        <i class="bi bi-diagram-3 text-warning fs-2"></i>
+                        <h5 class="mt-3">Unified Variants</h5>
+                        <p class="small text-muted mb-0">Colors and sizes live inside one product model instead of splintering the catalog into duplicate listings.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card bg-dark text-light border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <i class="bi bi-shop text-warning fs-2"></i>
-                        <h5 class="mt-3">Wholesale Ready</h5>
-                        <p class="small text-muted mb-0">Shop owners unlock {{ wholesale_discount_percent }}% off at 25+ caps across mixed styles in the same cart.</p>
+                        <i class="bi bi-images text-warning fs-2"></i>
+                        <h5 class="mt-3">Gallery-Ready Products</h5>
+                        <p class="small text-muted mb-0">Each product now supports multiple media assets, structured attributes, and richer product detail content.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card bg-dark text-light border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <i class="bi bi-headset text-warning fs-2"></i>
-                        <h5 class="mt-3">AI Customer Care</h5>
-                        <p class="small text-muted mb-0">Use the customer care assistant for product, pricing, bulk-order, shipping, and return guidance.</p>
+                        <i class="bi bi-box-seam text-warning fs-2"></i>
+                        <h5 class="mt-3">Live Stock Awareness</h5>
+                        <p class="small text-muted mb-0">Cart and checkout now validate inventory so customers cannot oversell a variant that is almost gone.</p>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<section id="discover" class="py-5">
+    <div class="container">
+        <div class="card bg-dark text-light border-0 shadow-lg p-4 discover-panel">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div>
+                    <h2 class="text-warning mb-1">Search and Filter Caps</h2>
+                    <p class="text-muted mb-0">Use category, price, and featured filters together for faster product discovery.</p>
+                </div>
+                <span class="badge rounded-pill text-bg-warning text-dark px-3 py-2">{{ browse_results|length }} results</span>
+            </div>
+            <form method="GET" action="{{ url_for('index') }}" class="row g-3 align-items-end">
+                <div class="col-lg-4 col-md-6">
+                    <label for="q" class="form-label">Search</label>
+                    <input type="search" class="form-control form-control-lg" id="q" name="q" value="{{ filters['q'] }}" placeholder="sports, trucker, embroidery, olive...">
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label for="category" class="form-label">Category</label>
+                    <select id="category" name="category" class="form-select form-select-lg">
+                        <option value="">All categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}" {% if filters['category'] == category.name %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label for="max_price" class="form-label">Max Retail Price</label>
+                    <select id="max_price" name="max_price" class="form-select form-select-lg">
+                        <option value="">Any budget</option>
+                        <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to Rs. 650</option>
+                        <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to Rs. 750</option>
+                        <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to Rs. 850</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <div class="form-check form-switch pt-4 ps-0 d-flex align-items-center gap-2 justify-content-md-start justify-content-between">
+                        <label class="form-check-label" for="featured">Featured only</label>
+                        <input class="form-check-input ms-0" type="checkbox" id="featured" name="featured" value="1" {% if filters['featured'] %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="col-12 d-flex gap-2 flex-wrap">
+                    <button type="submit" class="btn btn-warning btn-lg px-4">Apply Filters</button>
+                    {% if has_filters %}
+                    <a href="{{ url_for('index') }}#discover" class="btn btn-outline-warning btn-lg px-4">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        <div class="row g-4">
+            {% for product in browse_results %}
+            <div class="col-sm-6 col-lg-3 scroll-reveal">
+                <div class="card bg-dark text-light border-0 shadow product-card text-center h-100">
+                    <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}" loading="lazy">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge border border-warning text-warning align-self-center mb-2">{{ product.category }}</span>
+                        <h6 class="card-title">{{ product.name }}</h6>
+                        <p class="card-text text-muted small">{{ product.description }}</p>
+                        {% if product.average_rating %}
+                        <p class="small mb-1"><span class="text-warning fw-semibold">{{ product.average_rating }}/5</span> from {{ product.review_count }} review{% if product.review_count != 1 %}s{% endif %}</p>
+                        {% else %}
+                        <p class="small mb-1 text-muted">Freshly added style</p>
+                        {% endif %}
+                        <p class="small text-muted mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
+                        <p class="mb-1">Retail: <span class="text-warning">{{ product.normal_price|money }}</span></p>
+                        <p class="small text-muted">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap mt-auto">
+                            <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="variant_sku" value="{{ product.default_variant.sku if product.default_variant else '' }}">
+                                <button type="submit" class="btn btn-warning btn-sm" {% if not product.in_stock %}disabled{% endif %}><i class="bi bi-cart3 me-1"></i> Add</button>
+                            </form>
+                            <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-outline-warning btn-sm">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -93,18 +179,18 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-5 col-md-7">
                             <div class="card bg-dark text-light shadow product-card text-center border-0">
-                                <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}">
+                                <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
                                 <div class="card-body">
                                     <h4 class="card-title text-warning">{{ product.name }}</h4>
                                     <p class="card-text text-muted">{{ product.description }}</p>
+                                    <p class="small text-muted mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
                                     <p class="mb-1">Retail: <span class="text-warning">{{ product.normal_price|money }}</span></p>
                                     <p class="small text-muted">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
                                     <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
                                         <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
                                             <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-warning btn-sm">
-                                                <i class="bi bi-cart3 me-1"></i> Add to Cart
-                                            </button>
+                                            <input type="hidden" name="variant_sku" value="{{ product.default_variant.sku if product.default_variant else '' }}">
+                                            <button type="submit" class="btn btn-warning btn-sm" {% if not product.in_stock %}disabled{% endif %}><i class="bi bi-cart3 me-1"></i> Add to Cart</button>
                                         </form>
                                         <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-outline-warning btn-sm">View Product</a>
                                     </div>
@@ -135,7 +221,7 @@
             <div class="col-md-4 col-lg-2 scroll-reveal">
                 <a href="{{ url_for('category', category_name=category.name) }}" class="text-decoration-none">
                     <div class="card bg-dark text-light text-center category-card shadow border-0 h-100">
-                        <img src="{{ category.image_url }}" class="card-img-top p-3" alt="{{ category.name }}">
+                        <img src="{{ category.image_url }}" class="card-img-top p-3" alt="{{ category.name }}" loading="lazy">
                         <div class="card-body">
                             <h6 class="card-title mb-0">{{ category.name }}</h6>
                         </div>
@@ -152,13 +238,13 @@
         <h2 class="mb-4 text-warning text-center">Built for Modern Cap Buyers</h2>
         <div class="row align-items-center">
             <div class="col-md-6">
-                <img src="{{ url_for('static', path='img/logo.jpg') }}" class="img-fluid rounded shadow" alt="Apna Swad Caps">
+                <img src="{{ url_for('static', path='img/logo.jpg') }}" class="img-fluid rounded shadow" alt="{{ store_name }}" loading="lazy">
             </div>
             <div class="col-md-6 text-light">
-                <p>Apna Swad Caps now brings together sports, casual, snapback, trucker, dad cap, and beanie styles in one store while keeping the bold visual identity you already know.</p>
-                <p>Normal customers can shop freely, and shop owners can log in with wholesale accounts to unlock automatic bulk pricing once the cart reaches 25 pieces.</p>
+                <p>{{ store_name }} now carries richer product records with structured specs, live variant stock, and unified listings instead of fragmented duplicate products.</p>
+                <p>Retail buyers can use guest checkout immediately, while shop owners can log in with wholesale accounts to unlock automatic bulk pricing once the cart reaches 25 pieces.</p>
                 <div class="d-flex flex-wrap gap-2 mt-3">
-                    <a href="#products" class="btn btn-warning">Browse Products</a>
+                    <a href="#discover" class="btn btn-warning">Use Filters</a>
                     <a href="{{ url_for('customer_care_page') }}" class="btn btn-outline-warning">Ask Customer Care AI</a>
                 </div>
             </div>

@@ -4,54 +4,80 @@
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="mb-4 text-warning">
-        <i class="bi bi-credit-card me-2"></i>Checkout
-    </h2>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="text-warning mb-1"><i class="bi bi-credit-card me-2"></i>Checkout</h2>
+            <p class="text-muted mb-0">One-page checkout with guest access, Indian payment options, and live inventory protection.</p>
+        </div>
+        {% if guest_checkout %}
+        <span class="badge rounded-pill text-bg-warning text-dark px-3 py-2">Guest checkout</span>
+        {% endif %}
+    </div>
 
     {% if cart_summary["items"] %}
-    <div class="row">
+    <div class="row g-4">
         <div class="col-lg-7 mb-4">
             <div class="card bg-dark text-light shadow-sm border-0">
-                <div class="card-body">
+                <div class="card-body p-4">
+                    {% if guest_checkout %}
+                    <div class="alert alert-info border-0">
+                        You can place this order without creating an account. If you are buying for a shop, <a href="{{ url_for('login') }}" class="text-warning">log in as a shop owner</a> first to unlock wholesale pricing at {{ cart_summary.wholesale_threshold }}+ caps.
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-person-check text-warning me-2"></i>Guest checkout enabled</div></div>
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-box-seam text-warning me-2"></i>Live stock protected</div></div>
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-shield-check text-warning me-2"></i>UPI, cards, wallets, COD</div></div>
+                    </div>
+
                     <h5 class="card-title mb-3">Billing Details</h5>
                     <form method="POST" action="{{ url_for('place_order') }}" id="checkoutForm">
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" value="{{ checkout_defaults['name'] }}" required>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ checkout_defaults['name'] }}" autocomplete="name" required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" value="{{ checkout_defaults['email'] }}" required>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ checkout_defaults['email'] }}" autocomplete="email" inputmode="email" required>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ checkout_phone }}" required>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ checkout_phone }}" autocomplete="tel" inputmode="tel" required>
                         </div>
                         <div class="mb-3">
                             <label for="address" class="form-label">Delivery Address</label>
-                            <textarea class="form-control" id="address" name="address" rows="3" required>{{ checkout_address }}</textarea>
+                            <textarea class="form-control" id="address" name="address" rows="3" autocomplete="street-address" placeholder="House number, street, locality" required>{{ checkout_address }}</textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="city" class="form-label">City</label>
-                                <input type="text" class="form-control" id="city" name="city" value="{{ checkout_city }}" required>
+                                <input type="text" class="form-control" id="city" name="city" value="{{ checkout_city }}" autocomplete="address-level2" required>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="state" class="form-label">State</label>
-                                <input type="text" class="form-control" id="state" name="state" value="{{ checkout_state }}" required>
+                                <input type="text" class="form-control" id="state" name="state" value="{{ checkout_state }}" autocomplete="address-level1" required>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="pincode" class="form-label">Pincode</label>
-                                <input type="text" class="form-control" id="pincode" name="pincode" value="{{ checkout_pincode }}" required>
+                                <input type="text" class="form-control" id="pincode" name="pincode" value="{{ checkout_pincode }}" autocomplete="postal-code" inputmode="numeric" required>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="payment_method" class="form-label">Payment Method</label>
                             <select class="form-select" id="payment_method" name="payment_method" required>
                                 <option value="cod" {% if selected_payment_method == 'cod' %}selected{% endif %}>Cash on Delivery</option>
-                                <option value="upi" {% if selected_payment_method == 'upi' %}selected{% endif %}>UPI via Razorpay</option>
-                                <option value="card" {% if selected_payment_method == 'card' %}selected{% endif %}>Credit or Debit Card via Razorpay</option>
+                                <option value="upi" {% if selected_payment_method == 'upi' %}selected{% endif %} {% if not online_payments_available %}disabled{% endif %}>UPI via Razorpay{% if not online_payments_available %} (Unavailable){% endif %}</option>
+                                <option value="card" {% if selected_payment_method == 'card' %}selected{% endif %} {% if not online_payments_available %}disabled{% endif %}>Credit or Debit Card via Razorpay{% if not online_payments_available %} (Unavailable){% endif %}</option>
+                                <option value="wallet" {% if selected_payment_method == 'wallet' %}selected{% endif %} {% if not online_payments_available %}disabled{% endif %}>Wallet via Razorpay{% if not online_payments_available %} (Unavailable){% endif %}</option>
                             </select>
+                            <div class="small text-muted mt-2">
+                                {% if online_payments_available %}
+                                Razorpay supports UPI, cards, and popular wallets on the next step. If an online payment fails, you can retry once or switch to COD without losing your cart.
+                                {% else %}
+                                Online payments are temporarily unavailable. Cash on Delivery is still available right now.
+                                {% endif %}
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-warning btn-lg mt-3 w-100">Place Order</button>
                     </form>
@@ -60,11 +86,14 @@
                     <div class="card bg-black border border-warning mt-4">
                         <div class="card-body">
                             <h6 class="text-warning">Online Payment Required</h6>
-                            <p class="small text-muted">Your order has been created. Complete the Razorpay payment below to confirm it.</p>
-                            <button type="button" class="btn btn-warning w-100" id="razorpayButton">Pay with Razorpay</button>
+                            <p class="small text-muted">Your order has been created and stock has been reserved. Complete the Razorpay step below using UPI, card, or wallet. Retry is enabled if the first payment attempt fails.</p>
+                            <button type="button" class="btn btn-warning w-100" id="razorpayButton">Continue with Razorpay</button>
+                            <div class="small text-muted mt-3">Prefer a fallback? You can return to checkout and switch this order to Cash on Delivery.</div>
                             <form method="POST" action="{{ url_for('payment_success') }}" id="paymentSuccessForm" class="d-none">
                                 <input type="hidden" name="order_id" value="{{ pending_order_id }}">
+                                <input type="hidden" name="razorpay_order_id" id="razorpayOrderId" value="{{ razorpay_order.id }}">
                                 <input type="hidden" name="razorpay_payment_id" id="razorpayPaymentId">
+                                <input type="hidden" name="razorpay_signature" id="razorpaySignature">
                             </form>
                         </div>
                     </div>
@@ -74,7 +103,7 @@
         </div>
 
         <div class="col-lg-5 mb-4">
-            <div class="card bg-dark text-light shadow-sm border-0">
+            <div class="card bg-dark text-light shadow-sm border-0 checkout-summary-card">
                 <div class="card-body">
                     <h5 class="card-title mb-3">Order Summary</h5>
                     <ul class="list-group list-group-flush mb-3">
@@ -82,6 +111,7 @@
                         <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center">
                             <div>
                                 <strong>{{ item.product.name }}</strong>
+                                <div class="small text-muted">{{ item.variant_label }}</div>
                                 <div class="small text-muted">{{ item.quantity }} x {{ item.applied_unit_price|money }}</div>
                             </div>
                             <span>{{ item.line_total|money }}</span>
@@ -97,13 +127,17 @@
                         <span class="text-warning">{{ cart_summary.final_total|money }}</span>
                     </h5>
 
-                    {% if current_user.role == 'shop_owner' and not cart_summary.wholesale_eligible %}
+                    {% if current_user and current_user.role == 'shop_owner' and not cart_summary.wholesale_eligible %}
                     <div class="alert alert-info border-0 mt-3 small">
                         Add {{ cart_summary.remaining_to_wholesale }} more caps to unlock wholesale pricing on this order.
                     </div>
-                    {% elif current_user.role == 'shop_owner' and cart_summary.wholesale_eligible %}
+                    {% elif current_user and current_user.role == 'shop_owner' and cart_summary.wholesale_eligible %}
                     <div class="alert alert-success border-0 mt-3 small">
                         Wholesale pricing is active for this order.
+                    </div>
+                    {% elif guest_checkout %}
+                    <div class="alert alert-info border-0 mt-3 small">
+                        Guest orders use retail pricing. Log in as a shop owner before checkout if this is a wholesale order.
                     </div>
                     {% endif %}
                 </div>
@@ -132,13 +166,27 @@ document.getElementById('razorpayButton').addEventListener('click', function () 
         name: "{{ store_name }}",
         description: "Cap order payment",
         order_id: "{{ razorpay_order.id }}",
+        prefill: {
+            name: "{{ checkout_defaults['name']|e }}",
+            email: "{{ checkout_defaults['email']|e }}",
+            contact: "{{ checkout_phone|e }}"
+        },
+        retry: {
+            enabled: true,
+            max_count: 2
+        },
+        theme: {
+            color: "#d6a843"
+        },
         handler: function (response) {
+            document.getElementById('razorpayOrderId').value = response.razorpay_order_id || "{{ razorpay_order.id }}";
             document.getElementById('razorpayPaymentId').value = response.razorpay_payment_id;
+            document.getElementById('razorpaySignature').value = response.razorpay_signature;
             document.getElementById('paymentSuccessForm').submit();
         },
         modal: {
             ondismiss: function () {
-                window.location.href = "{{ url_for('failure') }}?order_id={{ pending_order_id }}";
+                window.location.href = "{{ url_for('failure') }}?order_id={{ pending_order_id }}&payment_method={{ selected_payment_method }}";
             }
         }
     };
@@ -149,3 +197,4 @@ document.getElementById('razorpayButton').addEventListener('click', function () 
 </script>
 {% endif %}
 {% endblock %}
+

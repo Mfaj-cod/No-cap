@@ -1,7 +1,12 @@
 __pycache__/
+.benchmarks/
+.pytest_cache/
 .env
 spicenv/
 .venv
 store.db
 
 .vscode/
+
+*.log
+*.ini

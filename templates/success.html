@@ -32,6 +32,7 @@
                             <thead>
                                 <tr>
                                     <th>Product</th>
+                                    <th>Variant</th>
                                     <th>Qty</th>
                                     <th>Unit</th>
                                     <th>Total</th>
@@ -41,6 +42,7 @@
                                 {% for item in order["items"] %}
                                 <tr>
                                     <td>{{ item.product_name }}</td>
+                                    <td>{{ item.variant_label }}</td>
                                     <td>{{ item.quantity }}</td>
                                     <td>{{ item.applied_unit_price|money }}</td>
                                     <td>{{ item.line_total|money }}</td>
@@ -53,10 +55,12 @@
                 {% endif %}
 
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
-                    <a href="{{ url_for('index') }}" class="btn btn-warning btn-lg">
-                        <i class="bi bi-arrow-left me-2"></i>Continue Shopping
-                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-warning btn-lg"><i class="bi bi-arrow-left me-2"></i>Continue Shopping</a>
+                    {% if current_user %}
                     <a href="{{ url_for('account') }}" class="btn btn-outline-warning btn-lg">View Account</a>
+                    {% else %}
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-warning btn-lg">Need Help?</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

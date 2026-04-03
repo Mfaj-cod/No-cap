@@ -32,7 +32,10 @@ def send_contact_message(
             "danger",
         )
         return RedirectResponse(url=str(request.url_for("contact")), status_code=303)
-
+    
+    print("SMTP_USER:", settings.smtp_user)
+    print("SMTP_PASS:", settings.smtp_pass)
+    
     body = (
         f"New website enquiry from Apna Swad Caps\n\n"
         f"Name: {name}\n"
@@ -53,8 +56,10 @@ def send_contact_message(
         server.send_message(email_message)
         server.quit()
         add_flash(request, "Your message has been sent successfully.", "success")
-    except Exception:
-        add_flash(request, "We could not send your message right now. Please try again later.", "danger")
+    except Exception as e:
+        print("SMTP ERROR:", e)
+        add_flash(request, f"Error: {str(e)}", "danger")
+        add_flash(request, "Email service temporarily unavailable.", "danger")
 
     return RedirectResponse(url=str(request.url_for("contact")), status_code=303)
 

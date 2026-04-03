@@ -7,3 +7,9 @@ itsdangerous
 razorpay
 langchain-core
 langchain-groq
+
+# Testing
+pytest
+pytest-cov
+pytest-asyncio
+httpx

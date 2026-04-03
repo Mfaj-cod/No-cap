@@ -27,22 +27,25 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" width="60" class="me-3 rounded">
-                            <span>{{ item.product.name }}</span>
+                            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" width="60" class="me-3 rounded" loading="lazy">
+                            <div>
+                                <div>{{ item.product.name }}</div>
+                                <div class="small text-muted">{{ item.variant_label }} | {{ item.available_stock }} left</div>
+                            </div>
                         </div>
                     </td>
                     <td>{{ item.retail_unit_price|money }}</td>
                     <td>{{ item.wholesale_unit_price|money }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('update_cart', product_id=item.product.id) }}" class="d-flex align-items-center cart-quantity-form">
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm me-2" style="width: 80px;">
+                        <form method="POST" action="{{ url_for('update_cart', cart_key=item.cart_key) }}" class="d-flex align-items-center cart-quantity-form">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.available_stock }}" class="form-control form-control-sm me-2" style="width: 80px;" inputmode="numeric">
                             <button type="submit" class="btn btn-sm btn-warning">Update</button>
                         </form>
                     </td>
                     <td>{{ item.applied_unit_price|money }}</td>
                     <td>{{ item.line_total|money }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.product.id) }}">
+                        <form method="POST" action="{{ url_for('remove_from_cart', cart_key=item.cart_key) }}">
                             <button type="submit" class="btn btn-sm btn-danger">
                                 <i class="bi bi-trash"></i> Remove
                             </button>
@@ -54,9 +57,22 @@
         </table>
     </div>
 
-    <div class="row justify-content-end mt-4">
+    <div class="row g-4 mt-2">
+        <div class="col-lg-7">
+            <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="text-warning">Catalog Integrity</h5>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-images text-warning me-2"></i>Unified product variants</div></div>
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-box-seam text-warning me-2"></i>Live stock validation</div></div>
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-shield-check text-warning me-2"></i>Secure UPI, cards, wallets, and COD</div></div>
+                    </div>
+                    <p class="small text-muted mt-3 mb-0">Retail buyers can go straight to checkout. Shop owners should log in before checkout to unlock wholesale pricing once the cart reaches {{ cart_summary.wholesale_threshold }} caps.</p>
+                </div>
+            </div>
+        </div>
         <div class="col-lg-5">
-            <div class="card bg-dark text-light border-0 shadow-sm">
+            <div class="card bg-dark text-light border-0 shadow-sm checkout-summary-card">
                 <div class="card-body">
                     <h5 class="text-warning">Pricing Summary</h5>
                     <p class="mb-2">Cart quantity: <strong>{{ cart_summary.total_quantity }}</strong> caps</p>
@@ -74,7 +90,7 @@
                     </div>
                     {% elif not current_user %}
                     <div class="alert alert-info border-0 small">
-                        Log in as a shop owner to unlock wholesale pricing at 25+ caps.
+                        Guest checkout is live. For wholesale pricing, log in as a shop owner before checkout.
                     </div>
                     {% endif %}
 
@@ -82,6 +98,14 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="mobile-cta-bar d-md-none">
+        <div>
+            <div class="small text-muted">Total</div>
+            <div class="text-warning fw-semibold">{{ cart_summary.final_total|money }}</div>
+        </div>
+        <a href="{{ url_for('checkout') }}" class="btn btn-warning">Checkout</a>
     </div>
     {% else %}
     <div class="text-center py-5">
@@ -92,3 +116,5 @@
     {% endif %}
 </div>
 {% endblock %}
+
+

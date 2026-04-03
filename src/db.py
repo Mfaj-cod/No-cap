@@ -5,7 +5,7 @@ from typing import Any
 from src.config import settings
 from src.data import CATEGORIES, PRODUCTS, WHOLESALE_DISCOUNT
 
-DB_SCHEMA_VERSION = 2
+DB_SCHEMA_VERSION = 3
 
 
 def get_connection() -> sqlite3.Connection:
@@ -60,6 +60,9 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             image_url TEXT NOT NULL,
             category TEXT NOT NULL,
             details TEXT NOT NULL,
+            attributes TEXT NOT NULL,
+            media_gallery TEXT NOT NULL,
+            variants TEXT NOT NULL,
             reviews TEXT NOT NULL,
             featured INTEGER NOT NULL DEFAULT 0
         );
@@ -92,6 +95,8 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             order_id INTEGER NOT NULL,
             product_id INTEGER NOT NULL,
             product_name TEXT NOT NULL,
+            variant_sku TEXT NOT NULL,
+            variant_label TEXT NOT NULL,
             quantity INTEGER NOT NULL,
             retail_unit_price REAL NOT NULL,
             wholesale_unit_price REAL NOT NULL,
@@ -109,44 +114,77 @@ def _reset_database(connection: sqlite3.Connection) -> None:
     )
 
 
+def _find_variant_by_sku(variants: list[dict[str, Any]], variant_sku: str | None) -> dict[str, Any] | None:
+    if variant_sku:
+        for variant in variants:
+            if variant.get("sku") == variant_sku:
+                return variant
+    for variant in variants:
+        if int(variant.get("stock_quantity", 0)) > 0:
+            return variant
+    return variants[0] if variants else None
+
+
+def format_variant_label(variant: dict[str, Any] | None) -> str:
+    if not variant:
+        return "Default"
+    parts = [variant.get("color"), variant.get("size")]
+    return " / ".join(part for part in parts if part)
+
+
+def get_variant_for_product(product: dict[str, Any], variant_sku: str | None = None) -> dict[str, Any] | None:
+    return _find_variant_by_sku(product.get("variants", []), variant_sku)
+
+
 def _seed_reference_data(connection: sqlite3.Connection) -> None:
-    category_count = connection.execute("SELECT COUNT(*) FROM categories").fetchone()[0]
-    product_count = connection.execute("SELECT COUNT(*) FROM products").fetchone()[0]
-
-    if category_count == 0:
-        connection.executemany(
-            "INSERT INTO categories (name, image_url) VALUES (?, ?)",
-            [(category["name"], category["image_url"]) for category in CATEGORIES],
-        )
-
-    if product_count == 0:
-        connection.executemany(
-            """
-            INSERT INTO products
-                (id, name, description, normal_price, image_url, category, details, reviews, featured)
-            VALUES
-                (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            [
-                (
-                    product["id"],
-                    product["name"],
-                    product["description"],
-                    product["normal_price"],
-                    product["image_url"],
-                    product["category"],
-                    json.dumps(product["details"]),
-                    json.dumps(product["reviews"]),
-                    1 if product.get("featured") else 0,
-                )
-                for product in PRODUCTS
-            ],
-        )
+    connection.executemany(
+        "INSERT OR REPLACE INTO categories (name, image_url) VALUES (?, ?)",
+        [(category["name"], category["image_url"]) for category in CATEGORIES],
+    )
+    connection.executemany(
+        """
+        INSERT OR REPLACE INTO products
+            (
+                id, name, description, normal_price, image_url, category,
+                details, attributes, media_gallery, variants, reviews, featured
+            )
+        VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        [
+            (
+                product["id"],
+                product["name"],
+                product["description"],
+                product["normal_price"],
+                product["image_url"],
+                product["category"],
+                json.dumps(product["details"]),
+                json.dumps(product["attributes"]),
+                json.dumps(product["media_gallery"]),
+                json.dumps(product["variants"]),
+                json.dumps(product["reviews"]),
+                1 if product.get("featured") else 0,
+            )
+            for product in PRODUCTS
+        ],
+    )
 
 
 def _product_from_row(row: sqlite3.Row) -> dict[str, Any]:
     normal_price = float(row["normal_price"])
+    reviews = json.loads(row["reviews"]) if row["reviews"] else []
+    ratings = [review["rating"] for review in reviews if isinstance(review, dict) and "rating" in review]
+    attributes = json.loads(row["attributes"]) if row["attributes"] else {}
+    media_gallery = json.loads(row["media_gallery"]) if row["media_gallery"] else []
+    variants = json.loads(row["variants"]) if row["variants"] else []
+    total_stock = sum(max(int(variant.get("stock_quantity", 0)), 0) for variant in variants)
+    default_variant = _find_variant_by_sku(variants, None)
     shop_owner_price = round(normal_price * (1 - WHOLESALE_DISCOUNT), 2)
+
+    if not media_gallery:
+        media_gallery = [row["image_url"]]
+
     return {
         "id": row["id"],
         "name": row["name"],
@@ -154,9 +192,19 @@ def _product_from_row(row: sqlite3.Row) -> dict[str, Any]:
         "normal_price": normal_price,
         "shop_owner_price": shop_owner_price,
         "image_url": row["image_url"],
+        "media_gallery": media_gallery,
         "category": row["category"],
         "details": json.loads(row["details"]) if row["details"] else [],
-        "reviews": json.loads(row["reviews"]) if row["reviews"] else [],
+        "attributes": attributes,
+        "variants": variants,
+        "default_variant": default_variant,
+        "variant_count": len(variants),
+        "total_stock": total_stock,
+        "in_stock": total_stock > 0,
+        "available_colors": sorted({variant.get("color") for variant in variants if variant.get("color")}),
+        "reviews": reviews,
+        "review_count": len(reviews),
+        "average_rating": round(sum(ratings) / len(ratings), 1) if ratings else None,
         "featured": bool(row["featured"]),
     }
 
@@ -172,7 +220,8 @@ def list_categories() -> list[dict[str, Any]]:
 
 def list_products(category: str | None = None, featured_only: bool = False) -> list[dict[str, Any]]:
     query = """
-        SELECT id, name, description, normal_price, image_url, category, details, reviews, featured
+        SELECT id, name, description, normal_price, image_url, category,
+               details, attributes, media_gallery, variants, reviews, featured
         FROM products
     """
     conditions = []
@@ -200,7 +249,8 @@ def get_product(product_id: int) -> dict[str, Any] | None:
     connection = get_connection()
     row = connection.execute(
         """
-        SELECT id, name, description, normal_price, image_url, category, details, reviews, featured
+        SELECT id, name, description, normal_price, image_url, category,
+               details, attributes, media_gallery, variants, reviews, featured
         FROM products
         WHERE id = ?
         """,
@@ -265,65 +315,100 @@ def create_order(
     connection = get_connection()
     cursor = connection.cursor()
 
-    cursor.execute(
-        """
-        INSERT INTO orders
-            (
-                user_id, name, email, phone, address, city, state, pincode,
-                payment_method, total, status, buyer_role, total_quantity,
-                pricing_tier, discount_amount
-            )
-        VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            user_id,
-            checkout_data["name"],
-            checkout_data["email"],
-            checkout_data["phone"],
-            checkout_data["address"],
-            checkout_data["city"],
-            checkout_data["state"],
-            checkout_data["pincode"],
-            checkout_data["payment_method"],
-            cart_summary["final_total"],
-            "pending",
-            cart_summary["buyer_role"],
-            cart_summary["total_quantity"],
-            cart_summary["pricing_tier"],
-            cart_summary["discount_amount"],
-        ),
-    )
+    try:
+        reserved_variants: list[tuple[int, list[dict[str, Any]]]] = []
+        for item in cart_summary["items"]:
+            row = cursor.execute(
+                "SELECT name, variants FROM products WHERE id = ?",
+                (item["product"]["id"],),
+            ).fetchone()
+            if not row:
+                raise ValueError(f"{item['product']['name']} is no longer available.")
 
-    order_id = cursor.lastrowid
-    cursor.executemany(
-        """
-        INSERT INTO order_items
-            (
-                order_id, product_id, product_name, quantity,
-                retail_unit_price, wholesale_unit_price, applied_unit_price, line_total
-            )
-        VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        [
-            (
-                order_id,
-                item["product"]["id"],
-                item["product"]["name"],
-                item["quantity"],
-                item["retail_unit_price"],
-                item["wholesale_unit_price"],
-                item["applied_unit_price"],
-                item["line_total"],
-            )
-            for item in cart_summary["items"]
-        ],
-    )
+            variants = json.loads(row["variants"]) if row["variants"] else []
+            variant = _find_variant_by_sku(variants, item["variant"]["sku"])
+            if not variant:
+                raise ValueError(f"The selected variant for {row['name']} is no longer available.")
 
-    connection.commit()
-    connection.close()
-    return order_id
+            available_stock = int(variant.get("stock_quantity", 0))
+            if available_stock < item["quantity"]:
+                raise ValueError(
+                    f"Only {available_stock} left for {row['name']} ({format_variant_label(variant)})."
+                )
+
+            variant["stock_quantity"] = available_stock - item["quantity"]
+            reserved_variants.append((item["product"]["id"], variants))
+
+        cursor.execute(
+            """
+            INSERT INTO orders
+                (
+                    user_id, name, email, phone, address, city, state, pincode,
+                    payment_method, total, status, buyer_role, total_quantity,
+                    pricing_tier, discount_amount
+                )
+            VALUES
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                user_id,
+                checkout_data["name"],
+                checkout_data["email"],
+                checkout_data["phone"],
+                checkout_data["address"],
+                checkout_data["city"],
+                checkout_data["state"],
+                checkout_data["pincode"],
+                checkout_data["payment_method"],
+                cart_summary["final_total"],
+                "pending",
+                cart_summary["buyer_role"],
+                cart_summary["total_quantity"],
+                cart_summary["pricing_tier"],
+                cart_summary["discount_amount"],
+            ),
+        )
+
+        order_id = cursor.lastrowid
+        for item in cart_summary["items"]:
+            cursor.execute(
+                """
+                INSERT INTO order_items
+                    (
+                        order_id, product_id, product_name, variant_sku, variant_label,
+                        quantity, retail_unit_price, wholesale_unit_price,
+                        applied_unit_price, line_total
+                    )
+                VALUES
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    order_id,
+                    item["product"]["id"],
+                    item["product"]["name"],
+                    item["variant"]["sku"],
+                    item["variant_label"],
+                    item["quantity"],
+                    item["retail_unit_price"],
+                    item["wholesale_unit_price"],
+                    item["applied_unit_price"],
+                    item["line_total"],
+                ),
+            )
+
+        for product_id, updated_variants in reserved_variants:
+            cursor.execute(
+                "UPDATE products SET variants = ? WHERE id = ?",
+                (json.dumps(updated_variants), product_id),
+            )
+
+        connection.commit()
+        return order_id
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
 
 def attach_razorpay_order(order_id: int, razorpay_order_id: str) -> None:
@@ -355,6 +440,116 @@ def mark_order_paid(order_id: int, payment_id: str) -> None:
     connection.commit()
     connection.close()
 
+
+def cancel_order_and_restore_stock(order_id: int) -> bool:
+    connection = get_connection()
+    cursor = connection.cursor()
+    order = cursor.execute(
+        "SELECT status FROM orders WHERE id = ?",
+        (order_id,),
+    ).fetchone()
+
+    if not order or order["status"] != "pending":
+        connection.close()
+        return False
+
+    items = cursor.execute(
+        "SELECT product_id, quantity, variant_sku FROM order_items WHERE order_id = ?",
+        (order_id,),
+    ).fetchall()
+
+    try:
+        for item in items:
+            row = cursor.execute(
+                "SELECT variants FROM products WHERE id = ?",
+                (item["product_id"],),
+            ).fetchone()
+            if not row:
+                continue
+            variants = json.loads(row["variants"]) if row["variants"] else []
+            variant = _find_variant_by_sku(variants, item["variant_sku"])
+            if variant:
+                variant["stock_quantity"] = int(variant.get("stock_quantity", 0)) + int(item["quantity"])
+                cursor.execute(
+                    "UPDATE products SET variants = ? WHERE id = ?",
+                    (json.dumps(variants), item["product_id"]),
+                )
+
+        cursor.execute(
+            "UPDATE orders SET status = ? WHERE id = ?",
+            ("cancelled", order_id),
+        )
+        connection.commit()
+        return True
+    finally:
+        connection.close()
+
+
+
+def get_recent_order_activity(email: str, phone: str, address: str, pincode: str, minutes: int = 30) -> dict[str, int]:
+    normalized_email = email.strip().lower()
+    normalized_phone = phone.strip()
+    normalized_address = address.strip().lower()
+    normalized_pincode = pincode.strip()
+    window = f"-{minutes} minutes"
+
+    connection = get_connection()
+    activity_row = connection.execute(
+        """
+        SELECT COUNT(*) AS recent_attempts,
+               SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS recent_cancelled,
+               SUM(CASE WHEN lower(email) = ? THEN 1 ELSE 0 END) AS recent_email_matches,
+               SUM(CASE WHEN phone = ? THEN 1 ELSE 0 END) AS recent_phone_matches,
+               SUM(CASE WHEN lower(trim(address)) = ? AND pincode = ? THEN 1 ELSE 0 END) AS recent_address_matches
+        FROM orders
+        WHERE created_at >= datetime('now', ?)
+          AND (
+              lower(email) = ?
+              OR phone = ?
+              OR (lower(trim(address)) = ? AND pincode = ?)
+          )
+        """,
+        (
+            normalized_email,
+            normalized_phone,
+            normalized_address,
+            normalized_pincode,
+            window,
+            normalized_email,
+            normalized_phone,
+            normalized_address,
+            normalized_pincode,
+        ),
+    ).fetchone()
+
+    distinct_email_row = connection.execute(
+        """
+        SELECT COUNT(DISTINCT lower(email)) AS distinct_emails_for_phone
+        FROM orders
+        WHERE created_at >= datetime('now', ?) AND phone = ?
+        """,
+        (window, normalized_phone),
+    ).fetchone()
+
+    distinct_phone_row = connection.execute(
+        """
+        SELECT COUNT(DISTINCT phone) AS distinct_phones_for_email
+        FROM orders
+        WHERE created_at >= datetime('now', ?) AND lower(email) = ?
+        """,
+        (window, normalized_email),
+    ).fetchone()
+    connection.close()
+
+    return {
+        "recent_attempts": int(activity_row["recent_attempts"] or 0),
+        "recent_cancelled": int(activity_row["recent_cancelled"] or 0),
+        "recent_email_matches": int(activity_row["recent_email_matches"] or 0),
+        "recent_phone_matches": int(activity_row["recent_phone_matches"] or 0),
+        "recent_address_matches": int(activity_row["recent_address_matches"] or 0),
+        "distinct_emails_for_phone": int(distinct_email_row["distinct_emails_for_phone"] or 0),
+        "distinct_phones_for_email": int(distinct_phone_row["distinct_phones_for_email"] or 0),
+    }
 
 def list_orders_for_user(user_id: int) -> list[dict[str, Any]]:
     connection = get_connection()
@@ -393,7 +588,8 @@ def get_order(order_id: int) -> dict[str, Any] | None:
     order = dict(row)
     item_rows = connection.execute(
         """
-        SELECT product_name, quantity, retail_unit_price, wholesale_unit_price,
+        SELECT product_name, variant_sku, variant_label, quantity,
+               retail_unit_price, wholesale_unit_price,
                applied_unit_price, line_total
         FROM order_items
         WHERE order_id = ?
@@ -404,4 +600,5 @@ def get_order(order_id: int) -> dict[str, Any] | None:
     connection.close()
     order["items"] = [dict(item_row) for item_row in item_rows]
     return order
+
 
