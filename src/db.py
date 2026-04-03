@@ -30,14 +30,7 @@ def init_database() -> None:
 def _reset_database(connection: sqlite3.Connection) -> None:
     connection.executescript(
         """
-        DROP TABLE IF EXISTS order_items;
-        DROP TABLE IF EXISTS orders;
-        DROP TABLE IF EXISTS users;
-        DROP TABLE IF EXISTS products;
-        DROP TABLE IF EXISTS categories;
-        DROP TABLE IF EXISTS subscriptions;
-
-        CREATE TABLE users (
+        CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
@@ -46,13 +39,13 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
-        CREATE TABLE categories (
+        CREATE TABLE IF NOT EXISTS categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE,
             image_url TEXT NOT NULL
         );
 
-        CREATE TABLE products (
+        CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             description TEXT NOT NULL,
@@ -67,7 +60,7 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             featured INTEGER NOT NULL DEFAULT 0
         );
 
-        CREATE TABLE orders (
+        CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
@@ -90,7 +83,7 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             FOREIGN KEY(user_id) REFERENCES users(id)
         );
 
-        CREATE TABLE order_items (
+        CREATE TABLE IF NOT EXISTS order_items (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_id INTEGER NOT NULL,
             product_id INTEGER NOT NULL,
@@ -105,7 +98,7 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             FOREIGN KEY(order_id) REFERENCES orders(id)
         );
 
-        CREATE TABLE subscriptions (
+        CREATE TABLE IF NOT EXISTS subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT NOT NULL UNIQUE,
             subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

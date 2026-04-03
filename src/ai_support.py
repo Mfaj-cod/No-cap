@@ -38,7 +38,7 @@ def generate_support_response(message: str) -> str:
             (
                 "system",
                 (
-                    "You are the customer care assistant for Apna Swad Caps. "
+                    "You are the customer care assistant for Nocaps. "
                     "Answer only with the store policies and catalog provided. "
                     "If someone asks for order-specific status, explain that the public assistant "
                     "cannot access private order data and direct them to the account or contact page. "
