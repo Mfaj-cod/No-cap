@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 import os, sqlite3, razorpay, smtplib
 from email.mime.text import MIMEText
 from random import random
-from init_db import init_db, insert_products, insert_categories
-from data import PRODUCTS, CATEGORIES
+from src.init_db import init_db, insert_products, insert_categories
+from src.data import PRODUCTS, CATEGORIES
 import json
 
 
