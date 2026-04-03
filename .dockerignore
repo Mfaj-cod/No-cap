@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+spicenv/
+.env
+store.db
+.pytest_cache/
+.vscode/

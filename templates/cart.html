@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %}Apna Swad - Cart{% endblock %}
+{% block title %}Cart - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container text-center py-5">
-    <h2 class="mb-4 text-warning">
+<div class="container py-5">
+    <h2 class="mb-4 text-warning text-center">
         <i class="bi bi-cart3 me-2"></i>Your Shopping Cart
     </h2>
 
-    {% if cart_items %}
+    {% if cart_summary["items"] %}
     <div class="table-responsive bg-dark text-light p-3 rounded shadow-sm">
         <table class="table table-dark table-hover align-middle mb-0">
             <thead>
                 <tr>
                     <th scope="col">Product</th>
-                    <th scope="col">Price</th>
+                    <th scope="col">Retail</th>
+                    <th scope="col">Wholesale</th>
                     <th scope="col">Quantity</th>
+                    <th scope="col">Applied Price</th>
                     <th scope="col">Subtotal</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in cart_items %}
+                {% for item in cart_summary["items"] %}
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
@@ -29,16 +31,18 @@
                             <span>{{ item.product.name }}</span>
                         </div>
                     </td>
-                    <td>₹{{ item.product.price }}</td>
+                    <td>{{ item.retail_unit_price|money }}</td>
+                    <td>{{ item.wholesale_unit_price|money }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('update_cart', pid=item.product.id) }}" class="d-flex align-items-center">
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm me-2" style="width: 70px;">
+                        <form method="POST" action="{{ url_for('update_cart', product_id=item.product.id) }}" class="d-flex align-items-center cart-quantity-form">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm me-2" style="width: 80px;">
                             <button type="submit" class="btn btn-sm btn-warning">Update</button>
                         </form>
                     </td>
-                    <td>₹{{ item.subtotal }}</td>
+                    <td>{{ item.applied_unit_price|money }}</td>
+                    <td>{{ item.line_total|money }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('remove_from_cart', pid=item.product.id) }}">
+                        <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.product.id) }}">
                             <button type="submit" class="btn btn-sm btn-danger">
                                 <i class="bi bi-trash"></i> Remove
                             </button>
@@ -50,20 +54,41 @@
         </table>
     </div>
 
-    <div class="d-flex justify-content-end mt-4">
-        <div class="text-end">
-            <h5>Total: <span class="text-warning">₹{{ cart_total }}</span></h5>
-            <a href="{{ url_for('checkout') }}" class="btn btn-warning btn-lg mt-2">
-                Proceed to Checkout
-            </a>
+    <div class="row justify-content-end mt-4">
+        <div class="col-lg-5">
+            <div class="card bg-dark text-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="text-warning">Pricing Summary</h5>
+                    <p class="mb-2">Cart quantity: <strong>{{ cart_summary.total_quantity }}</strong> caps</p>
+                    <p class="mb-2">Retail subtotal: <strong>{{ cart_summary.retail_subtotal|money }}</strong></p>
+                    <p class="mb-2">Discount: <strong class="text-warning">{{ cart_summary.discount_amount|money }}</strong></p>
+                    <p class="mb-3">Final total: <strong class="text-warning fs-5">{{ cart_summary.final_total|money }}</strong></p>
+
+                    {% if current_user and current_user.role == 'shop_owner' and not cart_summary.wholesale_eligible %}
+                    <div class="alert alert-info border-0 small">
+                        Add {{ cart_summary.remaining_to_wholesale }} more caps to unlock wholesale pricing.
+                    </div>
+                    {% elif current_user and current_user.role == 'shop_owner' and cart_summary.wholesale_eligible %}
+                    <div class="alert alert-success border-0 small">
+                        Wholesale pricing is active for this order.
+                    </div>
+                    {% elif not current_user %}
+                    <div class="alert alert-info border-0 small">
+                        Log in as a shop owner to unlock wholesale pricing at 25+ caps.
+                    </div>
+                    {% endif %}
+
+                    <a href="{{ url_for('checkout') }}" class="btn btn-warning btn-lg mt-2 w-100">Proceed to Checkout</a>
+                </div>
+            </div>
         </div>
     </div>
     {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-cart-x fs-1 mb-3"></i>
-            <h4>Your cart is empty</h4>
-            <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Continue Shopping</a>
-        </div>
+    <div class="text-center py-5">
+        <i class="bi bi-cart-x fs-1 mb-3"></i>
+        <h4>Your cart is empty</h4>
+        <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Continue Shopping</a>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

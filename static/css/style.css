@@ -23,6 +23,53 @@ body * {
     z-index: 1;
 }
 
+.role-banner {
+    backdrop-filter: blur(14px);
+}
+
+.chat-shell {
+    min-height: 460px;
+}
+
+.chat-messages {
+    min-height: 300px;
+    max-height: 420px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.chat-bubble {
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    max-width: 90%;
+    line-height: 1.5;
+}
+
+.chat-bubble.assistant {
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.35);
+    align-self: flex-start;
+}
+
+.chat-bubble.user {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    align-self: flex-end;
+}
+
+.form-control,
+.form-select {
+    background-color: rgba(255, 255, 255, 0.94);
+    border: none;
+}
+
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
 
 
 

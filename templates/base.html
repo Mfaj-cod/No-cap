@@ -3,158 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Apna Swad{% endblock %}</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/css/style.css">
-    
-    <!-- Additional head content -->
-    {% block head %}
+    <title>{% block title %}{{ store_name }}{% endblock %}</title>
 
-    {% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+
+    {% block head %}{% endblock %}
 </head>
 
 <body class="bg-grey text-light">
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-transparent shadow-lg sticky-top">
         <div class="container">
-            <!-- Brand Logo -->
             <a class="navbar-brand fw-bold fs-3" href="{{ url_for('index') }}">
-                <i class="bi bi-flower2 text-success me-2"></i>
+                <i class="bi bi-bag-check text-success me-2"></i>
                 Apna<span class="text-warning">Swad</span>
             </a>
-            
-            <!-- Mobile Toggle Button -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" 
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
                     aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
-            <!-- Navigation Menu -->
+
             <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-warning ms-2 px-3" href="{{ url_for('index') }}">
-                            <!-- <i class="bi bi-house me-1"></i> -->
-                            Home
-                        </a>
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('index') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-warning ms-2 px-3" href="{{ url_for('about') }}">
-                            <!-- <i class="bi bi-info-circle me-1"></i> -->
-                            About
-                        </a>
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('about') }}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-warning ms-2 px-3" href="{{ url_for('contact') }}">
-                            <!-- <i class="bi bi-envelope me-1"></i> -->
-                            Contact
-                        </a>
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('contact') }}">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-warning ms-2 px-3" href="{{ url_for('cart') }}">
-                            <!-- <i class="bi bi-cart3 me-1"></i> -->
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('customer_care_page') }}">Customer Care AI</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3 position-relative" href="{{ url_for('cart') }}">
                             Cart
+                            {% if cart_count %}
+                            <span class="badge rounded-pill text-bg-warning text-dark ms-1">{{ cart_count }}</span>
+                            {% endif %}
                         </a>
                     </li>
+                    {% if current_user %}
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('account') }}">
+                            {{ current_user.name }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-warning text-dark ms-lg-2 px-3" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-warning text-dark ms-lg-2 px-3" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="container mt-3">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} 
-                                alert-dismissible fade show" role="alert">
-                        <i class="bi bi-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+    {% if current_user %}
+    <div class="container mt-3">
+        <div class="role-banner bg-dark border border-warning rounded-4 p-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+            <div>
+                <span class="text-warning fw-semibold">{{ current_user.role.replace('_', ' ')|title }}</span>
+                <span class="text-light small ms-md-2">Wholesale pricing unlocks automatically at 25+ caps for shop owners.</span>
             </div>
-        {% endif %}
-    {% endwith %}
+            <a href="{{ url_for('account') }}" class="btn btn-outline-warning btn-sm mt-3 mt-md-0">View Account</a>
+        </div>
+    </div>
+    {% endif %}
 
-    <!-- Main Content -->
+    {% if flash_messages %}
+    <div class="container mt-3">
+        {% for item in flash_messages %}
+        <div class="alert alert-{{ 'success' if item.category == 'success' else 'danger' if item.category == 'danger' else 'info' }} alert-dismissible fade show" role="alert">
+            <i class="bi bi-{{ 'check-circle' if item.category == 'success' else 'exclamation-triangle' if item.category == 'danger' else 'info-circle' }} me-2"></i>
+            {{ item.message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <main class="container-fluid px-0">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
     <footer class="bg-blur text-light py-5 mt-5 border-top border-secondary">
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <h5 class="text-warning mb-3">
-                        <i class="bi bi-flower1 me-2"></i>Apna Swad
+                        <i class="bi bi-bag-check me-2"></i>{{ store_name }}
                     </h5>
                     <p class="small">
-                        Authentic spices from the heart of Bihar, bringing the rich flavors 
-                        of Northern India to your kitchen.
+                        Curated caps for everyday customers, teams, retailers, and shop owners who need dependable
+                        style with bulk-friendly pricing.
                     </p>
                     <div class="social-links">
-                        <a href="#" class="text-warning me-3 hover-effect">
-                            <i class="bi bi-facebook fs-5"></i>
-                        </a>
-                        <a href="#" class="text-warning me-3 hover-effect">
-                            <i class="bi bi-instagram fs-5"></i>
-                        </a>
-                        <a href="#" class="text-warning me-3 hover-effect">
-                            <i class="bi bi-twitter fs-5"></i>
-                        </a>
-                        <a href="#" class="text-warning hover-effect">
-                            <i class="bi bi-youtube fs-5"></i>
-                        </a>
+                        <a href="#" class="text-warning me-3 hover-effect"><i class="bi bi-facebook fs-5"></i></a>
+                        <a href="#" class="text-warning me-3 hover-effect"><i class="bi bi-instagram fs-5"></i></a>
+                        <a href="#" class="text-warning me-3 hover-effect"><i class="bi bi-twitter fs-5"></i></a>
+                        <a href="#" class="text-warning hover-effect"><i class="bi bi-youtube fs-5"></i></a>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="text-warning mb-3">Quick Links</h6>
+                    <h6 class="text-warning mb-3">Browse</h6>
                     <ul class="list-unstyled small">
-                        <li><a href="{{url_for('index')}}" class="text-light text-decoration-none hover-effect">Home</a></li>
+                        <li><a href="{{ url_for('index') }}" class="text-light text-decoration-none hover-effect">Home</a></li>
                         <li><a href="#products" class="text-light text-decoration-none hover-effect">Products</a></li>
-                        <li><a href="{{url_for('about')}}" class="text-light text-decoration-none hover-effect">About Us</a></li>
-                        <li><a href="{{url_for('contact')}}" class="text-light text-decoration-none hover-effect">Contact</a></li>
+                        <li><a href="{{ url_for('about') }}" class="text-light text-decoration-none hover-effect">About Us</a></li>
+                        <li><a href="{{ url_for('customer_care_page') }}" class="text-light text-decoration-none hover-effect">Customer Care AI</a></li>
                     </ul>
                 </div>
-            
-                
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="text-warning mb-3">Wholesale</h6>
+                    <div class="small">
+                        <p class="mb-2">Shop owners unlock {{ wholesale_discount_percent }}% off automatically at 25+ caps in one cart.</p>
+                        <p class="mb-2">Mixed cap styles count toward the threshold.</p>
+                        <p class="mb-0">Retail pricing still works for smaller test orders.</p>
+                    </div>
+                </div>
+
                 <div class="col-lg-3 mb-4">
                     <h6 class="text-warning mb-3">Contact Info</h6>
                     <div class="small">
-                        <p class="mb-2">
-                            <i class="bi bi-geo-alt me-2"></i>
-                            Bihar, India
-                        </p>
-                        <p class="mb-2">
-                            <i class="bi bi-telephone me-2"></i>
-                            +91 123 456 7890
-                        </p>
-                        <p class="mb-2">
-                            <i class="bi bi-envelope me-2"></i>
-                            info@keralaspices.com
-                        </p>
+                        <p class="mb-2"><i class="bi bi-geo-alt me-2"></i>Bihar, India</p>
+                        <p class="mb-2"><i class="bi bi-telephone me-2"></i>+91 123 456 7890</p>
+                        <p class="mb-2"><i class="bi bi-envelope me-2"></i>support@apnaswadcaps.com</p>
                     </div>
                 </div>
             </div>
-            
+
             <hr class="border-secondary my-4">
-            
+
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="small mb-0">
-                        © 2025 Apna Swad. All rights reserved.
-                    </p>
+                    <p class="small mb-0">&copy; {{ current_year }} {{ store_name }}. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="small mb-0">
@@ -166,20 +161,12 @@
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
     <button type="button" class="btn btn-warning btn-floating" id="backToTop" title="Back to top">
         <i class="bi bi-arrow-up"></i>
     </button>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JavaScript -->
-    <script src="/static/js/app.js"></script>
-    
-    <!-- Additional scripts -->
-    {% block scripts %}
-    
-    {% endblock %}
+    <script src="{{ url_for('static', path='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

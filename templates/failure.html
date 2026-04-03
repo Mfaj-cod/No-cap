@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Incomplete - {{ store_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card bg-dark text-light shadow-lg border-0 p-5">
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-4"></i>
+                <h2 class="text-warning mb-3">Payment Not Completed</h2>
+                <p class="mb-4">Your order has not been fully paid yet. You can return to checkout and try again.</p>
+                {% if order_id %}
+                <p class="small text-muted">Pending order reference: #{{ order_id }}</p>
+                {% endif %}
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{{ url_for('checkout') }}" class="btn btn-warning btn-lg">Back to Checkout</a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-warning btn-lg">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Checkout - Apna Swad{% endblock %}
+{% block title %}Checkout - {{ store_name }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -8,93 +8,144 @@
         <i class="bi bi-credit-card me-2"></i>Checkout
     </h2>
 
-    {% if cart_items %}
+    {% if cart_summary["items"] %}
     <div class="row">
-        <!-- Billing Details Form -->
         <div class="col-lg-7 mb-4">
-            <div class="card bg-dark text-light shadow-sm">
+            <div class="card bg-dark text-light shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="card-title mb-3">Billing Details</h5>
-                    <form method="POST" action="{{ url_for('checkout') }}">
+                    <form method="POST" action="{{ url_for('place_order') }}" id="checkoutForm">
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ checkout_defaults['name'] }}" required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ checkout_defaults['email'] }}" required>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ checkout_phone }}" required>
                         </div>
                         <div class="mb-3">
                             <label for="address" class="form-label">Delivery Address</label>
-                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                            <textarea class="form-control" id="address" name="address" rows="3" required>{{ checkout_address }}</textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="city" class="form-label">City</label>
-                            <input type="text" class="form-control" id="city" name="city" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="state" class="form-label">State</label>
-                            <input type="text" class="form-control" id="state" name="state" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pincode" class="form-label">Pincode</label>
-                            <input type="text" class="form-control" id="pincode" name="pincode" required>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" value="{{ checkout_city }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="state" class="form-label">State</label>
+                                <input type="text" class="form-control" id="state" name="state" value="{{ checkout_state }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="pincode" class="form-label">Pincode</label>
+                                <input type="text" class="form-control" id="pincode" name="pincode" value="{{ checkout_pincode }}" required>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="payment_method" class="form-label">Payment Method</label>
                             <select class="form-select" id="payment_method" name="payment_method" required>
-                                <option value="cod">Cash on Delivery</option>
-                                <option value="upi">UPI</option>
-                                <option value="card">Credit/Debit Card</option>
+                                <option value="cod" {% if selected_payment_method == 'cod' %}selected{% endif %}>Cash on Delivery</option>
+                                <option value="upi" {% if selected_payment_method == 'upi' %}selected{% endif %}>UPI via Razorpay</option>
+                                <option value="card" {% if selected_payment_method == 'card' %}selected{% endif %}>Credit or Debit Card via Razorpay</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-warning btn-lg mt-3">Place Order</button>
+                        <button type="submit" class="btn btn-warning btn-lg mt-3 w-100">Place Order</button>
                     </form>
+
+                    {% if razorpay_order and pending_order_id %}
+                    <div class="card bg-black border border-warning mt-4">
+                        <div class="card-body">
+                            <h6 class="text-warning">Online Payment Required</h6>
+                            <p class="small text-muted">Your order has been created. Complete the Razorpay payment below to confirm it.</p>
+                            <button type="button" class="btn btn-warning w-100" id="razorpayButton">Pay with Razorpay</button>
+                            <form method="POST" action="{{ url_for('payment_success') }}" id="paymentSuccessForm" class="d-none">
+                                <input type="hidden" name="order_id" value="{{ pending_order_id }}">
+                                <input type="hidden" name="razorpay_payment_id" id="razorpayPaymentId">
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Order Summary -->
         <div class="col-lg-5 mb-4">
-            <div class="card bg-dark text-light shadow-sm">
+            <div class="card bg-dark text-light shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="card-title mb-3">Order Summary</h5>
                     <ul class="list-group list-group-flush mb-3">
-                        {% for item in cart_items %}
+                        {% for item in cart_summary["items"] %}
                         <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center">
                             <div>
                                 <strong>{{ item.product.name }}</strong>
-                                <form method="POST" action="{{ url_for('update_cart', pid=item.product.id) }}" class="d-inline-flex ms-2">
-                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm me-2" style="width: 70px;">
-                                    <button type="submit" class="btn btn-sm btn-warning">Update</button>
-                                </form>
-                                <form method="POST" action="{{ url_for('remove_from_cart', pid=item.product.id) }}" class="d-inline ms-2">
-                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
-                                </form>
+                                <div class="small text-muted">{{ item.quantity }} x {{ item.applied_unit_price|money }}</div>
                             </div>
-                            <span>₹{{ item.product.price * item.quantity }}</span>
+                            <span>{{ item.line_total|money }}</span>
                         </li>
                         {% endfor %}
                     </ul>
                     <hr class="border-secondary">
+                    <p class="d-flex justify-content-between mb-2"><span>Quantity</span><span>{{ cart_summary.total_quantity }} caps</span></p>
+                    <p class="d-flex justify-content-between mb-2"><span>Retail subtotal</span><span>{{ cart_summary.retail_subtotal|money }}</span></p>
+                    <p class="d-flex justify-content-between mb-2"><span>Discount</span><span class="text-warning">{{ cart_summary.discount_amount|money }}</span></p>
                     <h5 class="d-flex justify-content-between">
-                        <span>Total:</span>
-                        <span class="text-warning">₹{{ cart_total }}</span>
+                        <span>Total</span>
+                        <span class="text-warning">{{ cart_summary.final_total|money }}</span>
                     </h5>
+
+                    {% if current_user.role == 'shop_owner' and not cart_summary.wholesale_eligible %}
+                    <div class="alert alert-info border-0 mt-3 small">
+                        Add {{ cart_summary.remaining_to_wholesale }} more caps to unlock wholesale pricing on this order.
+                    </div>
+                    {% elif current_user.role == 'shop_owner' and cart_summary.wholesale_eligible %}
+                    <div class="alert alert-success border-0 mt-3 small">
+                        Wholesale pricing is active for this order.
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
     {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-cart-x fs-1 mb-3"></i>
-            <h4>Your cart is empty</h4>
-            <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Continue Shopping</a>
-        </div>
+    <div class="text-center py-5">
+        <i class="bi bi-cart-x fs-1 mb-3"></i>
+        <h4>Your cart is empty</h4>
+        <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Continue Shopping</a>
+    </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if razorpay_order and pending_order_id %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('razorpayButton').addEventListener('click', function () {
+    const options = {
+        key: "{{ razorpay_key_id }}",
+        amount: "{{ razorpay_order.amount }}",
+        currency: "{{ razorpay_order.currency }}",
+        name: "{{ store_name }}",
+        description: "Cap order payment",
+        order_id: "{{ razorpay_order.id }}",
+        handler: function (response) {
+            document.getElementById('razorpayPaymentId').value = response.razorpay_payment_id;
+            document.getElementById('paymentSuccessForm').submit();
+        },
+        modal: {
+            ondismiss: function () {
+                window.location.href = "{{ url_for('failure') }}?order_id={{ pending_order_id }}";
+            }
+        }
+    };
+
+    const razorpayCheckout = new Razorpay(options);
+    razorpayCheckout.open();
+});
+</script>
+{% endif %}
 {% endblock %}

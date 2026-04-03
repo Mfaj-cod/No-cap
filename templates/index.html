@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Apna Swad{% endblock %}
+{% block title %}Home - {{ store_name }}{% endblock %}
 
 {% block head %}
 <style>
-/* Hero Animations */
 @keyframes fadeInUp {
     0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
@@ -38,36 +37,77 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
 <section class="hero-section text-center py-5 bg-transparent position-relative">
     <div class="container">
-        <h1 class="display-4 fw-bold text-warning hero-text">Experience the Rich Flavors of Bihar</h1>
-        <p class="lead text-light mt-3 hero-text" style="animation-delay: 0.3s;">Fresh, Authentic Spices Delivered to Your Doorstep</p>
+        <h1 class="display-4 fw-bold text-warning hero-text">Caps for Daily Wear, Teams, and Retail Shelves</h1>
+        <p class="lead text-light mt-3 hero-text" style="animation-delay: 0.3s;">
+            Shop sports, casual, snapback, trucker, dad cap, and beanie styles with automatic wholesale pricing for shop owners.
+        </p>
         <a href="#products" class="btn btn-warning btn-lg mt-4 hero-text" style="animation-delay: 0.6s;">
             Shop Now <i class="bi bi-arrow-right"></i>
         </a>
     </div>
 </section>
 
-<!-- Featured Products Carousel -->
+<section class="py-3">
+    <div class="container">
+        <div class="row g-3 text-center">
+            <div class="col-md-4">
+                <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-person-heart text-warning fs-2"></i>
+                        <h5 class="mt-3">Retail Friendly</h5>
+                        <p class="small text-muted mb-0">Buy a single cap or build your everyday collection with the same clean storefront flow.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-shop text-warning fs-2"></i>
+                        <h5 class="mt-3">Wholesale Ready</h5>
+                        <p class="small text-muted mb-0">Shop owners unlock {{ wholesale_discount_percent }}% off at 25+ caps across mixed styles in the same cart.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-headset text-warning fs-2"></i>
+                        <h5 class="mt-3">AI Customer Care</h5>
+                        <p class="small text-muted mb-0">Use the customer care assistant for product, pricing, bulk-order, shipping, and return guidance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section id="products" class="py-5">
     <div class="container">
-        <h2 class="mb-4 text-warning text-center">Featured Products</h2>
+        <h2 class="mb-4 text-warning text-center">Featured Caps</h2>
         <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 {% for product in featured_products %}
                 <div class="carousel-item {% if loop.first %}active{% endif %}">
                     <div class="row justify-content-center">
-                        <div class="col-md-4">
+                        <div class="col-lg-5 col-md-7">
                             <div class="card bg-dark text-light shadow product-card text-center border-0">
                                 <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}">
                                 <div class="card-body">
-                                    <form method="POST" action="{{ url_for('add_to_cart', pid=product.id) }}">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn btn-warning btn-sm">
-                                            <i class="bi bi-cart3 me-1"></i> Add to Cart
-                                        </button>
-                                    </form>
+                                    <h4 class="card-title text-warning">{{ product.name }}</h4>
+                                    <p class="card-text text-muted">{{ product.description }}</p>
+                                    <p class="mb-1">Retail: <span class="text-warning">{{ product.normal_price|money }}</span></p>
+                                    <p class="small text-muted">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
+                                    <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+                                        <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-cart3 me-1"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                        <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-outline-warning btn-sm">View Product</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -87,18 +127,17 @@
     </div>
 </section>
 
-<!-- Categories Section -->
 <section class="py-5 bg-transparent">
     <div class="container">
         <h2 class="mb-4 text-warning text-center">Shop by Category</h2>
         <div class="row g-4">
             {% for category in categories %}
-            <div class="col-md-3 col-sm-6 scroll-reveal">
+            <div class="col-md-4 col-lg-2 scroll-reveal">
                 <a href="{{ url_for('category', category_name=category.name) }}" class="text-decoration-none">
-                    <div class="card bg-dark text-light text-center category-card shadow border-0">
+                    <div class="card bg-dark text-light text-center category-card shadow border-0 h-100">
                         <img src="{{ category.image_url }}" class="card-img-top p-3" alt="{{ category.name }}">
                         <div class="card-body">
-                            <h5 class="card-title">{{ category.name }}</h5>
+                            <h6 class="card-title mb-0">{{ category.name }}</h6>
                         </div>
                     </div>
                 </a>
@@ -108,29 +147,29 @@
     </div>
 </section>
 
-<!-- About Section -->
 <section id="about" class="py-5">
     <div class="container scroll-reveal">
-        <h2 class="mb-4 text-warning text-center">About Apna Swad Spices</h2>
+        <h2 class="mb-4 text-warning text-center">Built for Modern Cap Buyers</h2>
         <div class="row align-items-center">
             <div class="col-md-6">
-                <img src="/static/images/about-spices.jpg" class="img-fluid rounded shadow" alt="About Spices">
+                <img src="{{ url_for('static', path='img/logo.jpg') }}" class="img-fluid rounded shadow" alt="Apna Swad Caps">
             </div>
             <div class="col-md-6 text-light">
-                <p>Bihar is known as the land of spices. At Apna Swad Store, we bring you authentic spices 
-                sourced directly from local farms. Our range includes whole spices, ground spices, and unique blends 
-                that add flavor and aroma to every dish.</p>
-                <a href="#products" class="btn btn-warning mt-3">Browse Products</a>
+                <p>Apna Swad Caps now brings together sports, casual, snapback, trucker, dad cap, and beanie styles in one store while keeping the bold visual identity you already know.</p>
+                <p>Normal customers can shop freely, and shop owners can log in with wholesale accounts to unlock automatic bulk pricing once the cart reaches 25 pieces.</p>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a href="#products" class="btn btn-warning">Browse Products</a>
+                    <a href="{{ url_for('customer_care_page') }}" class="btn btn-outline-warning">Ask Customer Care AI</a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Newsletter Section -->
 <section class="py-5 bg-transparent text-center scroll-reveal">
     <div class="container">
-        <h3 class="text-warning mb-3">Subscribe to Our Newsletter</h3>
-        <p class="text-light mb-4">Get exclusive offers and updates on new spices and blends.</p>
+        <h3 class="text-warning mb-3">Subscribe for New Drops and Bulk Offers</h3>
+        <p class="text-light mb-4">Get updates on new cap styles, seasonal launches, and wholesale-friendly pricing windows.</p>
         <form method="POST" action="{{ url_for('subscribe') }}" class="row justify-content-center">
             <div class="col-md-5 mb-2">
                 <input type="email" class="form-control form-control-lg" name="email" placeholder="Enter your email" required>
@@ -145,7 +184,6 @@
 
 {% block scripts %}
 <script>
-// Scroll Reveal Animation
 const revealElements = document.querySelectorAll('.scroll-reveal');
 function revealOnScroll() {
     const windowHeight = window.innerHeight;

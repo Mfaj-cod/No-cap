@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Order Success - Apna Swad{% endblock %}
+{% block title %}Order Success - {{ store_name }}{% endblock %}
 
 {% block content %}
 <div class="container py-5 text-center">
@@ -9,7 +9,7 @@
             <div class="card bg-dark text-light shadow-lg border-0 p-5">
                 <i class="bi bi-check-circle-fill text-warning fs-1 mb-4"></i>
                 <h2 class="text-warning mb-3">Thank You!</h2>
-                <p class="mb-4">Your order has been placed successfully. We are preparing your spices and will deliver them soon.</p>
+                <p class="mb-4">Your cap order has been placed successfully. We are getting it ready for dispatch.</p>
 
                 {% if order %}
                 <div class="text-start mb-4">
@@ -17,14 +17,47 @@
                     <p><strong>Order ID:</strong> {{ order.id }}</p>
                     <p><strong>Name:</strong> {{ order.name }}</p>
                     <p><strong>Email:</strong> {{ order.email }}</p>
-                    <p><strong>Total Amount:</strong> ₹{{ order.total }}</p>
-                    <p><strong>Payment Method:</strong> {{ order.payment_method|capitalize }}</p>
+                    <p><strong>Status:</strong> {{ order.status|title }}</p>
+                    <p><strong>Pricing Tier:</strong> {{ order.pricing_tier.replace('_', ' ')|title }}</p>
+                    <p><strong>Total Quantity:</strong> {{ order.total_quantity }} caps</p>
+                    <p><strong>Discount:</strong> {{ order.discount_amount|money }}</p>
+                    <p><strong>Total Amount:</strong> {{ order.total|money }}</p>
+                    <p><strong>Payment Method:</strong> {{ order.payment_method|upper }}</p>
+                </div>
+
+                <div class="text-start mb-4">
+                    <h5 class="text-warning">Items</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Unit</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order["items"] %}
+                                <tr>
+                                    <td>{{ item.product_name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.applied_unit_price|money }}</td>
+                                    <td>{{ item.line_total|money }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 {% endif %}
 
-                <a href="{{ url_for('index') }}" class="btn btn-warning btn-lg">
-                    <i class="bi bi-arrow-left me-2"></i>Continue Shopping
-                </a>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{{ url_for('index') }}" class="btn btn-warning btn-lg">
+                        <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                    </a>
+                    <a href="{{ url_for('account') }}" class="btn btn-outline-warning btn-lg">View Account</a>
+                </div>
             </div>
         </div>
     </div>

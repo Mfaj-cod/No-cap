@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Apna Swad-About Us{% endblock %}
+{% block title %}About Us - {{ store_name }}{% endblock %}
 
 {% block head %}
 <style>
-/* Scroll Reveal Animation */
 .scroll-reveal {
     opacity: 0;
     transform: translateY(20px);
@@ -16,7 +15,6 @@
     transform: translateY(0);
 }
 
-/* Image hover animation */
 .about-img:hover {
     transform: scale(1.05);
     transition: 0.5s;
@@ -25,60 +23,48 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
 <section class="hero-section text-center py-5 bg-transparent position-relative">
     <div class="container">
-        <h1 class="display-4 fw-bold text-warning scroll-reveal">About Apna Swad Store</h1>
-        <p class="lead text-light mt-3 scroll-reveal" style="animation-delay: 0.3s;">
-            Bringing Authentic Desi Flavors Straight to Your Kitchen
-        </p>
+        <h1 class="display-4 fw-bold text-warning scroll-reveal">About {{ store_name }}</h1>
+        <p class="lead text-light mt-3 scroll-reveal">A cap-first storefront built for both everyday buyers and wholesale shop owners.</p>
     </div>
 </section>
 
-<!-- About Content -->
 <section class="py-5 bg-transparent">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 scroll-reveal">
-                <img src="/static/images/about-spices.jpg" class="img-fluid rounded shadow about-img" alt="About Spices">
+                <img src="{{ url_for('static', path='img/logo.jpg') }}" class="img-fluid rounded shadow about-img" alt="{{ store_name }}">
             </div>
-            <div class="col-md-6 text-light scroll-reveal" style="animation-delay: 0.3s;">
+            <div class="col-md-6 text-light scroll-reveal">
                 <h2 class="text-warning mb-3">Our Story</h2>
-                <p>
-                    Bihar is known as the land of spices, with centuries-old traditions of cultivating
-                    aromatic herbs and spices. At Apna Swad, we source only the finest spices
-                    from local farmers, ensuring freshness, quality, and authenticity.
-                </p>
-                <p>
-                    From cardamom and pepper to cinnamon and cloves, our selection brings the vibrant
-                    flavors of Bihar into your home. Every order supports sustainable farming and
-                    empowers local communities.
-                </p>
-                <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Browse Products</a>
+                <p>We transformed Apna Swad into a cap store so the same recognizable visual style could serve a broader catalog for fashion, sports, events, and retail resale.</p>
+                <p>The store is built for two kinds of buyers: normal customers shopping single pieces and shop owners who need bulk-ready pricing without a separate ordering workflow.</p>
+                <p>When a shop-owner cart reaches 25 caps, wholesale pricing activates automatically across mixed styles so reordering stays simple.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Browse Caps</a>
             </div>
         </div>
 
-        <!-- Mission & Values -->
         <div class="row mt-5 text-center">
             <div class="col-md-4 scroll-reveal">
-                <div class="card bg-dark text-light shadow-sm border-0 p-3">
-                    <i class="bi bi-star text-warning fs-1 mb-3"></i>
-                    <h4>Quality Ingredients</h4>
-                    <p>We provide only the freshest, hand-picked spices.</p>
+                <div class="card bg-dark text-light shadow-sm border-0 p-3 h-100">
+                    <i class="bi bi-stars text-warning fs-1 mb-3"></i>
+                    <h4>Style Variety</h4>
+                    <p class="mb-0">Sports, casual, snapback, trucker, dad cap, and beanie options in one catalog.</p>
                 </div>
             </div>
-            <div class="col-md-4 scroll-reveal" style="animation-delay: 0.3s;">
-                <div class="card bg-dark text-light shadow-sm border-0 p-3">
-                    <i class="bi bi-people text-warning fs-1 mb-3"></i>
-                    <h4>Supporting Farmers</h4>
-                    <p>Directly sourcing from local farms for fair trade.</p>
+            <div class="col-md-4 scroll-reveal">
+                <div class="card bg-dark text-light shadow-sm border-0 p-3 h-100">
+                    <i class="bi bi-shop-window text-warning fs-1 mb-3"></i>
+                    <h4>Wholesale Logic</h4>
+                    <p class="mb-0">Shop owners keep retail flexibility for small orders and unlock 25% off at 25+ pieces.</p>
                 </div>
             </div>
-            <div class="col-md-4 scroll-reveal" style="animation-delay: 0.6s;">
-                <div class="card bg-dark text-light shadow-sm border-0 p-3">
-                    <i class="bi bi-truck text-warning fs-1 mb-3"></i>
-                    <h4>Fast Delivery</h4>
-                    <p>Fresh spices delivered to your doorstep quickly and safely.</p>
+            <div class="col-md-4 scroll-reveal">
+                <div class="card bg-dark text-light shadow-sm border-0 p-3 h-100">
+                    <i class="bi bi-robot text-warning fs-1 mb-3"></i>
+                    <h4>AI Customer Care</h4>
+                    <p class="mb-0">LangChain + Groq powered support helps with product, pricing, shipping, and policy questions.</p>
                 </div>
             </div>
         </div>
@@ -88,7 +74,6 @@
 
 {% block scripts %}
 <script>
-// Scroll Reveal Animation
 const revealElements = document.querySelectorAll('.scroll-reveal');
 function revealOnScroll() {
     const windowHeight = window.innerHeight;
