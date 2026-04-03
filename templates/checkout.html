@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Checkout - {{ store_name }}{% endblock %}
+{% block title %}Checkout - {{ Nocap }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
         <div>
             <h2 class="text-warning mb-1"><i class="bi bi-credit-card me-2"></i>Checkout</h2>
-            <p class="text-muted mb-0">One-page checkout with guest access, Indian payment options, and live inventory protection.</p>
+            <p class="text-muted mb-0">One-page checkout with guest access, Multiple payment options, and live inventory protection.</p>
         </div>
         {% if guest_checkout %}
         <span class="badge rounded-pill text-bg-warning text-dark px-3 py-2">Guest checkout</span>
@@ -21,14 +21,14 @@
                 <div class="card-body p-4">
                     {% if guest_checkout %}
                     <div class="alert alert-info border-0">
-                        You can place this order without creating an account. If you are buying for a shop, <a href="{{ url_for('login') }}" class="text-warning">log in as a shop owner</a> first to unlock wholesale pricing at {{ cart_summary.wholesale_threshold }}+ caps.
+                        If you are buying for a shop, <a href="{{ url_for('login') }}" class="text-warning">log in as a shop owner</a> first to unlock wholesale pricing at {{ cart_summary.wholesale_threshold }}+ caps.
                     </div>
                     {% endif %}
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-person-check text-warning me-2"></i>Guest checkout enabled</div></div>
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-person-check text-warning me-2"></i>Guest checkout</div></div>
                         <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-box-seam text-warning me-2"></i>Live stock protected</div></div>
-                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-shield-check text-warning me-2"></i>UPI, cards, wallets, COD</div></div>
+                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-shield-check text-warning me-2"></i>UPI, cards, COD</div></div>
                     </div>
 
                     <h5 class="card-title mb-3">Billing Details</h5>
@@ -86,9 +86,9 @@
                     <div class="card bg-black border border-warning mt-4">
                         <div class="card-body">
                             <h6 class="text-warning">Online Payment Required</h6>
-                            <p class="small text-muted">Your order has been created and stock has been reserved. Complete the Razorpay step below using UPI, card, or wallet. Retry is enabled if the first payment attempt fails.</p>
+                            <p class="small text-muted">Your order has been created and stock has been reserved. Complete the Razorpay step below using UPI, card, or wallet.</p>
                             <button type="button" class="btn btn-warning w-100" id="razorpayButton">Continue with Razorpay</button>
-                            <div class="small text-muted mt-3">Prefer a fallback? You can return to checkout and switch this order to Cash on Delivery.</div>
+                            <!-- <div class="small text-muted mt-3">Prefer a fallback? You can return to checkout and switch this order to Cash on Delivery.</div> -->
                             <form method="POST" action="{{ url_for('payment_success') }}" id="paymentSuccessForm" class="d-none">
                                 <input type="hidden" name="order_id" value="{{ pending_order_id }}">
                                 <input type="hidden" name="razorpay_order_id" id="razorpayOrderId" value="{{ razorpay_order.id }}">

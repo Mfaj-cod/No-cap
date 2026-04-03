@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Cart - {{ store_name }}{% endblock %}
+{% block title %}Cart - {{ Nocap }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -67,7 +67,7 @@
                         <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-box-seam text-warning me-2"></i>Live stock validation</div></div>
                         <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-shield-check text-warning me-2"></i>Secure UPI, cards, wallets, and COD</div></div>
                     </div>
-                    <p class="small text-muted mt-3 mb-0">Retail buyers can go straight to checkout. Shop owners should log in before checkout to unlock wholesale pricing once the cart reaches {{ cart_summary.wholesale_threshold }} caps.</p>
+                    <p class="small text-muted mt-3 mb-0">Shop owners should log in before checkout to unlock wholesale pricing once the cart reaches {{ cart_summary.wholesale_threshold }} caps.</p>
                 </div>
             </div>
         </div>
@@ -90,7 +90,7 @@
                     </div>
                     {% elif not current_user %}
                     <div class="alert alert-info border-0 small">
-                        Guest checkout is live. For wholesale pricing, log in as a shop owner before checkout.
+                        For wholesale pricing, log in as a shop owner before checkout.
                     </div>
                     {% endif %}
 

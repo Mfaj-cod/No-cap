@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ category_name }} - {{ store_name }}{% endblock %}
+{% block title %}{{ category_name }} - {{ Nocap }}{% endblock %}
 
 {% block head %}
 <style>
@@ -75,7 +75,7 @@
                     <p class="small text-muted mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
                     <p class="card-text mb-1">Retail: {{ product.normal_price|money }}</p>
                     <p class="small text-muted">Wholesale at 25+ caps: {{ product.shop_owner_price|money }}</p>
-                    <div class="small text-muted mb-3">7-day issue reporting | Guest checkout available</div>
+                    <div class="small text-muted mb-3">7-day issue reporting</div>
                     <div class="mt-auto">
                         <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
                             <input type="hidden" name="quantity" value="1">

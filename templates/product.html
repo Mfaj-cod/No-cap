@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ product.name }} - {{ store_name }}{% endblock %}
+{% block title %}{{ product.name }} - {{ Nocap }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -74,7 +74,7 @@
             </form>
 
             <div class="alert alert-info border-0">
-                Shop owners with 25 or more caps in the cart automatically receive {{ wholesale_discount_percent }}% off every item in the order. Retail buyers can use guest checkout without creating an account.
+                Shop owners with 25 or more caps in the cart automatically receive {{ wholesale_discount_percent }}% off every item in the order.
             </div>
 
             <ul class="nav nav-tabs bg-black text-light border-0" id="productTab" role="tablist">

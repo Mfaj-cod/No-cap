@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Home - {{ store_name }}{% endblock %}
+{% block title %}Home - {{ Nocap }}{% endblock %}
 
 {% block head %}
 <style>
@@ -45,7 +45,7 @@
         </p>
         <div class="d-flex justify-content-center gap-2 flex-wrap mt-4 hero-text" style="animation-delay: 0.6s;">
             <a href="#discover" class="btn btn-warning btn-lg">Find the Right Cap <i class="bi bi-arrow-right"></i></a>
-            <a href="{{ url_for('checkout') }}" class="btn btn-outline-warning btn-lg">Guest Checkout</a>
+            <a href="{{ url_for('checkout') }}" class="btn btn-outline-warning btn-lg">Checkout</a>
         </div>
     </div>
 </section>
@@ -58,7 +58,7 @@
                     <div class="card-body">
                         <i class="bi bi-diagram-3 text-warning fs-2"></i>
                         <h5 class="mt-3">Unified Variants</h5>
-                        <p class="small text-muted mb-0">Colors and sizes live inside one product model instead of splintering the catalog into duplicate listings.</p>
+                        <!-- <p class="small text-muted mb-0">Colors and sizes live inside one product model instead of splintering the catalog into duplicate listings.</p> -->
                     </div>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                     <div class="card-body">
                         <i class="bi bi-images text-warning fs-2"></i>
                         <h5 class="mt-3">Gallery-Ready Products</h5>
-                        <p class="small text-muted mb-0">Each product now supports multiple media assets, structured attributes, and richer product detail content.</p>
+                        <!-- <p class="small text-muted mb-0">Each product now supports multiple media assets, structured attributes, and richer product detail content.</p> -->
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                     <div class="card-body">
                         <i class="bi bi-box-seam text-warning fs-2"></i>
                         <h5 class="mt-3">Live Stock Awareness</h5>
-                        <p class="small text-muted mb-0">Cart and checkout now validate inventory so customers cannot oversell a variant that is almost gone.</p>
+                        <!-- <p class="small text-muted mb-0">Cart and checkout now validate inventory so customers cannot oversell a variant that is almost gone.</p> -->
                     </div>
                 </div>
             </div>
@@ -241,11 +241,11 @@
                 <img src="{{ url_for('static', path='img/logo.jpg') }}" class="img-fluid rounded shadow" alt="{{ store_name }}" loading="lazy">
             </div>
             <div class="col-md-6 text-light">
-                <p>{{ store_name }} now carries richer product records with structured specs, live variant stock, and unified listings instead of fragmented duplicate products.</p>
+                <p>{{ Nocap }} now carries richer product records with structured specs, live variant stock, and unified listings instead of fragmented duplicate products.</p>
                 <p>Retail buyers can use guest checkout immediately, while shop owners can log in with wholesale accounts to unlock automatic bulk pricing once the cart reaches 25 pieces.</p>
                 <div class="d-flex flex-wrap gap-2 mt-3">
                     <a href="#discover" class="btn btn-warning">Use Filters</a>
-                    <a href="{{ url_for('customer_care_page') }}" class="btn btn-outline-warning">Ask Customer Care AI</a>
+                    <a href="{{ url_for('customer_care_page') }}" class="btn btn-outline-warning">Ask CapAI</a>
                 </div>
             </div>
         </div>

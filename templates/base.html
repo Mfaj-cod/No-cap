@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ store_name }}{% endblock %}</title>
+    <title>{% block title %}{{ Nocap }}{% endblock %}</title>
     <meta name="description" content="Shop caps for retail and wholesale with guest checkout, UPI, cards, wallets, COD, and shop-owner pricing at 25+ pieces.">
 
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
@@ -19,8 +19,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-transparent shadow-lg sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold fs-3" href="{{ url_for('index') }}">
-                <i class="bi bi-bag-check text-success me-2"></i>
-                Apna<span class="text-warning">Swad</span>
+                <i class="bi bi-mortarboard-fill text-success me-2"></i>
+                NO<span class="text-warning">Cap</span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
@@ -40,10 +40,10 @@
                         <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('about') }}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('contact') }}">Contact</a>
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('contact') }}">Support</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('customer_care_page') }}">Customer Care AI</a>
+                        <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('customer_care_page') }}">CapAI</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-outline-warning ms-lg-2 px-3 position-relative" href="{{ url_for('cart') }}">
@@ -65,7 +65,7 @@
                         <a class="nav-link btn btn-outline-warning ms-lg-2 px-3" href="{{ url_for('login') }}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-warning text-dark ms-lg-2 px-3" href="{{ url_for('register') }}">Register</a>
+                        <a class="nav-link btn btn-warning text-yellow ms-lg-2 px-3" href="{{ url_for('register') }}">Register</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -75,9 +75,7 @@
 
     <div class="trust-strip border-top border-bottom border-secondary py-2">
         <div class="container d-flex flex-wrap justify-content-center justify-content-lg-between gap-2 small text-center text-lg-start">
-            <span><i class="bi bi-person-check me-1 text-warning"></i>Guest checkout enabled</span>
-            <span><i class="bi bi-shield-check me-1 text-warning"></i>UPI, cards, wallets, and COD</span>
-            <span><i class="bi bi-arrow-repeat me-1 text-warning"></i>7-day issue reporting on unworn items</span>
+            <span><i class="bi bi-arrow-repeat me-1 text-warning"></i>7-day replacement policy</span>
             <span><i class="bi bi-truck me-1 text-warning"></i>Fast dispatch across India</span>
         </div>
     </div>
@@ -135,7 +133,7 @@
                         <li><a href="{{ url_for('index') }}" class="text-light text-decoration-none hover-effect">Home</a></li>
                         <li><a href="{{ url_for('index') }}#discover" class="text-light text-decoration-none hover-effect">Search and Filters</a></li>
                         <li><a href="{{ url_for('about') }}" class="text-light text-decoration-none hover-effect">About Us</a></li>
-                        <li><a href="{{ url_for('customer_care_page') }}" class="text-light text-decoration-none hover-effect">Customer Care AI</a></li>
+                        <li><a href="{{ url_for('customer_care_page') }}" class="text-light text-decoration-none hover-effect">CapAI</a></li>
                     </ul>
                 </div>
 
@@ -162,7 +160,7 @@
 
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="small mb-0">&copy; {{ current_year }} {{ store_name }}. All rights reserved.</p>
+                    <p class="small mb-0">&copy; {{ current_year }} {{ Nocap }}. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="small mb-0">
