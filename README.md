@@ -5,36 +5,36 @@ A modern, feature-rich e-commerce platform built with FastAPI for selling premiu
 ## Features
 
 ### Core E-Commerce
-- 🛍️ Product browsing with advanced filtering (category, price, featured items)
-- 🔍 Real-time product search functionality
-- 🛒 Session-based shopping cart management
-- 💳 Secure checkout with multiple payment options
-- 📦 Order management and order history
-- ⭐ Product reviews and ratings
+- Product browsing with advanced filtering (category, price, featured items)
+- Real-time product search functionality
+- Session-based shopping cart management
+- Secure checkout with multiple payment options
+- Order management and order history
+- Product reviews and ratings
 
 ### User Management
-- 👤 Customer registration and authentication
-- 🔐 Secure password hashing (PBKDF2-HMAC-SHA256)
-- 👨‍💼 Shop owner roles with admin capabilities
-- 📱 User account dashboard
-- 📧 Email-based authentication
+- Customer registration and authentication
+- Secure password hashing (PBKDF2-HMAC-SHA256)
+- Shop owner roles with admin capabilities
+- User account dashboard
+- Email-based authentication
 
 ### Customer Engagement
-- 📬 Newsletter subscription management
-- 💬 Contact form with email notifications
-- 🤖 AI-powered support chatbot (powered by Groq LLM)
-- 📞 Customer support integration
+- Newsletter subscription management
+- Contact form with email notifications
+- AI-powered support chatbot (powered by Groq LLM)
+- Customer support integration
 
 ### Payment Processing
-- 💰 Razorpay payment gateway integration
-- 📋 Multiple payment method support
-- ✅ Payment verification and order confirmation
+- Razorpay payment gateway integration
+- Multiple payment method support
+- Payment verification and order confirmation
 
 ### Admin Features
-- 📊 Shop owner dashboard
-- 📈 Order and sales management
-- 👥 Customer management
-- 📝 Subscription list management
+- Shop owner dashboard
+- Order and sales management
+- Customer management
+- Subscription list management
 
 ## Tech Stack
 
@@ -97,7 +97,7 @@ OWNER_EMAIL=owner@example.com
 
 # AI Support (Optional - Groq LLM)
 GROQ_API_KEY=your-groq-api-key
-GROQ_MODEL=mixtral-8x7b-32768
+GROQ_MODEL=llama-3.1-8b-instant
 
 # Database (Optional - defaults to ./nocap.db)
 DATABASE_PATH=./nocap.db

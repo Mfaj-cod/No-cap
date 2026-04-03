@@ -20,7 +20,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Apna Swad Caps", lifespan=lifespan)
+app = FastAPI(title="Nocaps", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=settings.session_secret)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
