@@ -16,7 +16,7 @@ PRODUCTS = [
         "name": "Velocity Sports Cap",
         "description": "Lightweight performance cap with moisture control for training days, clubs, and team orders.",
         "normal_price": 799.0,
-        "image_url": "/static/img/sports/sports-1.jpeg",
+        "image_url": "/static/img/sports/sport-1.jpeg",
         "category": "Sports",
         "details": ["Breathable mesh panels", "Sweat-wicking band", "Adjustable rear strap"],
         "attributes": {
@@ -40,7 +40,7 @@ PRODUCTS = [
         "name": "Weekend Casual Cap",
         "description": "Classic everyday cap with a soft curved brim and easy all-day fit.",
         "normal_price": 649.0,
-        "image_url": "/static/img/placeholder.jpg",
+        "image_url": "/static/img/casual/casual-2.jpeg",
         "media_gallery": [
             "/static/img/placeholder.jpg",
             "/static/img/bg2.jpg",
@@ -69,7 +69,7 @@ PRODUCTS = [
         "name": "Street Snapback Pro",
         "description": "Structured snapback built for bold branding, events, and premium retail shelves.",
         "normal_price": 899.0,
-        "image_url": "/static/img/placeholder.jpg",
+        "image_url": "/static/img/snapback/snapback-1.jpeg",
         "media_gallery": [
             "/static/img/placeholder.jpg",
             "/static/img/logo.jpg",
@@ -123,7 +123,7 @@ PRODUCTS = [
         "name": "Heritage Dad Cap",
         "description": "Relaxed dad cap with a broken-in feel and subtle premium stitching.",
         "normal_price": 749.0,
-        "image_url": "/static/img/placeholder.jpg",
+        "image_url": "/static/img/Dad-Cap/dadcap-1.jpeg",
         "media_gallery": [
             "/static/img/placeholder.jpg",
             "/static/img/bg1.jpg",

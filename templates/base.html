@@ -113,6 +113,111 @@
         {% block content %}{% endblock %}
     </main>
 
+    <footer style="
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px);
+    color: #e5e7eb;
+    padding: 60px 0 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+">
+
+    <div class="container">
+
+        <!-- 🔥 TOP GRID -->
+        <div style="
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        ">
+
+            <!-- BRAND -->
+            <div style="max-width: 260px;">
+                <h5 style="color:#ffc107; font-weight:600;">
+                    <i class="bi bi-bag-check me-2"></i>{{ store_name }}
+                </h5>
+
+                <p style="font-size: 0.9rem; color:#9ca3af; line-height:1.6;">
+                    Curated caps for everyday customers, teams, retailers, and shop owners with bulk-friendly pricing.
+                </p>
+
+                <div style="margin-top:15px;">
+                    <a href="#" style="color:#ffc107; margin-right:12px;"><i class="bi bi-facebook"></i></a>
+                    <a href="#" style="color:#ffc107; margin-right:12px;"><i class="bi bi-instagram"></i></a>
+                    <a href="#" style="color:#ffc107; margin-right:12px;"><i class="bi bi-twitter"></i></a>
+                    <a href="#" style="color:#ffc107;"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+
+            <!-- LINKS -->
+            <div>
+                <h6 style="color:#ffc107; margin-bottom:15px;">Browse</h6>
+
+                <div style="font-size:0.9rem; line-height:1.8;">
+                    <a href="{{ url_for('index') }}" style="display:block; color:#d1d5db; text-decoration:none;">Home</a>
+                    <a href="{{ url_for('index') }}#discover" style="display:block; color:#d1d5db; text-decoration:none;">Search & Filters</a>
+                    <a href="{{ url_for('about') }}" style="display:block; color:#d1d5db; text-decoration:none;">About Us</a>
+                    <a href="{{ url_for('customer_care_page') }}" style="display:block; color:#d1d5db; text-decoration:none;">CapAI</a>
+                </div>
+            </div>
+
+            <!-- WHOLESALE -->
+            <div style="max-width: 260px;">
+                <h6 style="color:#ffc107; margin-bottom:15px;">Wholesale</h6>
+
+                <p style="font-size:0.9rem; color:#9ca3af; line-height:1.6;">
+                    Get {{ wholesale_discount_percent }}% off automatically when your cart reaches 25+ caps.
+                </p>
+
+                <p style="font-size:0.9rem; color:#9ca3af;">
+                    Mixed styles count. Guest checkout remains available.
+                </p>
+            </div>
+
+            <!-- CONTACT -->
+            <div>
+                <h6 style="color:#ffc107; margin-bottom:15px;">Contact</h6>
+
+                <div style="font-size:0.9rem; line-height:1.8; color:#d1d5db;">
+                    <div><i class="bi bi-geo-alt me-2"></i>Bihar, India</div>
+                    <div><i class="bi bi-telephone me-2"></i>+91 123 456 7890</div>
+                    <div><i class="bi bi-envelope me-2"></i>support@apnaswadcaps.com</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 🔥 DIVIDER -->
+        <div style="
+            margin:40px 0 20px;
+            border-top:1px solid rgba(255,255,255,0.1);
+        "></div>
+
+        <!-- 🔥 BOTTOM BAR -->
+        <div style="
+            display:flex;
+            flex-wrap:wrap;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            font-size:0.85rem;
+            color:#9ca3af;
+        ">
+
+            <div>
+                © {{ current_year }} {{ Nocap }}. All rights reserved.
+            </div>
+
+            <div>
+                <a href="#" style="color:#9ca3af; margin-right:15px; text-decoration:none;">Privacy Policy</a>
+                <a href="#" style="color:#9ca3af; text-decoration:none;">Terms of Service</a>
+            </div>
+
+        </div>
+
+    </div>
+</footer>
+<!-- 
     <footer class="bg-blur text-light py-5 mt-5 border-top border-secondary">
         <div class="container">
             <div class="row">
@@ -175,7 +280,7 @@
                 </div>
             </div>
         </div>
-    </footer>
+    </footer> -->
 
     <button type="button" class="btn btn-warning btn-floating" id="backToTop" title="Back to top">
         <i class="bi bi-arrow-up"></i>

@@ -1,4 +1,4 @@
-from groq import Groq
+from groq import Groq # type: ignore
 
 from src.config import settings
 from src.data import SUPPORT_POLICIES
@@ -24,7 +24,7 @@ def _catalog_snapshot() -> str:
 
 def generate_support_response(message: str) -> str:
     if not settings.groq_api_key:
-        raise RuntimeError("Customer Care AI is not configured yet. Add GROQ_API_KEY to enable chat.")
+        raise RuntimeError("CapAI is not configured yet. Add GROQ_API_KEY to enable chat.")
 
     client = Groq(api_key=settings.groq_api_key)
 

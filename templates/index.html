@@ -97,84 +97,277 @@
     </div>
 </section>
 
-<section id="discover" class="py-5">
+<section id="discover" style="padding: 60px 0;">
     <div class="container">
-        <div class="card bg-dark text-light border-0 shadow-lg p-4 discover-panel">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+
+        <div style="
+            background: linear-gradient(135deg, #0f172a, #111827);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        ">
+
+            <!-- HEADER -->
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                flex-wrap:wrap;
+                gap:10px;
+                margin-bottom:20px;
+            ">
                 <div>
-                    <h2 class="text-warning mb-1">Search and Filter Caps</h2>
-                    <p class="text-muted mb-0">Use category, price, and featured filters together for faster product discovery.</p>
+                    <h2 style="color:#ffc107; margin-bottom:5px;">Search and Filter Caps</h2>
+                    <p style="color:#9ca3af; font-size:0.9rem;">
+                        Use smart filters to find the perfect cap faster.
+                    </p>
                 </div>
-                <span class="badge rounded-pill text-bg-warning text-dark px-3 py-2">{{ browse_results|length }} results</span>
+
+                <div style="
+                    background:#ffc107;
+                    color:#000;
+                    padding:6px 14px;
+                    border-radius:20px;
+                    font-weight:600;
+                    font-size:0.85rem;
+                ">
+                    {{ browse_results|length }} results
+                </div>
             </div>
-            <form method="GET" action="{{ url_for('index') }}" class="row g-3 align-items-end">
-                <div class="col-lg-4 col-md-6">
-                    <label for="q" class="form-label">Search</label>
-                    <input type="search" class="form-control form-control-lg" id="q" name="q" value="{{ filters['q'] }}" placeholder="sports, trucker, embroidery, olive...">
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <label for="category" class="form-label">Category</label>
-                    <select id="category" name="category" class="form-select form-select-lg">
-                        <option value="">All categories</option>
-                        {% for category in categories %}
-                        <option value="{{ category.name }}" {% if filters['category'] == category.name %}selected{% endif %}>{{ category.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <label for="max_price" class="form-label">Max Retail Price</label>
-                    <select id="max_price" name="max_price" class="form-select form-select-lg">
-                        <option value="">Any budget</option>
-                        <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to Rs. 650</option>
-                        <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to Rs. 750</option>
-                        <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to Rs. 850</option>
-                    </select>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <div class="form-check form-switch pt-4 ps-0 d-flex align-items-center gap-2 justify-content-md-start justify-content-between">
-                        <label class="form-check-label" for="featured">Featured only</label>
-                        <input class="form-check-input ms-0" type="checkbox" id="featured" name="featured" value="1" {% if filters['featured'] %}checked{% endif %}>
-                    </div>
-                </div>
-                <div class="col-12 d-flex gap-2 flex-wrap">
-                    <button type="submit" class="btn btn-warning btn-lg px-4">Apply Filters</button>
+
+            <!-- FILTER BAR -->
+            <form method="GET" action="{{ url_for('index') }}"
+                style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:15px;
+                    align-items:center;
+                ">
+
+                <!-- SEARCH -->
+                <input type="search"
+                    name="q"
+                    value="{{ filters['q'] }}"
+                    placeholder="Search caps..."
+                    style="
+                        flex:1;
+                        min-width:200px;
+                        padding:12px;
+                        border-radius:10px;
+                        border:none;
+                        background:#1f2937;
+                        color:#fff;
+                    ">
+
+                <!-- CATEGORY -->
+                <select name="category"
+                    style="
+                        padding:12px;
+                        padding-right: 30px;
+                        border-radius:10px;
+                        border:none;
+                        background:#1f2937;
+                        color:#fff;
+                        min-width:160px;
+                    ">
+                    <option value="">All categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.name }}" {% if filters['category'] == category.name %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <!-- PRICE -->
+                <select name="max_price"
+                    style="
+                        padding:12px;
+                        border-radius:10px;
+                        border:none;
+                        background:#1f2937;
+                        color:#fff;
+                        min-width:160px;
+                    ">
+                    <option value="">Any budget</option>
+                    <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to Rs. 650</option>
+                    <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to Rs. 750</option>
+                    <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to Rs. 850</option>
+                </select>
+
+                <!-- TOGGLE -->
+                <label style="
+                    display:flex;
+                    align-items:center;
+                    gap:8px;
+                    color:#d1d5db;
+                    font-size:0.9rem;
+                ">
+                    Featured
+                    <input type="checkbox"
+                        name="featured"
+                        value="1"
+                        {% if filters['featured'] %}checked{% endif %}
+                        style="transform: scale(1.2);">
+                </label>
+
+                <!-- BUTTONS -->
+                <div style="display:flex; gap:10px;">
+
+                    <button type="submit"
+                        style="
+                            background:#ffc107;
+                            border:none;
+                            padding:10px 18px;
+                            border-radius:10px;
+                            font-weight:600;
+                        ">
+                        Apply
+                    </button>
+
                     {% if has_filters %}
-                    <a href="{{ url_for('index') }}#discover" class="btn btn-outline-warning btn-lg px-4">Clear</a>
+                    <a href="{{ url_for('index') }}#discover"
+                        style="
+                            border:1px solid #ffc107;
+                            padding:10px 18px;
+                            border-radius:10px;
+                            color:#ffc107;
+                            text-decoration:none;
+                        ">
+                        Clear
+                    </a>
                     {% endif %}
                 </div>
             </form>
         </div>
     </div>
 </section>
-
 <section class="pb-5">
     <div class="container">
         <div class="row g-4">
+
             {% for product in browse_results %}
             <div class="col-sm-6 col-lg-3 scroll-reveal">
-                    <div class="card bg-dark text-light border-0 shadow product-card text-center">
-                        <img src="{{ img_url(product.image_url, loop.index0) }}" class="card-img-top p-3 product-thumb" alt="{{ product.name }}" loading="lazy">
-                    <div class="card-body d-flex flex-column">
-                        <span class="badge border border-warning text-warning align-self-center mb-2">{{ product.category }}</span>
-                        <h6 class="card-title">{{ product.name }}</h6>
-                        <p class="card-text text-white small text-truncate">
-                        {{ product.description }}
+
+                <div style="
+                    background:#0f172a;
+                    border-radius:18px;
+                    padding:20px;
+                    height:100%;
+                    display:flex;
+                    flex-direction:column;
+                    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+                    text-align:center;
+                ">
+
+                    <!-- 🔥 IMAGE BOX (FIXED) -->
+                    <div style="
+                        height:160px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        margin-bottom:15px;
+                    ">
+                        <img src="{{ img_url(product.image_url, loop.index0) }}"
+                             alt="{{ product.name }}"
+                             loading="lazy"
+                             style="
+                                max-height:100%;
+                                max-width:100%;
+                                object-fit:contain;
+                                border-radius:10px;
+                             ">
+                    </div>
+
+                    <!-- CONTENT -->
+                    <div style="flex:1; display:flex; flex-direction:column;">
+
+                        <span style="
+                            border:1px solid #ffc107;
+                            color:#ffc107;
+                            padding:3px 10px;
+                            border-radius:20px;
+                            font-size:0.75rem;
+                            margin-bottom:10px;
+                            display:inline-block;
+                        ">
+                            {{ product.category }}
+                        </span>
+
+                        <h6 style="color:#fff;">{{ product.name }}</h6>
+
+                        <p style="
+                            color:#9ca3af;
+                            font-size:0.85rem;
+                            margin-bottom:10px;
+                        ">
+                            {{ product.description[:60] }}...
                         </p>
+
                         {% if product.average_rating %}
-                        <p class="small mb-1"><span class="text-warning fw-semibold">{{ product.average_rating }}/5</span> from {{ product.review_count }} review{% if product.review_count != 1 %}s{% endif %}</p>
+                        <p style="font-size:0.85rem;">
+                            <span style="color:#ffc107; font-weight:600;">
+                                {{ product.average_rating }}/5
+                            </span>
+                            <span style="color:#9ca3af;">
+                                from {{ product.review_count }} review{% if product.review_count != 1 %}s{% endif %}
+                            </span>
+                        </p>
                         {% else %}
-                        <p class="small mb-1 text-white">Freshly added style</p>
+                        <p style="font-size:0.85rem; color:#9ca3af;">
+                            Freshly added style
+                        </p>
                         {% endif %}
-                        <p class="small text-white mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
-                        <p class="mb-1">Retail: <span class="text-warning">{{ product.normal_price|money }}</span></p>
-                        <p class="small text-white">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
-                        <div class="d-flex justify-content-center gap-2 flex-wrap mt-auto">
+
+                        <p style="font-size:0.85rem; color:#9ca3af;">
+                            {{ product.variant_count }} variants | {{ product.total_stock }} in stock
+                        </p>
+
+                        <p style="margin-bottom:5px;">
+                            Retail:
+                            <span style="color:#ffc107;">
+                                {{ product.normal_price|money }}
+                            </span>
+                        </p>
+
+                        <p style="font-size:0.85rem; color:#9ca3af;">
+                            Shop owner: {{ product.shop_owner_price|money }}
+                        </p>
+
+                        <!-- BUTTONS -->
+                        <div style="
+                            display:flex;
+                            gap:8px;
+                            justify-content:center;
+                            margin-top:auto;
+                        ">
+
                             <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
                                 <input type="hidden" name="quantity" value="1">
                                 <input type="hidden" name="variant_sku" value="{{ product.default_variant.sku if product.default_variant else '' }}">
-                                <button type="submit" class="btn btn-warning btn-sm" {% if not product.in_stock %}disabled{% endif %}><i class="bi bi-cart3 me-1"></i> Add</button>
+                                <button type="submit"
+                                        {% if not product.in_stock %}disabled{% endif %}
+                                        style="
+                                            background:#ffc107;
+                                            border:none;
+                                            padding:6px 12px;
+                                            border-radius:8px;
+                                            font-size:0.85rem;
+                                        ">
+                                    Add
+                                </button>
                             </form>
-                            <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-outline-warning btn-sm">View</a>
+
+                            <a href="{{ url_for('product', product_id=product.id) }}"
+                               style="
+                                    border:1px solid #ffc107;
+                                    color:#ffc107;
+                                    padding:6px 12px;
+                                    border-radius:8px;
+                                    text-decoration:none;
+                                    font-size:0.85rem;
+                               ">
+                                View
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -247,20 +440,94 @@
         </div>
     </div>
 </section>
+<section id="about" style="padding: 80px 0;">
 
-<section id="about" class="py-5">
-    <div class="container scroll-reveal">
-        <h2 class="mb-4 text-warning text-center">Built for Modern Cap Buyers</h2>
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <img src="{{ url_for('static', path='img/logo.jpg') }}" class="img-fluid rounded shadow" alt="{{ store_name }}" loading="lazy">
+    <div class="container">
+
+        <!-- HEADER -->
+        <h2 style="
+            text-align:center;
+            color:#ffc107;
+            margin-bottom:50px;
+            font-weight:700;
+        ">
+            Built for Modern Cap Buyers
+        </h2>
+
+        <!-- MAIN CONTENT -->
+        <div style="
+            display:flex;
+            flex-wrap:wrap;
+            align-items:center;
+            gap:40px;
+        ">
+
+            <!-- IMAGE -->
+            <div style="
+                flex:1;
+                min-width:280px;
+                display:flex;
+                justify-content:center;
+            ">
+                <img src="{{ url_for('static', path='img/logo.jpg') }}"
+                     alt="{{ store_name }}"
+                     loading="lazy"
+                     style="
+                        width:100%;
+                        max-width:420px;
+                        border-radius:16px;
+                        box-shadow:0 20px 40px rgba(0,0,0,0.5);
+                     ">
             </div>
-            <div class="col-md-6 text-light">
-                <p>{{ Nocap }} now carries richer product records with structured specs, live variant stock, and unified listings instead of fragmented duplicate products.</p>
-                <p>Retail buyers can use guest checkout immediately, while shop owners can log in with wholesale accounts to unlock automatic bulk pricing once the cart reaches 25 pieces.</p>
-                <div class="d-flex flex-wrap gap-2 mt-3">
-                    <a href="#discover" class="btn btn-warning">Use Filters</a>
-                    <a href="{{ url_for('customer_care_page') }}" class="btn btn-outline-warning">Ask CapAI</a>
+
+            <!-- TEXT -->
+            <div style="
+                flex:1;
+                min-width:280px;
+                color:#d1d5db;
+                line-height:1.7;
+                max-width:520px;
+            ">
+
+                <p style="margin-bottom:18px;">
+                    <strong style="color:#fff;">{{ Nocap }}</strong> now delivers richer product records with structured specs,
+                    live variant tracking, and unified listings — eliminating duplicate clutter.
+                </p>
+
+                <p style="margin-bottom:18px;">
+                    Retail buyers can check out instantly, while shop owners unlock wholesale pricing automatically
+                    when their cart reaches <strong style="color:#ffc107;">25+ caps</strong>.
+                </p>
+
+                <p style="margin-bottom:25px;">
+                    Mixed styles count toward bulk discounts — making reordering seamless and flexible.
+                </p>
+
+                <!-- CTA -->
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+
+                    <a href="#discover"
+                       style="
+                            background:#ffc107;
+                            color:#000;
+                            padding:10px 18px;
+                            border-radius:10px;
+                            font-weight:600;
+                            text-decoration:none;
+                       ">
+                        Use Filters
+                    </a>
+
+                    <a href="{{ url_for('customer_care_page') }}"
+                       style="
+                            border:1px solid #ffc107;
+                            color:#ffc107;
+                            padding:10px 18px;
+                            border-radius:10px;
+                            text-decoration:none;
+                       ">
+                        Ask CapAI
+                    </a>
                 </div>
             </div>
         </div>

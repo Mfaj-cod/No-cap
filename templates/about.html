@@ -31,44 +31,127 @@
 </section>
 
 <section class="py-5 bg-transparent">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6 scroll-reveal">
-                <img src="{{ url_for('static', path='img/logo.jpg') }}" class="img-fluid rounded shadow about-img" alt="{{ store_name }}">
-            </div>
-            <div class="col-md-6 text-light scroll-reveal">
-                <h2 class="text-warning mb-3">Our Story</h2>
-                <p>We transformed Apna Swad into a cap store so the same recognizable visual style could serve a broader catalog for fashion, sports, events, and retail resale.</p>
-                <p>The store is built for two kinds of buyers: normal customers shopping single pieces and shop owners who need bulk-ready pricing without a separate ordering workflow.</p>
-                <p>When a shop-owner cart reaches 25 caps, wholesale pricing activates automatically across mixed styles so reordering stays simple.</p>
-                <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Browse Caps</a>
-            </div>
+
+    <div class="container text-center">
+
+        <!-- STORY BLOCK -->
+        <div class="scroll-reveal mx-auto"
+             style="
+                max-width: 720px;
+                color: #f8f9fa;
+                line-height: 1.8;
+            ">
+
+            <h2 style="
+                color: #ffc107;
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 25px;
+            ">
+                Our Story
+            </h2>
+
+            <p style="margin-bottom: 16px;">
+                We transformed Apna Swad into a focused cap store to expand into fashion, sports, events, and retail resale.
+            </p>
+
+            <p style="margin-bottom: 16px;">
+                The platform serves both everyday buyers and shop owners who need bulk-ready pricing without complexity.
+            </p>
+
+            <p style="margin-bottom: 25px;">
+                When a cart reaches 25 caps, wholesale pricing activates automatically across mixed styles, making reordering seamless.
+            </p>
+
+            <a href="{{ url_for('index') }}#discover"
+               style="
+                    display: inline-block;
+                    background: #ffc107;
+                    color: #000;
+                    padding: 12px 24px;
+                    border-radius: 10px;
+                    text-decoration: none;
+                    font-weight: 600;
+                    box-shadow: 0 6px 20px rgba(255,193,7,0.3);
+               ">
+                Browse Caps
+            </a>
+
         </div>
 
-        <div class="row mt-5 text-center">
-            <div class="col-md-4 scroll-reveal">
-                <div class="card bg-dark text-light shadow-sm border-0 p-3 h-100">
-                    <i class="bi bi-stars text-warning fs-1 mb-3"></i>
-                    <h4>Style Variety</h4>
-                    <p class="mb-0">Sports, casual, snapback, trucker, dad cap, and beanie options in one catalog.</p>
-                </div>
+        <!-- FEATURES (NO HEIGHT STRETCH) -->
+        <div class="mt-5 d-flex flex-wrap justify-content-center gap-4">
+
+            <!-- CARD 1 -->
+            <div class="scroll-reveal"
+                 style="
+                    background: #111827;
+                    color: #fff;
+                    padding: 20px;
+                    border-radius: 14px;
+                    width: 260px;
+                    text-align: center;
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+                 ">
+
+                <i class="bi bi-stars"
+                   style="font-size: 2rem; color: #ffc107;"></i>
+
+                <h5 style="margin-top: 12px;">Style Variety</h5>
+
+                <p style="font-size: 0.9rem; color: #9ca3af;">
+                    Sports, casual, snapback, trucker, dad cap, and beanie styles in one place.
+                </p>
             </div>
-            <div class="col-md-4 scroll-reveal">
-                <div class="card bg-dark text-light shadow-sm border-0 p-3 h-100">
-                    <i class="bi bi-shop-window text-warning fs-1 mb-3"></i>
-                    <h4>Wholesale Logic</h4>
-                    <p class="mb-0">Shop owners keep retail flexibility for small orders and unlock 25% off at 25+ pieces.</p>
-                </div>
+
+            <!-- CARD 2 -->
+            <div class="scroll-reveal"
+                 style="
+                    background: #111827;
+                    color: #fff;
+                    padding: 20px;
+                    border-radius: 14px;
+                    width: 260px;
+                    text-align: center;
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+                 ">
+
+                <i class="bi bi-shop-window"
+                   style="font-size: 2rem; color: #ffc107;"></i>
+
+                <h5 style="margin-top: 12px;">Wholesale</h5>
+
+                <p style="font-size: 0.9rem; color: #9ca3af;">
+                    Retail flexibility for small orders and automatic bulk pricing at 25+ caps.
+                </p>
             </div>
-            <div class="col-md-4 scroll-reveal">
-                <div class="card bg-dark text-light shadow-sm border-0 p-3 h-100">
-                    <i class="bi bi-robot text-warning fs-1 mb-3"></i>
-                    <h4>AI Customer Care</h4>
-                    <p class="mb-0">LangChain + Groq powered support helps with product, pricing, shipping, and policy questions.</p>
-                </div>
+
+            <!-- CARD 3 -->
+            <div class="scroll-reveal"
+                 style="
+                    background: #111827;
+                    color: #fff;
+                    padding: 20px;
+                    border-radius: 14px;
+                    width: 260px;
+                    text-align: center;
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+                 ">
+
+                <i class="bi bi-robot"
+                   style="font-size: 2rem; color: #ffc107;"></i>
+
+                <h5 style="margin-top: 12px;">AI Customer Care</h5>
+
+                <p style="font-size: 0.9rem; color: #9ca3af;">
+                    Smart support for product, pricing, shipping, and policies.
+                </p>
             </div>
+
         </div>
+
     </div>
+
 </section>
 {% endblock %}
 

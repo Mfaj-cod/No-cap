@@ -9,53 +9,125 @@
     </h2>
 
     {% if cart_summary["items"] %}
-    <div class="table-responsive bg-dark text-light p-3 rounded shadow-sm">
-        <table class="table table-dark table-hover align-middle mb-0">
-            <thead>
-                <tr>
-                    <th scope="col">Product</th>
-                    <th scope="col">Retail</th>
-                    <th scope="col">Wholesale</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Applied Price</th>
-                    <th scope="col">Subtotal</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart_summary["items"] %}
-                <tr>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" width="60" class="me-3 rounded" loading="lazy">
-                            <div>
-                                <div>{{ item.product.name }}</div>
-                                <div class="small text-muted">{{ item.variant_label }} | {{ item.available_stock }} left</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>{{ item.retail_unit_price|money }}</td>
-                    <td>{{ item.wholesale_unit_price|money }}</td>
-                    <td>
-                        <form method="POST" action="{{ url_for('update_cart', cart_key=item.cart_key) }}" class="d-flex align-items-center cart-quantity-form">
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.available_stock }}" class="form-control form-control-sm me-2" style="width: 80px;" inputmode="numeric">
-                            <button type="submit" class="btn btn-sm btn-warning">Update</button>
-                        </form>
-                    </td>
-                    <td>{{ item.applied_unit_price|money }}</td>
-                    <td>{{ item.line_total|money }}</td>
-                    <td>
-                        <form method="POST" action="{{ url_for('remove_from_cart', cart_key=item.cart_key) }}">
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Remove
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div style="
+    background:#0f172a;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.5);
+">
+
+    {% for item in cart_summary["items"] %}
+    <div style="
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        gap:20px;
+        padding:15px;
+        border-bottom:1px solid rgba(255,255,255,0.08);
+    ">
+
+        <!-- IMAGE -->
+        <div style="
+            width:90px;
+            height:90px;
+            background:#0b1220;
+            border-radius:12px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            overflow:hidden;
+            border:1px solid rgba(255,255,255,0.05);
+        ">
+
+            <img src="{{ item.product.image_url }}"
+                alt="{{ item.product.name }}"
+                style="
+                    width:100%;
+                    height:100%;
+                    object-fit:contain;
+                    padding:8px;
+                ">
+        </div>
+        <!-- INFO -->
+        <div style="flex:1; min-width:200px;">
+            <div style="color:#fff; font-weight:600;">
+                {{ item.product.name }}
+            </div>
+            <div style="font-size:0.85rem; color:#9ca3af;">
+                {{ item.variant_label }} • {{ item.available_stock }} left
+            </div>
+        </div>
+
+        <!-- PRICE -->
+        <div style="min-width:120px;">
+            <div style="font-size:0.8rem; color:#9ca3af;">Retail</div>
+            <div style="color:#ffc107;">{{ item.retail_unit_price|money }}</div>
+        </div>
+
+        <div style="min-width:120px;">
+            <div style="font-size:0.8rem; color:#9ca3af;">Wholesale</div>
+            <div style="color:#9ca3af;">{{ item.wholesale_unit_price|money }}</div>
+        </div>
+
+        <!-- QUANTITY -->
+        <form method="POST"
+              action="{{ url_for('update_cart', cart_key=item.cart_key) }}"
+              style="display:flex; gap:8px; align-items:center;">
+
+            <input type="number"
+                   name="quantity"
+                   value="{{ item.quantity }}"
+                   min="1"
+                   max="{{ item.available_stock }}"
+                   style="
+                        width:60px;
+                        padding:6px;
+                        border-radius:6px;
+                        border:none;
+                        background:#1f2937;
+                        color:#fff;
+                   ">
+
+            <button type="submit"
+                    style="
+                        background:#ffc107;
+                        border:none;
+                        padding:6px 10px;
+                        border-radius:6px;
+                        font-size:0.8rem;
+                    ">
+                Update
+            </button>
+        </form>
+
+        <!-- SUBTOTAL -->
+        <div style="min-width:120px;">
+            <div style="font-size:0.8rem; color:#9ca3af;">Subtotal</div>
+            <div style="color:#fff; font-weight:600;">
+                {{ item.line_total|money }}
+            </div>
+        </div>
+
+        <!-- REMOVE -->
+        <form method="POST"
+              action="{{ url_for('remove_from_cart', cart_key=item.cart_key) }}">
+            <button type="submit"
+                style="
+                    background:#ef4444;
+                    border:none;
+                    padding:6px 12px;
+                    border-radius:8px;
+                    color:#fff;
+                    font-size:0.8rem;
+                ">
+                Remove
+            </button>
+        </form>
+
     </div>
+    {% endfor %}
+
+</div>
 
     <div class="row g-4 mt-2">
         <div class="col-lg-7">
