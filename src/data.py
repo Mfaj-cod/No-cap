@@ -16,12 +16,7 @@ PRODUCTS = [
         "name": "Velocity Sports Cap",
         "description": "Lightweight performance cap with moisture control for training days, clubs, and team orders.",
         "normal_price": 799.0,
-        "image_url": "/static/img/placeholder.jpg",
-        "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/logo.jpg",
-            "/static/img/bg1.jpg",
-        ],
+        "image_url": "/static/img/sports/sports-1.jpeg",
         "category": "Sports",
         "details": ["Breathable mesh panels", "Sweat-wicking band", "Adjustable rear strap"],
         "attributes": {
@@ -234,6 +229,69 @@ PRODUCTS = [
         "featured": False,
     },
 ]
+
+# Dynamically append a product entry for each cap image found under static/img
+# This keeps `PRODUCTS` in sync with the repository images without hardcoding hundreds
+from pathlib import Path
+
+def _generate_products_from_images():
+    project_root = Path(__file__).resolve().parent.parent
+    img_dir = project_root / "static" / "img"
+    if not img_dir.exists():
+        return
+
+    existing_urls = {p.get("image_url") for p in PRODUCTS if p.get("image_url")}
+    next_id = max((p.get("id", 0) for p in PRODUCTS), default=0) + 1
+    suffixes = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+
+    for folder in sorted(img_dir.iterdir()):
+        if not folder.is_dir():
+            continue
+        category = folder.name.replace("-", " ").replace("_", " ").title()
+        for img in sorted(folder.iterdir()):
+            if img.suffix.lower() not in suffixes:
+                continue
+            # skip generic assets
+            if any(tok in img.name.lower() for tok in ("logo", "placeholder", "bg")):
+                continue
+            rel = img.relative_to(project_root).as_posix()  # e.g. static/img/sports/sport-1.jpeg
+            image_url = "/" + rel
+            if image_url in existing_urls:
+                continue
+
+            # build a friendly name from folder and filename
+            stem_parts = img.stem.split('-')
+            idx = stem_parts[-1] if stem_parts[-1].isdigit() else None
+            if idx:
+                name = f"{category} Cap {idx}"
+            else:
+                name = f"{category} Cap {img.stem}"
+
+            product = {
+                "id": next_id,
+                "name": name,
+                "description": f"Designed from the {category.lower()} collection image.",
+                "normal_price": 799.0,
+                "image_url": image_url,
+                "media_gallery": [image_url],
+                "category": category,
+                "details": ["Quality fit", "Adjustable closure", "Durable brim"],
+                "attributes": {"Material": "Cotton blend", "Fit": "One Size", "Best For": "Everyday wear"},
+                "variants": [
+                    {"sku": f"{img.stem.upper().replace('-','')}-BLK-OS", "color": "Black", "size": "One Size", "stock_quantity": 20},
+                    {"sku": f"{img.stem.upper().replace('-','')}-WHT-OS", "color": "White", "size": "One Size", "stock_quantity": 15},
+                    {"sku": f"{img.stem.upper().replace('-','')}-NVY-OS", "color": "Navy", "size": "One Size", "stock_quantity": 12},
+                ],
+                "reviews": [],
+                "featured": False,
+            }
+
+            PRODUCTS.append(product)
+            existing_urls.add(image_url)
+            next_id += 1
+
+
+_generate_products_from_images()
 
 SUPPORT_POLICIES = """
 Store focus: caps for normal customers and bulk-buying shop owners.

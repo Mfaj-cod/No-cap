@@ -3,6 +3,8 @@ from fastapi.responses import HTMLResponse
 
 from src.db import get_product, list_categories, list_products
 from src.web import render_template
+from fastapi.responses import JSONResponse
+from src.web import _collect_gallery_images
 
 router = APIRouter()
 
@@ -143,3 +145,10 @@ def product(request: Request, product_id: int):
         product=selected_product,
         related_products=related_products,
     )
+
+
+@router.get('/_debug/gallery_images', response_class=JSONResponse, name='debug_gallery')
+def debug_gallery(request: Request):
+    """Debug endpoint: return the gallery image paths collected by web._collect_gallery_images()."""
+    imgs = _collect_gallery_images(100)
+    return JSONResponse({'count': len(imgs), 'images': imgs})

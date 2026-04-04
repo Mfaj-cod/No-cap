@@ -146,17 +146,17 @@ def _seed_reference_data(connection: sqlite3.Connection) -> None:
         """,
         [
             (
-                product["id"],
-                product["name"],
-                product["description"],
-                product["normal_price"],
-                product["image_url"],
-                product["category"],
-                json.dumps(product["details"]),
-                json.dumps(product["attributes"]),
-                json.dumps(product["media_gallery"]),
-                json.dumps(product["variants"]),
-                json.dumps(product["reviews"]),
+                product.get("id"),
+                product.get("name"),
+                product.get("description"),
+                product.get("normal_price"),
+                product.get("image_url"),
+                product.get("category"),
+                json.dumps(product.get("details", [])),
+                json.dumps(product.get("attributes", {})),
+                json.dumps(product.get("media_gallery", [product.get("image_url")]) ),
+                json.dumps(product.get("variants", [])),
+                json.dumps(product.get("reviews", [])),
                 1 if product.get("featured") else 0,
             )
             for product in PRODUCTS

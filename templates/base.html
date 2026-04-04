@@ -76,7 +76,12 @@
     <div class="trust-strip border-top border-bottom border-secondary py-2">
         <div class="container d-flex flex-wrap justify-content-center justify-content-lg-between gap-2 small text-center text-lg-start">
             <span><i class="bi bi-arrow-repeat me-1 text-warning"></i>7-day replacement policy</span>
+
             <span><i class="bi bi-truck me-1 text-warning"></i>Fast dispatch across India</span>
+
+            <span><i class="bi bi-shield-check me-1 text-warning"></i>Secure payments with Razorpay</span>
+
+            <span><i class="bi bi-people me-1 text-warning"></i>Dedicated support team</span>
         </div>
     </div>
 
@@ -178,6 +183,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', path='js/app.js') }}"></script>
+    <script>
+    // Ensure images are lazy-loaded by default unless marked high-priority
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const imgs = document.querySelectorAll('img');
+            imgs.forEach(img => {
+                // Respect explicit high-priority hints
+                if (img.hasAttribute('fetchpriority')) return;
+                // Respect any intentionally eager images
+                if (img.dataset && img.dataset.eager === '1') return;
+                // Set browser-native lazy attribute if not already set
+                if (!img.hasAttribute('loading')) {
+                    img.setAttribute('loading', 'lazy');
+                }
+                // Use async decoding for better responsiveness
+                try { img.decoding = 'async'; } catch (e) {}
+            });
+        } catch (err) {
+            console.warn('Lazy init failed', err);
+        }
+    });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

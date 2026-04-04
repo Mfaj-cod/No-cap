@@ -1,3 +1,5 @@
+/* EXISTING CSS (UNCHANGED) */
+
 body {
     position: relative;
     background-image: url('/static/img/bg1.jpg'), url('/static/img/bg2.jpg');
@@ -14,6 +16,10 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
+
+    /* 🔥 PATCH: prevent layout interference */
+    pointer-events: none;
+
     background: rgba(0, 0, 0, 0.4);
     z-index: 0;
 }
@@ -75,6 +81,28 @@ body * {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* Product and category thumbnails fit and crop nicely */
+.product-thumb {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.product-thumb-lg {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    display: block;
+}
+
+.category-thumb {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
 }
 
 .gallery-thumb.active,
@@ -204,4 +232,218 @@ body * {
     .checkout-summary-card {
         position: static;
     }
+}
+
+/* ================= 🔥 PATCH SECTION (NO REMOVALS) ================= */
+
+/* FIX 1: STOP GRID STRETCHING */
+.grid-3 {
+    align-items: start !important;
+    grid-auto-rows: auto !important;
+}
+
+/* FIX 2: FORCE CARD NATURAL HEIGHT */
+.card {
+    height: auto !important;
+    min-height: unset !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+}
+
+/* FIX 3: REMOVE HIDDEN STRETCH FROM PSEUDO ELEMENT */
+.card::before {
+    height: auto !important;
+}
+
+/* FIX 4: IMAGE NORMALIZATION */
+.card img,
+.card-img-top {
+    height: 150px !important;
+    object-fit: contain !important;
+}
+
+/* FIX 5: BUTTON POSITION (NO EXTRA SPACE) */
+.card .btn,
+.card .btn-group {
+    margin-top: auto !important;
+}
+
+/* FIX 6: PREVENT ANIMATION FROM AFFECTING HEIGHT */
+.card.show,
+.card.fade-in,
+.card.fade-up {
+    transform: none !important;
+}
+
+/* FIX 7: MOBILE SAFETY */
+@media (max-width: 768px) {
+    .grid-3 {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ================= 🎨 COLOR SYSTEM (PREMIUM DARK + GOLD) ================= */
+
+:root {
+  --bg-main: #0b0f14;
+  --bg-card: #111827;
+  --bg-soft: #1a1f26;
+
+  --text-main: #ffffff;
+  --text-muted: #9ca3af;
+
+  --accent: #facc15;
+  --accent-hover: #eab308;
+
+  --border-soft: rgba(255,255,255,0.08);
+}
+
+/* Background improvement */
+body::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.55),
+    rgba(0,0,0,0.75)
+  ) !important;
+}
+
+/* ================= 🧱 GRID FIX (MAIN ISSUE) ================= */
+
+.grid-3,
+.row {
+  align-items: start !important;
+}
+
+/* If using Bootstrap cols */
+.row > div {
+  display: flex;
+}
+
+/* ================= 🧩 CARD FIX (REAL FIX) ================= */
+
+.card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+
+  /* 🔥 CRITICAL FIX */
+  height: auto !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+
+  padding: 16px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+
+  transition: 0.25s ease;
+}
+
+/* 🔥 REMOVE FORCED STRETCH FROM PARENT */
+.row > div > .card {
+  width: 100%;
+}
+
+/* 🔥 REMOVE RANDOM EMPTY SPACE */
+.card > * {
+  margin-bottom: 8px;
+}
+
+/* ================= 🖼 IMAGE FIX ================= */
+
+.card img,
+.card-img-top {
+  height: 140px !important;
+  object-fit: contain !important;
+  margin-bottom: 10px;
+}
+
+/* ================= 🏷 TEXT ================= */
+
+.card h3,
+.card h5 {
+  color: var(--text-main);
+  font-weight: 600;
+  margin: 6px 0;
+}
+
+.card p {
+  color: var(--text-muted);
+}
+
+/* ================= 💰 PRICE ================= */
+
+.card .price,
+.card .retail {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* ================= 🔘 BUTTONS ================= */
+
+.btn-primary,
+.btn-warning {
+  background: var(--accent) !important;
+  border: none !important;
+  color: #000 !important;
+
+  box-shadow: 0 4px 20px rgba(250, 204, 21, 0.25);
+}
+
+.btn-primary:hover,
+.btn-warning:hover {
+  background: var(--accent-hover) !important;
+}
+
+/* Outline button */
+.btn-outline-primary {
+  border: 1px solid var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+.btn-outline-primary:hover {
+  background: var(--accent) !important;
+  color: #000 !important;
+}
+
+/* 🔥 BUTTON POSITION FIX */
+.card .btn,
+.card .btn-group {
+  margin-top: auto !important;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ================= 🚫 REMOVE FAKE HEIGHT CAUSES ================= */
+
+/* Kill pseudo-element stretching */
+.card::before {
+  display: none !important;
+}
+
+/* Kill animation layout interference */
+.card,
+.card.show,
+.fade-in,
+.fade-up {
+  transform: none !important;
+}
+
+/* ================= 📱 MOBILE */
+
+@media (max-width: 768px) {
+  .grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .card img {
+    height: 120px !important;
+  }
 }

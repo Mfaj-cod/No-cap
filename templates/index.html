@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Home - {{ Nocap }}{% endblock %}
+{% block title %}Home - Nocap{% endblock %}
 
 {% block head %}
 <style>
@@ -37,6 +37,19 @@
 {% endblock %}
 
 {% block content %}
+{% macro img_url(path, fallback_index=0) -%}
+    {%- if path -%}
+        {%- if path.startswith('/static/') -%}
+            {{ path }}
+        {%- elif path.startswith('img/') -%}
+            {{ url_for('static', path=path) }}
+        {%- else -%}
+            {{ path }}
+        {%- endif -%}
+    {%- else -%}
+        {{ url_for('static', path=gallery_images[fallback_index % (gallery_images|length)] if gallery_images|length else 'img/logo.jpg') }}
+    {%- endif -%}
+{%- endmacro %}
 <section class="hero-section text-center py-5 bg-transparent position-relative">
     <div class="container">
         <h1 class="display-4 fw-bold text-warning hero-text">Caps for Daily Wear, Teams, and Retail Shelves</h1>
@@ -139,20 +152,22 @@
         <div class="row g-4">
             {% for product in browse_results %}
             <div class="col-sm-6 col-lg-3 scroll-reveal">
-                <div class="card bg-dark text-light border-0 shadow product-card text-center h-100">
-                    <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}" loading="lazy">
+                    <div class="card bg-dark text-light border-0 shadow product-card text-center">
+                        <img src="{{ img_url(product.image_url, loop.index0) }}" class="card-img-top p-3 product-thumb" alt="{{ product.name }}" loading="lazy">
                     <div class="card-body d-flex flex-column">
                         <span class="badge border border-warning text-warning align-self-center mb-2">{{ product.category }}</span>
                         <h6 class="card-title">{{ product.name }}</h6>
-                        <p class="card-text text-muted small">{{ product.description }}</p>
+                        <p class="card-text text-white small text-truncate">
+                        {{ product.description }}
+                        </p>
                         {% if product.average_rating %}
                         <p class="small mb-1"><span class="text-warning fw-semibold">{{ product.average_rating }}/5</span> from {{ product.review_count }} review{% if product.review_count != 1 %}s{% endif %}</p>
                         {% else %}
-                        <p class="small mb-1 text-muted">Freshly added style</p>
+                        <p class="small mb-1 text-white">Freshly added style</p>
                         {% endif %}
-                        <p class="small text-muted mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
+                        <p class="small text-white mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
                         <p class="mb-1">Retail: <span class="text-warning">{{ product.normal_price|money }}</span></p>
-                        <p class="small text-muted">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
+                        <p class="small text-white">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
                         <div class="d-flex justify-content-center gap-2 flex-wrap mt-auto">
                             <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
                                 <input type="hidden" name="quantity" value="1">
@@ -179,13 +194,13 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-5 col-md-7">
                             <div class="card bg-dark text-light shadow product-card text-center border-0">
-                                <img src="{{ product.image_url }}" class="card-img-top p-3" alt="{{ product.name }}" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+                                <img src="{{ img_url(product.image_url, loop.index0) }}" class="card-img-top p-3 product-thumb-lg" alt="{{ product.name }}" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
                                 <div class="card-body">
                                     <h4 class="card-title text-warning">{{ product.name }}</h4>
-                                    <p class="card-text text-muted">{{ product.description }}</p>
-                                    <p class="small text-muted mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
+                                    <p class="card-text text-white">{{ product.description }}</p>
+                                    <p class="small text-white mb-1">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
                                     <p class="mb-1">Retail: <span class="text-warning">{{ product.normal_price|money }}</span></p>
-                                    <p class="small text-muted">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
+                                    <p class="small text-white">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
                                     <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
                                         <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
                                             <input type="hidden" name="quantity" value="1">
@@ -221,7 +236,7 @@
             <div class="col-md-4 col-lg-2 scroll-reveal">
                 <a href="{{ url_for('category', category_name=category.name) }}" class="text-decoration-none">
                     <div class="card bg-dark text-light text-center category-card shadow border-0 h-100">
-                        <img src="{{ category.image_url }}" class="card-img-top p-3" alt="{{ category.name }}" loading="lazy">
+                        <img src="{{ img_url(category.image_url, loop.index0) }}" class="card-img-top p-3 category-thumb" alt="{{ category.name }}" loading="lazy">
                         <div class="card-body">
                             <h6 class="card-title mb-0">{{ category.name }}</h6>
                         </div>
