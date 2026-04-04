@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{{ product.name }} - {{ Nocap }}{% endblock %}
+{% block title %}{{ product.name }} - NoCap{% endblock %}
 
 {% block content %}
-<div class="container py-5">
 {% macro img_url(path, fallback_index=0) -%}
     {%- if path -%}
         {%- if path.startswith('/static/') -%}
@@ -17,204 +16,325 @@
         {{ url_for('static', path=gallery_images[fallback_index % (gallery_images|length)] if gallery_images|length else 'img/logo.jpg') }}
     {%- endif -%}
 {%- endmacro %}
-    <div class="row g-4">
-        <div class="col-md-6 mb-4">
-            <div class="card bg-dark text-light shadow-sm border-0 product-zoom-shell">
-                <img src="{{ (product.media_gallery[0] if product.media_gallery else (product.image_url or (url_for('static', path=gallery_images[0]) if gallery_images|length else url_for('static', path='img/logo.jpg')))) }}" id="mainProductImage" class="card-img-top p-3 product-image product-thumb-lg" alt="{{ product.name }}" fetchpriority="high">
+
+<style>
+    /* Clean Tab Styling */
+    #productTab .nav-link { 
+        color: #9ca3af; 
+        border: none; 
+        border-bottom: 3px solid transparent !important; 
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+    #productTab .nav-link:hover { color: #d1d5db; }
+    #productTab .nav-link.active { 
+        color: #ffc107 !important; 
+        border-bottom-color: #ffc107 !important; 
+    }
+    
+    /* Hide number arrows for clean quantity input */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+</style>
+
+<div class="container py-4 py-lg-5">
+    
+    <!-- Main 2-Column Product Layout -->
+    <div class="row g-4 g-lg-5">
+        
+        <!-- Left Column: Product Images -->
+        <div class="col-lg-6">
+            <!-- Main Image Wrapper (White background for uniform product look) -->
+            <div class="bg-white rounded-4 shadow-sm p-4 mb-3 d-flex align-items-center justify-content-center" style="height: 450px; border: 1px solid #374151;">
+                <img src="{{ img_url(product.media_gallery[0] if product.media_gallery else product.image_url, 0) }}" 
+                     id="mainProductImage" 
+                     class="img-fluid" 
+                     alt="{{ product.name }}" 
+                     style="max-height: 100%; max-width: 100%; object-fit: contain;"
+                     fetchpriority="high">
             </div>
+
+            <!-- Thumbnails (Horizontal Scroll) -->
             {% if product.media_gallery|length > 1 %}
-            <div class="d-flex gap-2 flex-wrap mt-3">
+            <div class="d-flex gap-2 overflow-x-auto pb-2">
                 {% for image in product.media_gallery %}
-                <button type="button" class="gallery-thumb {% if loop.first %}active{% endif %}" data-product-image="{{ image }}" aria-label="View image {{ loop.index }}">
-                    <img src="{{ image or (url_for('static', path=gallery_images[loop.index0 % (gallery_images|length)]) if gallery_images|length else url_for('static', path='img/logo.jpg')) }}" alt="{{ product.name }} image {{ loop.index }}">
+                <button type="button" 
+                        class="btn p-1 bg-white rounded-3 flex-shrink-0 thumbnail-btn {% if loop.first %}border-warning border-2{% else %}border-secondary border-1{% endif %}" 
+                        data-product-image="{{ img_url(image) }}" 
+                        onclick="changeImg(this)"
+                        style="width: 70px; height: 70px;">
+                    <img src="{{ img_url(image) }}" alt="Thumbnail {{ loop.index }}" class="w-100 h-100 rounded-2" style="object-fit: cover;">
                 </button>
                 {% endfor %}
             </div>
             {% endif %}
         </div>
 
-        <div class="col-md-6">
-            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
-                <div>
-                    <h2 class="text-warning mb-1">{{ product.name }}</h2>
-                    <p class="text-muted mb-0">Category:
-                        <a href="{{ url_for('category', category_name=product.category) }}" class="text-warning">{{ product.category }}</a>
-                    </p>
-                </div>
-                {% if product.average_rating %}
-                <div class="text-end">
-                    <div class="text-warning fw-semibold">{{ product.average_rating }}/5</div>
-                    <div class="small text-muted">{{ product.review_count }} verified review{% if product.review_count != 1 %}s{% endif %}</div>
-                </div>
-                {% else %}
-                <div class="small text-muted text-end">Freshly added style</div>
-                {% endif %}
-            </div>
-
-            <p class="text-light fs-5 mb-1">Retail: {{ product.normal_price|money }}</p>
-            <p class="text-muted mb-3">Shop owner price at 25+ caps: {{ product.shop_owner_price|money }}</p>
-
-            <div class="row g-2 mb-3">
-                <div class="col-sm-4"><div class="trust-tile h-100"><i class="bi bi-person-check text-warning me-2"></i>Guest checkout ready</div></div>
-                <div class="col-sm-4"><div class="trust-tile h-100"><i class="bi bi-arrow-repeat text-warning me-2"></i>7-day issue reporting</div></div>
-                <div class="col-sm-4"><div class="trust-tile h-100"><i class="bi bi-box-seam text-warning me-2"></i><span id="variantStockStatus">{{ product.total_stock }} total in stock</span></div></div>
-            </div>
-
-            <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="mb-3" id="productPurchaseForm">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-5">
-                        <label for="variant_sku" class="form-label">Variant</label>
-                        <select id="variant_sku" name="variant_sku" class="form-select form-select-lg">
-                            {% for variant in product.variants %}
-                            <option value="{{ variant.sku }}" data-stock="{{ variant.stock_quantity }}" {% if product.default_variant and variant.sku == product.default_variant.sku %}selected{% endif %} {% if variant.stock_quantity == 0 %}disabled{% endif %}>
-                                {{ variant.color }} / {{ variant.size }}{% if variant.stock_quantity == 0 %} - Sold out{% elif variant.stock_quantity <= 5 %} - Only {{ variant.stock_quantity }} left{% endif %}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control form-control-lg" inputmode="numeric">
-                    </div>
-                    <div class="col-md-4 d-grid">
-                        <button type="submit" class="btn btn-warning btn-lg"><i class="bi bi-cart3 me-1"></i> Add to Cart</button>
-                    </div>
-                </div>
-                <div class="d-flex gap-2 flex-wrap mt-3">
-                    <button type="submit" formaction="{{ url_for('add_to_cart', product_id=product.id) }}?next=checkout" class="btn btn-outline-warning btn-lg">Buy Now</button>
-                    <span class="small text-muted align-self-center">Select a variant first. Quantity will be capped by live stock.</span>
-                </div>
-            </form>
-
-            <div class="alert alert-info border-0">
-                Shop owners with 25 or more caps in the cart automatically receive {{ wholesale_discount_percent }}% off every item in the order.
-            </div>
-
-            <ul class="nav nav-tabs bg-black text-light border-0" id="productTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active text-warning" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link text-warning" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Specs</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link text-warning" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button>
-                </li>
-            </ul>
-            <div class="tab-content bg-dark text-light p-3 border border-secondary border-top-0 rounded-bottom" id="productTabContent">
-                <div class="tab-pane fade show active" id="description" role="tabpanel">
-                    <p>{{ product.description }}</p>
-                    <ul>
-                        {% for detail in product.details %}
-                        <li>{{ detail }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="tab-pane fade" id="specs" role="tabpanel">
-                    <div class="table-responsive">
-                        <table class="table table-dark table-sm align-middle mb-0">
-                            <tbody>
-                                {% for label, value in product.attributes.items() %}
-                                <tr>
-                                    <th class="text-warning" style="width: 35%;">{{ label }}</th>
-                                    <td>{{ value }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="reviews" role="tabpanel">
-                    {% if product.reviews %}
-                        {% for review in product.reviews %}
-                        <div class="mb-3 border-bottom border-secondary pb-2">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <strong class="text-warning">{{ review.user }}</strong>
-                                {% if review.rating %}
-                                <span class="small text-warning">{{ review.rating }}/5</span>
-                                {% endif %}
-                            </div>
-                            <span class="text-muted small">{{ review.date }}</span>
-                            <p class="mb-0 mt-2">{{ review.comment }}</p>
-                        </div>
-                        {% endfor %}
+        <!-- Right Column: Product Info & Buy Box -->
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <span class="badge bg-secondary text-light px-3 py-2 rounded-pill mb-3">{{ product.category }}</span>
+                <h1 class="text-warning fw-bold mb-3" style="font-size: 2.2rem; line-height: 1.2;">{{ product.name }}</h1>
+                
+                <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
+                    <h2 class="text-white fw-bold mb-0" style="font-size: 2rem;">{{ product.normal_price|money }}</h2>
+                    {% if product.total_stock > 0 %}
+                        <span class="badge bg-success px-3 py-2 rounded-pill">✔ {{ product.total_stock }} in stock</span>
                     {% else %}
-                        <p class="text-muted">No reviews yet.</p>
+                        <span class="badge bg-danger px-3 py-2 rounded-pill">Out of Stock</span>
                     {% endif %}
                 </div>
+                <p class="text-muted mb-0">Shop owner (25+ caps): <strong class="text-light">{{ product.shop_owner_price|money }}</strong></p>
+            </div>
+
+            {% if wholesale_discount_percent %}
+            <div class="alert bg-dark border border-info rounded-4 mb-4">
+                <div class="d-flex gap-3 align-items-center">
+                    <i class="bi bi-info-circle-fill fs-4 text-info"></i>
+                    <div>
+                        <strong class="text-info d-block">Wholesale Offer</strong> 
+                        <span class="text-light small">Buy 25+ caps for {{ wholesale_discount_percent }}% off your entire order.</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <p class="text-light text-opacity-75 lh-lg">{{ product.description | truncate(150) }} <a href="#productTab" onclick="document.getElementById('description-tab').click();" class="text-warning text-decoration-none ms-1">Read more</a></p>
+            </div>
+
+            <!-- Buy Box Card (Strict Vertical Flow) -->
+            <div class="card bg-dark border border-secondary rounded-4 shadow-lg mt-4">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" id="productPurchaseForm">
+                        
+                        <!-- Block-level Variant Select -->
+                        <div class="mb-4">
+                            <label for="variant_sku" class="form-label fw-bold text-light mb-2">Variant</label>
+                            <select id="variant_sku" name="variant_sku" class="form-select form-select-lg bg-dark text-light border-secondary shadow-none cursor-pointer">
+                                {% for variant in product.variants %}
+                                <option value="{{ variant.sku }}" 
+                                        data-stock="{{ variant.stock_quantity }}" 
+                                        {% if product.default_variant and variant.sku == product.default_variant.sku %}selected{% endif %} 
+                                        {% if variant.stock_quantity == 0 %}disabled{% endif %}>
+                                    {{ variant.color }} / {{ variant.size }}
+                                    {% if variant.stock_quantity == 0 %} (Sold out)
+                                    {% elif variant.stock_quantity <= 5 %} (Only {{ variant.stock_quantity }} left)
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Block-level Quantity Input -->
+                        <div class="mb-4">
+                            <label for="quantity" class="form-label fw-bold text-light mb-2">Quantity</label>
+                            <div class="input-group" style="max-width: 160px;">
+                                <button class="btn btn-outline-secondary px-3" type="button" id="quantityDecrement"><i class="bi bi-dash"></i></button>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control bg-dark text-light text-center border-secondary shadow-none fw-bold" style="appearance: textfield;">
+                                <button class="btn btn-outline-secondary px-3" type="button" id="quantityIncrement"><i class="bi bi-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Stacked Buttons using d-grid -->
+                        <div class="d-grid gap-3 pt-2">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold py-3 rounded-3 d-flex justify-content-center align-items-center gap-2 shadow-sm">
+                                <i class="bi bi-cart-plus fs-5"></i> Add to Cart
+                            </button>
+                            <button type="submit" formaction="{{ url_for('add_to_cart', product_id=product.id) }}?next=checkout" class="btn btn-outline-warning btn-lg fw-bold py-3 rounded-3">
+                                Buy Now
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="mobile-cta-bar d-md-none">
-        <div>
-            <div class="small text-muted">Retail</div>
-            <div class="text-warning fw-semibold">{{ product.normal_price|money }}</div>
+    <!-- Product Details Tabs -->
+    <div class="mt-5 pt-4">
+        <ul class="nav nav-tabs border-secondary mb-4" id="productTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-bold fs-5 pb-3" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold fs-5 pb-3" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Specifications</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold fs-5 pb-3" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button>
+            </li>
+        </ul>
+
+        <div class="tab-content px-lg-4 py-3" id="productTabContent">
+            <!-- Description -->
+            <div class="tab-pane fade show active" id="description" role="tabpanel">
+                <div class="row gx-5">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <p class="text-light lh-lg fs-5">{{ product.description }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if product.details %}
+                        <ul class="text-light lh-lg fs-5">
+                            {% for detail in product.details %}
+                            <li class="mb-3">{{ detail }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specs -->
+            <div class="tab-pane fade" id="specs" role="tabpanel">
+                <div class="table-responsive rounded-3 overflow-hidden border border-secondary">
+                    <table class="table table-dark table-striped table-hover align-middle mb-0 m-0">
+                        <tbody>
+                            {% for label, value in product.attributes.items() %}
+                            <tr>
+                                <th class="text-warning fw-bold px-4 py-3 border-secondary" style="width: 35%;">{{ label }}</th>
+                                <td class="text-light px-4 py-3 border-secondary">{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reviews -->
+            <div class="tab-pane fade" id="reviews" role="tabpanel">
+                {% if product.reviews %}
+                    {% for review in product.reviews %}
+                    <div class="card bg-transparent border border-secondary rounded-4 mb-3 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong class="text-warning fs-5">{{ review.user }}</strong>
+                                {% if review.rating %}
+                                <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill"><i class="bi bi-star-fill me-1"></i> {{ review.rating }}/5</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-muted small mb-3"><i class="bi bi-calendar3 me-1"></i> {{ review.date }}</div>
+                            <p class="mb-0 text-light fs-6 lh-lg">{{ review.comment }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <h4 class="text-muted">No reviews yet.</h4>
+                        <p class="text-secondary">Be the first to review this product!</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="d-flex gap-2 align-items-center" id="mobileQuickAddForm">
-            <input type="hidden" name="quantity" value="1">
-            <input type="hidden" name="variant_sku" id="mobileVariantSku" value="{{ product.default_variant.sku if product.default_variant else '' }}">
-            <button type="submit" class="btn btn-warning" {% if not product.in_stock %}disabled{% endif %}>Add to Cart</button>
-        </form>
     </div>
 
-    <div class="mt-5">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <h3 class="text-warning mb-0">Related Products</h3>
-            <span class="small text-muted">Secure checkout, live stock, and visible pricing stay consistent across the store.</span>
-        </div>
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mt-5 pt-5">
+        <h3 class="text-warning mb-4 fw-bold">You Might Also Like</h3>
         <div class="row g-4">
             {% for rel_product in related_products %}
-            <div class="col-md-3 col-sm-6">
-                <div class="card bg-dark text-light border-0 shadow product-card text-center h-100">
-                    <img src="{{ rel_product.image_url or (url_for('static', path=gallery_images[loop.index0 % (gallery_images|length)]) if gallery_images|length else url_for('static', path='img/logo.jpg')) }}" class="card-img-top p-3 product-thumb" alt="{{ rel_product.name }}" loading="lazy">
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="card-title">{{ rel_product.name }}</h6>
-                        <p class="small text-muted mb-1">{{ rel_product.variant_count }} variants | {{ rel_product.total_stock }} in stock</p>
-                        <p class="card-text mb-1">{{ rel_product.normal_price|money }}</p>
-                        <p class="small text-muted">Wholesale: {{ rel_product.shop_owner_price|money }}</p>
-                        <a href="{{ url_for('product', product_id=rel_product.id) }}" class="btn btn-warning btn-sm mt-auto">View Product</a>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card bg-dark border border-secondary shadow-sm rounded-4 h-100 overflow-hidden text-center transition-hover">
+                    <a href="{{ url_for('product', product_id=rel_product.id) }}" class="text-decoration-none">
+                        <!-- Clean white wrapper for related images fixed at 180px height -->
+                        <div class="bg-white p-3 d-flex align-items-center justify-content-center" style="height: 180px;">
+                            <img src="{{ img_url(rel_product.image_url, loop.index0) }}" 
+                                 alt="{{ rel_product.name }}" 
+                                 loading="lazy"
+                                 class="img-fluid"
+                                 style="max-height: 100%; object-fit: contain;">
+                        </div>
+                    </a>
+                    <div class="card-body d-flex flex-column p-3 p-lg-4">
+                        <h6 class="card-title text-light fw-bold mb-3 text-truncate">{{ rel_product.name }}</h6>
+                        <div class="mt-auto">
+                            <p class="text-warning fw-bold fs-6 mb-1">{{ rel_product.normal_price|money }}</p>
+                            <p class="small text-secondary mb-3">Wholesale: {{ rel_product.shop_owner_price|money }}</p>
+                            <a href="{{ url_for('product', product_id=rel_product.id) }}" class="btn btn-outline-warning btn-sm w-100 rounded-pill py-2 fw-semibold">View Details</a>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 </div>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
 const mainProductImage = document.getElementById('mainProductImage');
-const thumbnailButtons = document.querySelectorAll('[data-product-image]');
 const variantSelect = document.getElementById('variant_sku');
 const quantityInput = document.getElementById('quantity');
-const stockStatus = document.getElementById('variantStockStatus');
-const mobileVariantInput = document.getElementById('mobileVariantSku');
+const quantityDecrement = document.getElementById('quantityDecrement');
+const quantityIncrement = document.getElementById('quantityIncrement');
 
-thumbnailButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-        const image = button.getAttribute('data-product-image');
-        mainProductImage.src = image;
-        thumbnailButtons.forEach((thumb) => thumb.classList.remove('active'));
-        button.classList.add('active');
+function changeImg(btn) {
+    const imageUrl = btn.getAttribute('data-product-image');
+    mainProductImage.src = imageUrl;
+    
+    // Update thumbnail border styling
+    document.querySelectorAll('.thumbnail-btn').forEach(t => {
+        t.classList.remove('border-warning', 'border-2');
+        t.classList.add('border-secondary', 'border-1');
     });
-});
+    btn.classList.remove('border-secondary', 'border-1');
+    btn.classList.add('border-warning', 'border-2');
+}
 
 function updateVariantState() {
+    if (!variantSelect) return;
     const selectedOption = variantSelect.options[variantSelect.selectedIndex];
     const stock = Number(selectedOption.dataset.stock || '0');
-    quantityInput.max = stock || 1;
-    if (Number(quantityInput.value) > stock && stock > 0) {
-        quantityInput.value = stock;
+    quantityInput.max = Math.max(stock, 1);
+    
+    if (stock === 0) {
+        quantityInput.disabled = true;
+        quantityDecrement.disabled = true;
+        quantityIncrement.disabled = true;
+        quantityInput.value = 0;
+    } else {
+        quantityInput.disabled = false;
+        quantityDecrement.disabled = false;
+        quantityIncrement.disabled = false;
+        if (Number(quantityInput.value) > stock) {
+            quantityInput.value = Math.min(stock, 1);
+        }
     }
-    stockStatus.textContent = stock > 0 ? `${stock} pieces left in ${selectedOption.textContent.split(' - ')[0]}` : 'Selected variant is sold out';
-    mobileVariantInput.value = selectedOption.value;
 }
 
 if (variantSelect) {
     variantSelect.addEventListener('change', updateVariantState);
     updateVariantState();
+}
+
+if (quantityDecrement) {
+    quantityDecrement.addEventListener('click', function() {
+        const val = Number(quantityInput.value);
+        if (val > 1) quantityInput.value = val - 1;
+    });
+}
+
+if (quantityIncrement) {
+    quantityIncrement.addEventListener('click', function() {
+        const val = Number(quantityInput.value);
+        const max = Math.max(Number(variantSelect?.options[variantSelect.selectedIndex].dataset.stock || '0'), 1);
+        if (val < max) quantityInput.value = val + 1;
+    });
+}
+
+if (quantityInput) {
+    quantityInput.addEventListener('change', function() {
+        const max = Math.max(Number(variantSelect?.options[variantSelect.selectedIndex].dataset.stock || '0'), 1);
+        let val = Number(this.value);
+        if (val > max) val = max;
+        if (val < 1) val = 1;
+        this.value = val;
+    });
 }
 </script>
 {% endblock %}

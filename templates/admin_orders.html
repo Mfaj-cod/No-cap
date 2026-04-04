@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — Orders{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="text-warning mb-3">Order Management</h2>
+    <div class="card bg-dark text-light p-3">
+        <div id="ordersContainer">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>When</th>
+                        <th>Customer</th>
+                        <th>Address</th>
+                        <th>Items</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody">
+                    {% for o in orders %}
+                    <tr data-order-id="{{ o.id }}">
+                        <td>{{ o.id }}</td>
+                        <td>{{ o.created_at }}</td>
+                        <td>{{ o.name }}<br><small>{{ o.email }}</small></td>
+                        <td>{{ o.address }}, {{ o.city }} {{ o.pincode }}</td>
+                        <td>
+                            <ul class="mb-0">
+                                {% for it in o.items %}
+                                <li>{{ it.product_name }} x{{ it.quantity }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ o.payment_method }} / Rs. {{ o.total }}</td>
+                        <td class="order-status">{{ o.status }}</td>
+                        <td>
+                            <select class="form-select form-select-sm status-select">
+                                <option value="placed">placed</option>
+                                <option value="processing">processing</option>
+                                <option value="on the way">on the way</option>
+                                <option value="delivered">delivered</option>
+                            </select>
+                            <button class="btn btn-warning btn-sm mt-1 update-status">Update</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p class="small text-muted mt-2">Auto-refreshes every 5 seconds.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function fetchOrders() {
+    const res = await fetch('/api/admin/orders');
+    if (!res.ok) return;
+    const orders = await res.json();
+    const body = document.getElementById('ordersBody');
+    body.innerHTML = '';
+    orders.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.dataset.orderId = o.id;
+        tr.innerHTML = `
+            <td>${o.id}</td>
+            <td>${o.created_at}</td>
+            <td>${o.name}<br><small>${o.email}</small></td>
+            <td>${o.address}</td>
+            <td><ul class="mb-0">${o.items.map(i=>`<li>${i.product_name} x${i.quantity}</li>`).join('')}</ul></td>
+            <td>${o.payment_method} / Rs. ${o.total}</td>
+            <td class="order-status">${o.status}</td>
+            <td>
+                <select class="form-select form-select-sm status-select">
+                    <option value="placed">placed</option>
+                    <option value="processing">processing</option>
+                    <option value="on the way">on the way</option>
+                    <option value="delivered">delivered</option>
+                </select>
+                <button class="btn btn-warning btn-sm mt-1 update-status">Update</button>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
+    attachHandlers();
+}
+
+function attachHandlers(){
+    document.querySelectorAll('.update-status').forEach(btn=>{
+        btn.onclick = async (e)=>{
+            const tr = e.target.closest('tr');
+            const id = tr.dataset.orderId;
+            const sel = tr.querySelector('.status-select');
+            const status = sel.value;
+            await fetch(`/api/admin/orders/${id}/status`, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({status})});
+            // optimistic update
+            tr.querySelector('.order-status').textContent = status;
+        }
+    });
+}
+
+fetchOrders();
+setInterval(fetchOrders, 5000);
+</script>
+{% endblock %}

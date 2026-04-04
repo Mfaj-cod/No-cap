@@ -5,7 +5,7 @@ from typing import Any
 from src.config import settings
 from src.data import CATEGORIES, PRODUCTS, WHOLESALE_DISCOUNT
 
-DB_SCHEMA_VERSION = 3
+DB_SCHEMA_VERSION = 4
 
 
 def get_connection() -> sqlite3.Connection:
@@ -35,7 +35,7 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL,
-            role TEXT NOT NULL CHECK(role IN ('customer', 'shop_owner')),
+            role TEXT NOT NULL CHECK(role IN ('customer', 'shop_owner', 'admin')),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -593,5 +593,20 @@ def get_order(order_id: int) -> dict[str, Any] | None:
     connection.close()
     order["items"] = [dict(item_row) for item_row in item_rows]
     return order
+
+
+def list_orders(limit: int = 100) -> list[dict[str, Any]]:
+    connection = get_connection()
+    rows = connection.execute(
+        """
+        SELECT id
+        FROM orders
+        ORDER BY created_at DESC, id DESC
+        LIMIT ?
+        """,
+        (limit,),
+    ).fetchall()
+    connection.close()
+    return [get_order(row[0]) for row in rows]
 
 

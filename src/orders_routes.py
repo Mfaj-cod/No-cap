@@ -12,6 +12,7 @@ from src.db import (
     mark_order_paid,
     update_order_status,
 )
+from src.notifications import send_order_placed_email
 from src.services import (
     GUEST_USER_ID,
     add_flash,
@@ -190,6 +191,10 @@ def place_order(
 
     if payment_method == "cod":
         update_order_status(order_id, "confirmed")
+        try:
+            send_order_placed_email(order_id)
+        except Exception:
+            pass
         clear_cart(request)
         clear_saved_checkout_data(request)
         add_flash(request, "Your order has been placed successfully.", "success")
@@ -281,6 +286,10 @@ def payment_success(
         return RedirectResponse(url=str(failure_url), status_code=303)
 
     mark_order_paid(order_id, razorpay_payment_id)
+    try:
+        send_order_placed_email(order_id)
+    except Exception:
+        pass
     clear_cart(request)
     clear_saved_checkout_data(request)
     add_flash(request, "Payment received successfully.", "success")
