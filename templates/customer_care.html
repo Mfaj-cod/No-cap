@@ -55,6 +55,7 @@
 const customerCareForm = document.getElementById('customerCareForm');
 const customerCareInput = document.getElementById('customerCareInput');
 const chatMessages = document.getElementById('chatMessages');
+const sendButton = customerCareForm.querySelector('button[type="submit"]');
 
 function appendMessage(role, text) {
     const bubble = document.createElement('div');
@@ -64,8 +65,23 @@ function appendMessage(role, text) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-customerCareForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
+function showLoadingIndicator() {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble assistant';
+    bubble.id = 'loadingIndicator';
+    bubble.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Thinking...';
+    chatMessages.appendChild(bubble);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeLoadingIndicator() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (loadingIndicator) {
+        loadingIndicator.remove();
+    }
+}
+
+async function sendMessage() {
     const message = customerCareInput.value.trim();
     if (!message) {
         return;
@@ -73,6 +89,9 @@ customerCareForm.addEventListener('submit', async (event) => {
 
     appendMessage('user', message);
     customerCareInput.value = '';
+    sendButton.disabled = true;
+
+    showLoadingIndicator();
 
     try {
         const response = await fetch("{{ url_for('customer_care_message') }}", {
@@ -81,13 +100,31 @@ customerCareForm.addEventListener('submit', async (event) => {
             body: JSON.stringify({ message })
         });
         const data = await response.json();
+        removeLoadingIndicator();
         if (!response.ok) {
             appendMessage('assistant', data.error || 'Customer care is temporarily unavailable.');
             return;
         }
         appendMessage('assistant', data.answer);
     } catch (error) {
+        removeLoadingIndicator();
         appendMessage('assistant', 'Customer care is temporarily unavailable.');
+    } finally {
+        sendButton.disabled = false;
+        customerCareInput.focus();
+    }
+}
+
+customerCareForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    sendMessage();
+});
+
+// Send on Enter key (without Shift for multiline support)
+customerCareInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
     }
 });
 </script>

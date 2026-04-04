@@ -5,8 +5,7 @@ python-multipart
 python-dotenv
 itsdangerous
 razorpay
-langchain-core
-langchain-groq
+groq
 
 # Testing
 pytest
