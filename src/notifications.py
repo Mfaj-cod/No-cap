@@ -62,3 +62,18 @@ def send_order_delivered_email(order_id: int) -> None:
         "If you have any issues, please contact support.\n\nThanks,\nNoCaps team"
     )
     _send_mail(subject, body, order.get("email") or settings.owner_email)
+
+
+def send_password_reset_otp_email(email: str, otp: str) -> None:
+    """Send password reset OTP to user's email"""
+    subject = "Your NoCaps Password Reset OTP"
+    body = (
+        f"Hi there,\n\n"
+        f"We received a request to reset your password for your NoCaps account.\n"
+        f"Use the following One-Time Password (OTP) to proceed:\n\n"
+        f"OTP: {otp}\n\n"
+        f"This OTP will expire in 10 minutes.\n\n"
+        f"If you did not request this, please ignore this email.\n\n"
+        f"Thanks,\nNoCaps team"
+    )
+    _send_mail(subject, body, email)

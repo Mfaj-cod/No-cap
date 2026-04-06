@@ -5,7 +5,7 @@ from typing import Any
 from src.config import settings
 from src.data import CATEGORIES, PRODUCTS, WHOLESALE_DISCOUNT
 
-DB_SCHEMA_VERSION = 4
+DB_SCHEMA_VERSION = 5
 
 
 def get_connection() -> sqlite3.Connection:
@@ -36,6 +36,8 @@ def _reset_database(connection: sqlite3.Connection) -> None:
             email TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL,
             role TEXT NOT NULL CHECK(role IN ('customer', 'shop_owner', 'admin')),
+            reset_otp TEXT,
+            reset_otp_expiry TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -608,5 +610,105 @@ def list_orders(limit: int = 100) -> list[dict[str, Any]]:
     ).fetchall()
     connection.close()
     return [get_order(row[0]) for row in rows]
+
+
+def store_reset_otp(email: str, otp: str, expiry_minutes: int = 10) -> bool:
+    """Store OTP for password reset with expiry time"""
+    connection = get_connection()
+    try:
+        connection.execute(
+            """
+            UPDATE users 
+            SET reset_otp = ?, reset_otp_expiry = datetime('now', ? || ' minutes')
+            WHERE email = ?
+            """,
+            (otp, str(expiry_minutes), email),
+        )
+        connection.commit()
+        return True
+    except Exception:
+        return False
+    finally:
+        connection.close()
+
+
+def verify_reset_otp(email: str, otp: str) -> bool:
+    """Verify OTP and check if it hasn't expired"""
+    connection = get_connection()
+    try:
+        row = connection.execute(
+            """
+            SELECT reset_otp, reset_otp_expiry 
+            FROM users 
+            WHERE email = ?
+            """,
+            (email,),
+        ).fetchone()
+        
+        if not row:
+            return False
+        
+        stored_otp = row["reset_otp"]
+        expiry = row["reset_otp_expiry"]
+        
+        if not stored_otp or not expiry:
+            return False
+        
+        # Check if OTP matches and hasn't expired
+        is_valid = connection.execute(
+            """
+            SELECT 1 FROM users 
+            WHERE email = ? 
+            AND reset_otp = ? 
+            AND reset_otp_expiry > datetime('now')
+            """,
+            (email, otp),
+        ).fetchone()
+        
+        return bool(is_valid)
+    except Exception:
+        return False
+    finally:
+        connection.close()
+
+
+def reset_user_password(email: str, new_password_hash: str) -> bool:
+    """Update user password and clear OTP"""
+    connection = get_connection()
+    try:
+        connection.execute(
+            """
+            UPDATE users 
+            SET password_hash = ?, reset_otp = NULL, reset_otp_expiry = NULL
+            WHERE email = ?
+            """,
+            (new_password_hash, email),
+        )
+        connection.commit()
+        return True
+    except Exception:
+        return False
+    finally:
+        connection.close()
+
+
+def clear_reset_otp(email: str) -> bool:
+    """Clear OTP after successful or failed attempt"""
+    connection = get_connection()
+    try:
+        connection.execute(
+            """
+            UPDATE users 
+            SET reset_otp = NULL, reset_otp_expiry = NULL
+            WHERE email = ?
+            """,
+            (email,),
+        )
+        connection.commit()
+        return True
+    except Exception:
+        return False
+    finally:
+        connection.close()
 
 
