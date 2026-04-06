@@ -44,7 +44,7 @@
                                 <div>{{ o.name }}</div>
                                 <small class="text-muted">{{ o.email }}</small>
                                 <div class="small text-muted mt-1">
-                                    {{ o.city }}, {{ o.pincode }}
+                                    {{ o.address }}
                                 </div>
                             </td>
 
@@ -143,7 +143,7 @@ async function fetchOrders() {
             <td>
                 <div>${o.name}</div>
                 <small class="text-muted">${o.email}</small>
-                <div class="small text-muted mt-1">${o.city}, ${o.pincode}</div>
+                <div class="small text-muted mt-1">${o.address || ''}</div>
             </td>
 
             <td style="max-width:220px;">
