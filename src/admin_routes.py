@@ -26,7 +26,7 @@ def admin_orders_page(request: Request):
 @router.get("/api/admin/orders", response_class=JSONResponse)
 def api_list_orders(request: Request):
     _require_admin(request)
-    orders = list_orders(200)
+    orders = [o for o in list_orders(200) if o.get("status") not in ("cancelled", "failed")]
     # sanitize/shape minimal data
     out = []
     for o in orders:
@@ -35,7 +35,12 @@ def api_list_orders(request: Request):
                 "id": o["id"],
                 "name": o["name"],
                 "email": o["email"],
-                "address": f"{o.get('address')}, {o.get('city')} - {o.get('pincode')}",
+                # "address": f"{o.get('address')}, {o.get('city')} - {o.get('pincode')}",
+                "address": ", ".join(filter(None, [
+                    o.get("address"),
+                    o.get("city"),
+                    o.get("pincode")
+                ])),
                 "status": o.get("status"),
                 "payment_method": o.get("payment_method"),
                 "total": o.get("total"),
@@ -47,9 +52,9 @@ def api_list_orders(request: Request):
 
 
 @router.post("/api/admin/orders/{order_id}/status", response_class=JSONResponse)
-def api_update_order_status(request: Request, order_id: int):
+async def api_update_order_status(request: Request, order_id: int):
     _require_admin(request)
-    payload = request.json()
+    payload = await request.json()
     new_status = payload.get("status") if isinstance(payload, dict) else None
     if not new_status:
         return JSONResponse({"error": "Missing status"}, status_code=400)

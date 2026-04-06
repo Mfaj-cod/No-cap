@@ -3,107 +3,218 @@
 {% block title %}Admin — Orders{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <h2 class="text-warning mb-3">Order Management</h2>
-    <div class="card bg-dark text-light p-3">
-        <div id="ordersContainer">
-            <table class="table table-dark table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>When</th>
-                        <th>Customer</th>
-                        <th>Address</th>
-                        <th>Items</th>
-                        <th>Payment</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="ordersBody">
-                    {% for o in orders %}
-                    <tr data-order-id="{{ o.id }}">
-                        <td>{{ o.id }}</td>
-                        <td>{{ o.created_at }}</td>
-                        <td>{{ o.name }}<br><small>{{ o.email }}</small></td>
-                        <td>{{ o.address }}, {{ o.city }} {{ o.pincode }}</td>
-                        <td>
-                            <ul class="mb-0">
-                                {% for it in o.items %}
-                                <li>{{ it.product_name }} x{{ it.quantity }}</li>
-                                {% endfor %}
-                            </ul>
-                        </td>
-                        <td>{{ o.payment_method }} / Rs. {{ o.total }}</td>
-                        <td class="order-status">{{ o.status }}</td>
-                        <td>
-                            <select class="form-select form-select-sm status-select">
-                                <option value="placed">placed</option>
-                                <option value="processing">processing</option>
-                                <option value="on the way">on the way</option>
-                                <option value="delivered">delivered</option>
-                            </select>
-                            <button class="btn btn-warning btn-sm mt-1 update-status">Update</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container py-5">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-warning fw-bold">Order Management</h2>
+        <span class="text-muted small">Auto-refresh every 5s</span>
+    </div>
+
+    <div class="card border-0 shadow-lg"
+         style="background: linear-gradient(145deg,#0f172a,#0b1220); border-radius:16px;">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table align-middle text-light mb-0">
+
+                    <thead style="background: rgba(255,255,255,0.05);">
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th style="width:180px;">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="ordersBody">
+
+                        {% for o in orders %}
+                        <tr data-order-id="{{ o.id }}" style="border-bottom:1px solid rgba(255,255,255,0.05);">
+
+                            <!-- ID -->
+                            <td class="fw-bold text-warning">#{{ o.id }}</td>
+
+                            <!-- CUSTOMER -->
+                            <td>
+                                <div>{{ o.name }}</div>
+                                <small class="text-muted">{{ o.email }}</small>
+                                <div class="small text-muted mt-1">
+                                    {{ o.city }}, {{ o.pincode }}
+                                </div>
+                            </td>
+
+                            <!-- ITEMS -->
+                            <td style="max-width:220px;">
+                                <ul class="mb-0 small">
+                                    {% for it in o["items"] %}
+                                    <li>{{ it.product_name }} × {{ it.quantity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+
+                            <!-- TOTAL -->
+                            <td class="fw-semibold text-warning">
+                                ₹{{ o.total }}
+                            </td>
+
+                            <!-- PAYMENT -->
+                            <td>
+                                <span class="badge bg-secondary text-uppercase">
+                                    {{ o.payment_method }}
+                                </span>
+                            </td>
+
+                            <!-- STATUS -->
+                            <td>
+                                <span class="badge status-badge text-uppercase"
+                                      data-status="{{ o.status }}">
+                                    {{ o.status }}
+                                </span>
+                            </td>
+
+                            <!-- ACTION -->
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <select class="form-select form-select-sm status-select" style="background:#1f2937;border:none;color:#fff;">
+                                        <option value="placed" {% if o.status == 'placed' %}selected{% endif %}>Placed</option>
+                                        <option value="processing" {% if o.status == 'processing' %}selected{% endif %}>Processing</option>
+                                        <option value="on the way" {% if o.status == 'on the way' %}selected{% endif %}>On the Way</option>
+                                        <option value="delivered" {% if o.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                    </select>
+
+                                    <button class="btn btn-warning btn-sm update-status">
+                                        Update
+                                    </button>
+                                </div>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
         </div>
     </div>
-    <p class="small text-muted mt-2">Auto-refreshes every 5 seconds.</p>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+
+// 🎯 STATUS COLORS
+function applyStatusColors() {
+    document.querySelectorAll('.status-badge').forEach(el => {
+        const status = el.dataset.status.toLowerCase();
+
+        el.classList.remove('bg-secondary','bg-info','bg-primary','bg-success');
+
+        if (status === 'placed') el.classList.add('bg-secondary');
+        else if (status === 'processing') el.classList.add('bg-info');
+        else if (status === 'on the way') el.classList.add('bg-primary');
+        else if (status === 'delivered') el.classList.add('bg-success');
+    });
+}
+
+// 🔁 FETCH ORDERS
 async function fetchOrders() {
     const res = await fetch('/api/admin/orders');
     if (!res.ok) return;
+
     const orders = await res.json();
     const body = document.getElementById('ordersBody');
+
     body.innerHTML = '';
+
     orders.forEach(o => {
         const tr = document.createElement('tr');
         tr.dataset.orderId = o.id;
+
         tr.innerHTML = `
-            <td>${o.id}</td>
-            <td>${o.created_at}</td>
-            <td>${o.name}<br><small>${o.email}</small></td>
-            <td>${o.address}</td>
-            <td><ul class="mb-0">${o.items.map(i=>`<li>${i.product_name} x${i.quantity}</li>`).join('')}</ul></td>
-            <td>${o.payment_method} / Rs. ${o.total}</td>
-            <td class="order-status">${o.status}</td>
+            <td class="fw-bold text-warning">#${o.id}</td>
+
             <td>
-                <select class="form-select form-select-sm status-select">
-                    <option value="placed">placed</option>
-                    <option value="processing">processing</option>
-                    <option value="on the way">on the way</option>
-                    <option value="delivered">delivered</option>
-                </select>
-                <button class="btn btn-warning btn-sm mt-1 update-status">Update</button>
+                <div>${o.name}</div>
+                <small class="text-muted">${o.email}</small>
+                <div class="small text-muted mt-1">${o.city}, ${o.pincode}</div>
+            </td>
+
+            <td style="max-width:220px;">
+                <ul class="mb-0 small">
+                    ${o.items.map(i => `<li>${i.product_name} × ${i.quantity}</li>`).join('')}
+                </ul>
+            </td>
+
+            <td class="fw-semibold text-warning">₹${o.total}</td>
+
+            <td>
+                <span class="badge bg-secondary text-uppercase">${o.payment_method}</span>
+            </td>
+
+            <td>
+                <span class="badge status-badge text-uppercase" data-status="${o.status}">
+                    ${o.status}
+                </span>
+            </td>
+
+            <td>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm status-select" style="background:#1f2937;border:none;color:#fff;">
+                        <option value="placed" ${o.status === 'placed' ? 'selected' : ''}>Placed</option>
+                        <option value="processing" ${o.status === 'processing' ? 'selected' : ''}>Processing</option>
+                        <option value="on the way" ${o.status === 'on the way' ? 'selected' : ''}>On the Way</option>
+                        <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                    </select>
+
+                    <button class="btn btn-warning btn-sm update-status">
+                        Update
+                    </button>
+                </div>
             </td>
         `;
+
         body.appendChild(tr);
     });
+
     attachHandlers();
+    applyStatusColors();
 }
 
-function attachHandlers(){
-    document.querySelectorAll('.update-status').forEach(btn=>{
-        btn.onclick = async (e)=>{
+// 🔘 UPDATE STATUS
+function attachHandlers() {
+    document.querySelectorAll('.update-status').forEach(btn => {
+        btn.onclick = async (e) => {
             const tr = e.target.closest('tr');
             const id = tr.dataset.orderId;
-            const sel = tr.querySelector('.status-select');
-            const status = sel.value;
-            await fetch(`/api/admin/orders/${id}/status`, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({status})});
-            // optimistic update
-            tr.querySelector('.order-status').textContent = status;
-        }
+            const status = tr.querySelector('.status-select').value;
+
+            await fetch(`/api/admin/orders/${id}/status`, {
+                method: 'POST',
+                headers: {'content-type': 'application/json'},
+                body: JSON.stringify({status})
+            });
+
+            const badge = tr.querySelector('.status-badge');
+            badge.textContent = status;
+            badge.dataset.status = status;
+
+            tr.querySelector('.status-select').value = status;
+
+            applyStatusColors();
+        };
     });
 }
 
+// INIT
 fetchOrders();
 setInterval(fetchOrders, 5000);
+
 </script>
 {% endblock %}

@@ -130,7 +130,7 @@
 </div>
 
     <div class="row g-4 mt-2">
-        <div class="col-lg-7">
+        <!-- <div class="col-lg-7">
             <div class="card bg-dark text-light border-0 shadow-sm h-100">
                 <div class="card-body">
                     <h5 class="text-warning">Catalog Integrity</h5>
@@ -142,10 +142,10 @@
                     <p class="small text-muted mt-3 mb-0">Shop owners should log in before checkout to unlock wholesale pricing once the cart reaches {{ cart_summary.wholesale_threshold }} caps.</p>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-5">
+        </div> -->
+        <div class="col-lg-6 offset-lg-3">
             <div class="card bg-dark text-light border-0 shadow-sm checkout-summary-card">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <h5 class="text-warning">Pricing Summary</h5>
                     <p class="mb-2">Cart quantity: <strong>{{ cart_summary.total_quantity }}</strong> caps</p>
                     <p class="mb-2">Retail subtotal: <strong>{{ cart_summary.retail_subtotal|money }}</strong></p>

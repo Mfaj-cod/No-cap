@@ -15,7 +15,7 @@ PRODUCTS = [
         "id": 1,
         "name": "Velocity Sports Cap",
         "description": "Lightweight performance cap with moisture control for training days, clubs, and team orders.",
-        "normal_price": 799.0,
+        "normal_price": 49.0,
         "image_url": "/static/img/sports/sport-1.jpeg",
         "category": "Sports",
         "details": ["Breathable mesh panels", "Sweat-wicking band", "Adjustable rear strap"],
