@@ -97,143 +97,58 @@
     </div>
 </section>
 
-<section id="discover" style="padding: 60px 0;">
+<section id="discover" class="py-5 homepage-exclusive">
     <div class="container">
-
-        <div style="
-            background: linear-gradient(135deg, #0f172a, #111827);
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        ">
-
-            <!-- HEADER -->
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                flex-wrap:wrap;
-                gap:10px;
-                margin-bottom:20px;
-            ">
+        <div class="card bg-dark text-light border-0 shadow-lg p-4 discover-panel">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                 <div>
-                    <h2 style="color:#ffc107; margin-bottom:5px;">Search and Filter Caps</h2>
-                    <p style="color:#9ca3af; font-size:0.9rem;">
-                        Use smart filters to find the perfect cap faster.
-                    </p>
+                    <h2 class="text-warning mb-1">Search and Filter Caps</h2>
+                    <p class="text-white mb-0">Use category, price, and featured filters together for faster product discovery.</p>
                 </div>
-
-                <div style="
-                    background:#ffc107;
-                    color:#000;
-                    padding:6px 14px;
-                    border-radius:20px;
-                    font-weight:600;
-                    font-size:0.85rem;
-                ">
-                    {{ browse_results|length }} results
-                </div>
+                <span class="badge rounded-pill text-bg-warning text-dark px-3 py-2">{{ browse_results|length }} results</span>
             </div>
-
-            <!-- FILTER BAR -->
-            <form method="GET" action="{{ url_for('index') }}"
-                style="
-                    display:flex;
-                    flex-wrap:wrap;
-                    gap:15px;
-                    align-items:center;
-                ">
-
-                <!-- SEARCH -->
-                <input type="search"
-                    name="q"
-                    value="{{ filters['q'] }}"
-                    placeholder="Search caps..."
-                    style="
-                        flex:1;
-                        min-width:200px;
-                        padding:12px;
-                        border-radius:10px;
-                        border:none;
-                        background:#1f2937;
-                        color:#fff;
-                    ">
-
-                <!-- CATEGORY -->
-                <select name="category"
-                    style="
-                        padding:12px;
-                        padding-right: 30px;
-                        border-radius:10px;
-                        border:none;
-                        background:#1f2937;
-                        color:#fff;
-                        min-width:160px;
-                    ">
-                    <option value="">All categories</option>
-                    {% for category in categories %}
-                    <option value="{{ category.name }}" {% if filters['category'] == category.name %}selected{% endif %}>
-                        {{ category.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-
-                <!-- PRICE -->
-                <select name="max_price"
-                    style="
-                        padding:12px;
-                        border-radius:10px;
-                        border:none;
-                        background:#1f2937;
-                        color:#fff;
-                        min-width:160px;
-                    ">
-                    <option value="">Any budget</option>
-                    <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to Rs. 650</option>
-                    <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to Rs. 750</option>
-                    <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to Rs. 850</option>
-                </select>
-
-                <!-- TOGGLE -->
-                <label style="
-                    display:flex;
-                    align-items:center;
-                    gap:8px;
-                    color:#d1d5db;
-                    font-size:0.9rem;
-                ">
-                    Featured
-                    <input type="checkbox"
-                        name="featured"
-                        value="1"
-                        {% if filters['featured'] %}checked{% endif %}
-                        style="transform: scale(1.2);">
-                </label>
-
-                <!-- BUTTONS -->
-                <div style="display:flex; gap:10px;">
-
-                    <button type="submit"
-                        style="
-                            background:#ffc107;
-                            border:none;
-                            padding:10px 18px;
-                            border-radius:10px;
-                            font-weight:600;
-                        ">
+            <form method="GET" action="{{ url_for('index') }}" class="row g-3 align-items-center bg-white-opacity-5 p-2 rounded-5 shadow-sm inner-glass">
+                <div class="col-lg-4 col-md-12">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-white border-0 text-dark ps-3"><i class="bi bi-search"></i></span>
+                        <input type="search" class="form-control border-0 ps-2" id="q" name="q" value="{{ filters['q'] }}" placeholder="Search style or type...">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-warning px-1"><i class="bi bi-tags-fill"></i></span>
+                        <select id="category" name="category" class="form-select form-select-lg border-0 bg-white">
+                            <option value="">All Styles</option>
+                            {% for category in categories %}
+                            <option value="{{ category.name }}" {% if filters['category'] == category.name %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-warning px-1"><i class="bi bi-currency-rupee"></i></span>
+                        <select id="max_price" name="max_price" class="form-select form-select-lg border-0 bg-white">
+                            <option value="">Any Price</option>
+                            <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to 650</option>
+                            <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to 750</option>
+                            <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to 850</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-6 text-center">
+                    <div class="form-check form-switch d-inline-block ps-0" title="Show featured only">
+                        <label class="d-block small text-warning mb-1 uppercase fw-bold" style="font-size: 0.65rem;">Featured</label>
+                        <input class="form-check-input ms-0" type="checkbox" id="featured" name="featured" value="1" {% if filters['featured'] %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 d-flex gap-2">
+                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold uppercase tracking-wider glow-on-hover">
                         Apply
                     </button>
-
                     {% if has_filters %}
-                    <a href="{{ url_for('index') }}#discover"
-                        style="
-                            border:1px solid #ffc107;
-                            padding:10px 18px;
-                            border-radius:10px;
-                            color:#ffc107;
-                            text-decoration:none;
-                        ">
-                        Clear
+                    <a href="{{ url_for('index') }}#discover" class="btn btn-outline-light btn-lg border-0 opacity-50 hover-opacity-100" title="Clear all filters">
+                        <i class="bi bi-x-lg"></i>
                     </a>
                     {% endif %}
                 </div>
@@ -241,6 +156,7 @@
         </div>
     </div>
 </section>
+
 <section class="pb-5">
     <div class="container">
         <div class="row g-4">
@@ -420,6 +336,8 @@
         </div>
     </div>
 </section>
+
+
 
 <section class="py-5 bg-transparent">
     <div class="container">

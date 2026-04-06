@@ -9,7 +9,7 @@
             <div class="card bg-dark text-light shadow-lg border-0">
                 <div class="card-body p-4">
                     <h2 class="text-warning mb-3 text-center">Create an Account</h2>
-                    <p class="text-muted text-center">Choose customer for retail shopping or shop owner for bulk-ready pricing.</p>
+                    <p class="text-white text-center">Choose customer for retail shopping or shop owner for bulk-ready pricing.</p>
                     <form method="POST" action="{{ url_for('register_user') }}">
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
@@ -28,7 +28,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="password" class="form-label pr-2">Password </label>
                                 <input type="password" id="password" name="password" class="form-control" required>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -41,7 +41,7 @@
                         </div>
                         <button type="submit" class="btn btn-warning w-100 btn-lg">Create Account</button>
                     </form>
-                    <p class="small text-center text-muted mt-3 mb-0">
+                    <p class="small text-center mt-3 mb-0">
                         Already registered? <a href="{{ url_for('login') }}" class="text-warning">Log in</a>
                     </p>
                 </div>

@@ -16,7 +16,11 @@
 </head>
 
 <body class="bg-grey text-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent shadow-lg sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-lg sticky-top" style="
+    background: transparent(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    color: #e5e7eb;
+    border-bottom: 1px solid rgba(255,255,255,0.1);">
         <div class="container">
             <a class="navbar-brand fw-bold fs-3" href="{{ url_for('index') }}">
                 <i class="bi bi-mortarboard-fill text-success me-2"></i>
@@ -113,8 +117,8 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer style="
-    background: rgba(0,0,0,0.75);
+<footer style="
+    background: transparent(0,0,0,0.5);
     backdrop-filter: blur(10px);
     color: #e5e7eb;
     padding: 60px 0 30px;

@@ -1,8 +1,12 @@
+import logging
+import sys
 import razorpay
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from src.config import settings
+
+logger = logging.getLogger(__name__)
 from src.db import (
     attach_razorpay_order,
     cancel_order_and_restore_stock,
@@ -42,6 +46,12 @@ client = (
     if settings.razorpay_key_id and settings.razorpay_key_secret
     else None
 )
+
+# Debug: Show client initialization status
+if client:
+    print(f"[DEBUG] Razorpay client initialized with key: {settings.razorpay_key_id}\n")
+else:
+    print(f"[DEBUG] Razorpay client is None. Key ID set: {bool(settings.razorpay_key_id)}, Key Secret set: {bool(settings.razorpay_key_secret)}\n")
 
 
 def _redirect(request: Request, route_name: str):
@@ -105,19 +115,19 @@ def _checkout_risk_message(checkout_data: dict[str, str], payment_method: str) -
         checkout_data["pincode"],
     )
 
-    if activity["recent_attempts"] >= 5:
+    if activity["recent_attempts"] >= 10:
         return (
             "We paused checkout for a few minutes because several recent orders were attempted "
             "with the same contact or address. Please wait a bit, then try again."
         )
 
-    if payment_method in ONLINE_PAYMENT_METHODS and activity["recent_cancelled"] >= 3:
+    if payment_method in ONLINE_PAYMENT_METHODS and activity["recent_cancelled"] >= 5:
         return (
             "We noticed multiple incomplete online payment attempts recently. Please wait a few minutes "
             "before retrying, or switch to Cash on Delivery if you need to place the order now."
         )
 
-    if activity["distinct_emails_for_phone"] >= 3 or activity["distinct_phones_for_email"] >= 3:
+    if activity["distinct_emails_for_phone"] >= 5 or activity["distinct_phones_for_email"] >= 5:
         return (
             "We could not verify this payment pattern right now. Please use one consistent email and phone number, "
             "or contact support if you need help placing the order."
@@ -202,14 +212,26 @@ def place_order(
         return RedirectResponse(url=str(success_url), status_code=303)
 
     try:
-        razorpay_order = client.order.create(
-            {
-                "amount": int(round(cart_summary["final_total"] * 100)),
-                "currency": "INR",
-                "receipt": str(order_id),
-            }
-        )
-    except Exception:
+        print(f"[DEBUG] About to create Razorpay order. Client: {client is not None}, Amount: {int(round(cart_summary['final_total'] * 100))}\n", flush=True)
+
+        amount = int(round(float(cart_summary["final_total"]) * 100))
+
+        print("Creating Razorpay order with amount:", amount, flush=True)
+
+        razorpay_order = client.order.create({
+            "amount": amount,
+            "currency": "INR",
+            "receipt": str(order_id),
+        })
+
+        print("Razorpay order success:", razorpay_order, flush=True)
+
+    except Exception as e:
+        print(f"[ERROR] Razorpay order creation failed!\n")
+        print(f"[ERROR] Exception type: {type(e).__name__}\n")
+        print(f"[ERROR] Exception message: {str(e)}\n")
+        sys.stderr.flush()
+        logger.error(f"Razorpay order creation failed: {str(e)}", exc_info=True)
         cancel_order_and_restore_stock(order_id)
         add_flash(
             request,
