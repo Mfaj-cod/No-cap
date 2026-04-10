@@ -22,7 +22,7 @@ services:
       - key: GROQ_MODEL
         value: "llama-3.3-70b-versatile"
       - key: SMTP_SERVER
-        sync: "smtp.gmail.com"
+        value: "smtp.gmail.com"
       - key: SMTP_PORT
         value: "587"
       - key: SMTP_USER
