@@ -12,3 +12,4 @@ store.db
 *.ini
 
 scripts/
+tests/

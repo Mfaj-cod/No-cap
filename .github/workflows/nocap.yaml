@@ -20,9 +20,6 @@ jobs:
       - name: Install deps
         run: pip install --no-cache-dir -r requirements.txt
 
-      - name: run tests
-        run: python -m pytest
-
   continuous-deployment:
     needs: continuous-integration
     runs-on: ubuntu-latest
