@@ -1,38 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Verify OTP - {{ Nocap }}{% endblock %}
+{% block title %}Verify OTP - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-5">
-            <div class="card bg-dark text-light shadow-lg border-0">
-                <div class="card-body p-4">
-                    <h2 class="text-warning mb-3 text-center">Verify OTP</h2>
-                    <p class="text-white text-center">Enter the 6-digit OTP sent to your email.</p>
-                    <p class="text-muted text-center small">Email: {{ email }}</p>
-                    <form method="POST" action="{{ url_for('verify_otp_submit') }}">
-                        <div class="mb-3">
-                            <label for="otp" class="form-label">One-Time Password (OTP)</label>
-                            <input 
-                                type="text" 
-                                id="otp" 
-                                name="otp" 
-                                class="form-control" 
-                                placeholder="Enter 6-digit OTP" 
-                                pattern="[0-9]{6}"
-                                maxlength="6"
-                                required>
-                            <small class="form-text text-muted">OTP expires in 10 minutes.</small>
-                        </div>
-                        <button type="submit" class="btn btn-warning w-100 btn-lg">Verify OTP</button>
-                    </form>
-                    <p class="small text-center text-white mt-3 mb-0">
-                        Didn't receive the OTP? <a href="{{ url_for('forgot_password') }}" class="text-warning">Request new OTP</a>
-                    </p>
+<section class="page-shell auth-shell">
+    <div class="container">
+        <div class="section-card auth-card scroll-reveal">
+            <div class="auth-card__header">
+                <div class="stat-pill mx-auto mb-3"><i class="bi bi-shield-lock"></i>Step 2 of 2</div>
+                <h1 class="section-title mb-2">Verify OTP</h1>
+                <p class="section-copy mb-1">Enter the 6-digit code sent to your email address.</p>
+                <p class="helper-copy mb-0">Email: {{ email }}</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('verify_otp_submit') }}" class="auth-stack">
+                <div>
+                    <label for="otp" class="form-label">One-Time Password</label>
+                    <input type="text" id="otp" name="otp" class="form-control form-control-lg" placeholder="Enter 6-digit OTP" pattern="[0-9]{6}" maxlength="6" inputmode="numeric" required>
+                    <div class="helper-copy small mt-2">OTP expires in 10 minutes.</div>
                 </div>
+                <button type="submit" class="btn btn-warning btn-lg w-100">Verify OTP</button>
+            </form>
+
+            <div class="auth-footer">
+                Did not receive it? <a href="{{ url_for('forgot_password') }}" class="text-warning text-decoration-none">Request a new OTP</a>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

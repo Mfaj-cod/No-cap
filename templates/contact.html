@@ -1,44 +1,39 @@
 {% extends "base.html" %}
 
-{% block title %}Contact Us - {{ Nocap }}{% endblock %}
+{% block title %}Contact Us - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h2 class="mb-4 text-warning text-center">
-        <i class="bi bi-envelope me-2"></i>Contact Us
-    </h2>
+<section class="page-shell">
+    <div class="container container-narrow section-stack">
+        <div class="section-card info-panel text-center scroll-reveal">
+            <h1 class="page-heading mb-2">Contact Us</h1>
+            <p class="page-subtitle mb-0">Need help with cap styles, wholesale orders, or account questions? Send a message and the team will follow up.</p>
+        </div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card bg-dark text-light shadow-sm border-0">
-                <div class="card-body p-4">
-                    <p class="text-white">Need help with cap styles, wholesale orders, or account assistance? Send a message and the team will follow up.</p>
-                    <form method="POST" action="{{ url_for('send_contact_message') }}">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Your name" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="+91 9876543210" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Your Message</label>
-                            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Tell us what you need help with..." required></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-warning btn-lg w-100">Send Message</button>
-                    </form>
+        <div class="section-card info-panel scroll-reveal">
+            <form method="POST" action="{{ url_for('send_contact_message') }}" class="checkout-form-grid">
+                <div class="checkout-form-grid checkout-form-grid--2">
+                    <div>
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="Your name" required>
+                    </div>
+                    <div>
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
                 </div>
-            </div>
+                <div>
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control form-control-lg" id="phone" name="phone" placeholder="+91 9876543210" required>
+                </div>
+                <div>
+                    <label for="message" class="form-label">Your Message</label>
+                    <textarea class="form-control form-control-lg" id="message" name="message" rows="5" placeholder="Tell us what you need help with..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-warning btn-lg w-100">Send Message</button>
+            </form>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
+

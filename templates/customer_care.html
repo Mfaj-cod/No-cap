@@ -1,136 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}CapAI - {{ Nocap }}{% endblock %}
+{% block title %}CapAI - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-
-    <div style="
-        max-width: 1000px;
-        margin: auto;
-        background: rgba(17,24,39,0.95);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    ">
-
-        <!-- HEADER -->
-        <div style="margin-bottom: 25px;">
-            <h2 style="color:#ffc107; font-weight:700;">CapAI</h2>
-            <p style="color:#9ca3af;">
-                Ask about products, pricing, wholesale rules, shipping, returns, or how the store works.
-            </p>
+<section class="page-shell">
+    <div class="container container-wide section-stack">
+        <div class="section-card info-panel scroll-reveal">
+            <div class="section-header mb-0">
+                <div>
+                    <h1 class="page-heading mb-2">CapAI Customer Care</h1>
+                    <p class="page-subtitle mb-0">Ask about products, pricing, wholesale rules, shipping, returns, or how the store works. The layout stacks naturally on mobile so the prompt guide never squeezes the chat area.</p>
+                </div>
+                <span class="stat-pill"><i class="bi bi-chat-dots"></i>Public support assistant</span>
+            </div>
         </div>
 
-        <!-- MAIN LAYOUT -->
-        <div style="
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        ">
-
-            <!-- LEFT PANEL -->
-            <div style="
-                flex: 1;
-                min-width: 260px;
-                max-width: 300px;
-                background: #0b0f14;
-                border-radius: 14px;
-                padding: 16px;
-                border: 1px solid rgba(255,255,255,0.08);
-            ">
-
-                <h6 style="color:#ffc107;">Good prompts</h6>
-
-                <ul style="
-                    font-size: 0.9rem;
-                    color: #d1d5db;
-                    line-height: 1.6;
-                    padding-left: 18px;
-                ">
+        <div class="support-layout">
+            <aside class="section-card chat-sidebar scroll-reveal">
+                <h2 class="section-title">Good Prompts</h2>
+                <ul class="section-copy ps-3 mb-0">
                     <li>Which caps are best for sports teams?</li>
                     <li>How does shop-owner pricing work?</li>
                     <li>What is your shipping timeline?</li>
                     <li>Can I mix styles for wholesale pricing?</li>
                 </ul>
+            </aside>
 
-            </div>
-
-            <!-- CHAT PANEL -->
-            <div style="
-                flex: 2;
-                min-width: 300px;
-                background: #000;
-                border-radius: 14px;
-                padding: 20px;
-                border: 1px solid rgba(255,255,255,0.1);
-                display: flex;
-                flex-direction: column;
-                height: 420px;
-            ">
-
-                <!-- CHAT MESSAGES -->
-                <div id="chatMessages" style="
-                    flex: 1;
-                    overflow-y: auto;
-                    margin-bottom: 15px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                ">
-
-                    <div style="
-                        background: rgba(255,193,7,0.15);
-                        border: 1px solid rgba(255,193,7,0.4);
-                        padding: 10px 14px;
-                        border-radius: 12px;
-                        max-width: 80%;
-                    ">
+            <div class="section-card chat-panel chat-shell scroll-reveal">
+                <div id="chatMessages" class="chat-messages">
+                    <div class="chat-bubble assistant">
                         I can help with cap styles, pricing tiers, shipping timelines, return guidance, and bulk-order rules.
                     </div>
-
                 </div>
 
-                <!-- INPUT -->
-                <form id="customerCareForm" style="
-                    display: flex;
-                    gap: 10px;
-                ">
-
-                    <textarea id="customerCareInput"
-                        placeholder="Ask a support question..."
-                        required
-                        style="
-                            flex: 1;
-                            resize: none;
-                            border-radius: 10px;
-                            padding: 10px;
-                            border: none;
-                            outline: none;
-                        "></textarea>
-
-                    <button type="submit"
-                        style="
-                            background: #ffc107;
-                            border: none;
-                            padding: 0 18px;
-                            border-radius: 10px;
-                            font-weight: 600;
-                        ">
-                        Send
-                    </button>
-
+                <form id="customerCareForm" class="chat-input-row">
+                    <textarea id="customerCareInput" class="form-control form-control-lg" rows="3" placeholder="Ask a support question..." required></textarea>
+                    <button type="submit" class="btn btn-warning btn-lg">Send</button>
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
-</div>
+</section>
 {% endblock %}
-
 
 {% block scripts %}
 <script>
@@ -139,45 +50,32 @@ const customerCareInput = document.getElementById('customerCareInput');
 const chatMessages = document.getElementById('chatMessages');
 const sendButton = customerCareForm.querySelector('button[type="submit"]');
 
-/* 🔥 FORMATTER (CORE FIX) */
 function formatResponse(text) {
     return text
-        // bold (**text**)
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-
-        // numbered lists
         .replace(/(?:^|\n)(\d+\.\s.*)/g, '<li>$1</li>')
         .replace(/(<li>.*<\/li>)/g, '<ol>$1</ol>')
         .replace(/<\/ol>\s*<ol>/g, '')
-
-        // line breaks
         .replace(/\n/g, '<br>');
 }
 
-/* 🔥 MESSAGE APPENDER */
 function appendMessage(role, text) {
     const bubble = document.createElement('div');
     bubble.className = `chat-bubble ${role}`;
-
     if (role === 'assistant') {
-        bubble.innerHTML = formatResponse(text);  // ✅ FIX
+        bubble.innerHTML = formatResponse(text);
     } else {
-        bubble.textContent = text; // keep user safe
+        bubble.textContent = text;
     }
-
     chatMessages.appendChild(bubble);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-/* LOADING */
 function showLoadingIndicator() {
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble assistant';
     bubble.id = 'loadingIndicator';
-    bubble.innerHTML = `
-        <span class="spinner-border spinner-border-sm me-2"></span>
-        Thinking...
-    `;
+    bubble.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Thinking...';
     chatMessages.appendChild(bubble);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -187,7 +85,6 @@ function removeLoadingIndicator() {
     if (loadingIndicator) loadingIndicator.remove();
 }
 
-/* SEND MESSAGE */
 async function sendMessage() {
     const message = customerCareInput.value.trim();
     if (!message) return;
@@ -195,7 +92,6 @@ async function sendMessage() {
     appendMessage('user', message);
     customerCareInput.value = '';
     sendButton.disabled = true;
-
     showLoadingIndicator();
 
     try {
@@ -214,7 +110,6 @@ async function sendMessage() {
         }
 
         appendMessage('assistant', data.answer);
-
     } catch (error) {
         removeLoadingIndicator();
         appendMessage('assistant', 'Customer care is temporarily unavailable.');
@@ -224,7 +119,6 @@ async function sendMessage() {
     }
 }
 
-/* EVENTS */
 customerCareForm.addEventListener('submit', (event) => {
     event.preventDefault();
     sendMessage();
@@ -238,3 +132,4 @@ customerCareInput.addEventListener('keydown', (event) => {
 });
 </script>
 {% endblock %}
+

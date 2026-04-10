@@ -1,6 +1,5 @@
 import smtplib
 from email.mime.text import MIMEText
-from typing import Optional
 
 from src.config import settings
 from src.db import get_order

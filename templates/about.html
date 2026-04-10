@@ -1,173 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}About Us - {{ Nocap }}{% endblock %}
-
-{% block head %}
-<style>
-.scroll-reveal {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.8s ease-out;
-}
-
-.scroll-reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.about-img:hover {
-    transform: scale(1.05);
-    transition: 0.5s;
-}
-</style>
-{% endblock %}
+{% block title %}About - {{ store_name }}{% endblock %}
 
 {% block content %}
-<section class="hero-section text-center py-5 bg-transparent position-relative">
-    <div class="container">
-        <h1 class="display-4 fw-bold text-warning scroll-reveal">About {{ Nocap }}</h1>
-        <p class="lead text-light mt-3 scroll-reveal">A cap-first storefront built for both everyday buyers and wholesale shop owners.</p>
-    </div>
-</section>
-
-<section class="py-5 bg-transparent">
-
-    <div class="container text-center">
-
-        <!-- STORY BLOCK -->
-        <div class="scroll-reveal mx-auto"
-             style="
-                max-width: 720px;
-                color: #f8f9fa;
-                line-height: 1.8;
-            ">
-
-            <h2 style="
-                color: #ffc107;
-                font-size: 2.5rem;
-                font-weight: 700;
-                margin-bottom: 25px;
-            ">
-                Our Story
-            </h2>
-
-            <p style="margin-bottom: 16px;">
-                We transformed Apna Swad into a focused cap store to expand into fashion, sports, events, and retail resale.
-            </p>
-
-            <p style="margin-bottom: 16px;">
-                The platform serves both everyday buyers and shop owners who need bulk-ready pricing without complexity.
-            </p>
-
-            <p style="margin-bottom: 25px;">
-                When a cart reaches 25 caps, wholesale pricing activates automatically across mixed styles, making reordering seamless.
-            </p>
-
-            <a href="{{ url_for('index') }}#discover"
-               style="
-                    display: inline-block;
-                    background: #ffc107;
-                    color: #000;
-                    padding: 12px 24px;
-                    border-radius: 10px;
-                    text-decoration: none;
-                    font-weight: 600;
-                    box-shadow: 0 6px 20px rgba(255,193,7,0.3);
-               ">
-                Browse Caps
-            </a>
-
+<section class="page-shell">
+    <div class="container section-stack">
+        <div class="section-card hero-panel text-center scroll-reveal">
+            <div class="stat-pill mx-auto mb-3"><i class="bi bi-compass"></i>About {{ store_name }}</div>
+            <h1 class="page-heading text-warning mb-3">A Cap-First Storefront for Everyday Buyers and Wholesale Sellers</h1>
+            <p class="page-subtitle mb-0">The store now focuses entirely on caps, with a catalog, pricing, and support flow designed to work equally well for individual shoppers and shop owners.</p>
         </div>
 
-        <!-- FEATURES (NO HEIGHT STRETCH) -->
-        <div class="mt-5 d-flex flex-wrap justify-content-center gap-4">
-
-            <!-- CARD 1 -->
-            <div class="scroll-reveal"
-                 style="
-                    background: #111827;
-                    color: #fff;
-                    padding: 20px;
-                    border-radius: 14px;
-                    width: 260px;
-                    text-align: center;
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-                 ">
-
-                <i class="bi bi-stars"
-                   style="font-size: 2rem; color: #ffc107;"></i>
-
-                <h5 style="margin-top: 12px;">Style Variety</h5>
-
-                <p style="font-size: 0.9rem; color: #9ca3af;">
-                    Sports, casual, snapback, trucker, dad cap, and beanie styles in one place.
-                </p>
+        <div class="section-card info-panel scroll-reveal">
+            <div class="split-copy">
+                <div>
+                    <h2 class="section-title">Our Story</h2>
+                    <div class="section-stack">
+                        <p class="section-copy mb-0">We transformed the project into a cap-focused storefront so the experience could support sports, casual fashion, resale, events, and bulk shop ordering without extra clutter.</p>
+                        <p class="section-copy mb-0">Retail buyers keep a fast browsing and checkout flow, while shop owners unlock wholesale pricing automatically once the cart hits 25 caps.</p>
+                        <p class="section-copy mb-0">The mobile-first refresh now makes that full flow easier to use on smaller screens too.</p>
+                        <div class="hero-actions">
+                            <a href="{{ url_for('index') }}#discover" class="btn btn-warning">Browse Caps</a>
+                            <a href="{{ url_for('customer_care_page') }}" class="btn btn-outline-warning">Ask CapAI</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="surface-grid surface-grid--3">
+                    <div class="mini-stat">
+                        <div class="text-warning fs-3 mb-2"><i class="bi bi-stars"></i></div>
+                        <strong class="d-block mb-2">Style Variety</strong>
+                        <div class="helper-copy">Sports, casual, snapback, trucker, dad cap, and beanie styles in one place.</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="text-warning fs-3 mb-2"><i class="bi bi-shop-window"></i></div>
+                        <strong class="d-block mb-2">Wholesale Rules</strong>
+                        <div class="helper-copy">Retail flexibility for small orders and automatic bulk pricing at 25+ caps.</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="text-warning fs-3 mb-2"><i class="bi bi-robot"></i></div>
+                        <strong class="d-block mb-2">AI Customer Care</strong>
+                        <div class="helper-copy">Smart support for product, pricing, shipping, and policy questions.</div>
+                    </div>
+                </div>
             </div>
-
-            <!-- CARD 2 -->
-            <div class="scroll-reveal"
-                 style="
-                    background: #111827;
-                    color: #fff;
-                    padding: 20px;
-                    border-radius: 14px;
-                    width: 260px;
-                    text-align: center;
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-                 ">
-
-                <i class="bi bi-shop-window"
-                   style="font-size: 2rem; color: #ffc107;"></i>
-
-                <h5 style="margin-top: 12px;">Wholesale</h5>
-
-                <p style="font-size: 0.9rem; color: #9ca3af;">
-                    Retail flexibility for small orders and automatic bulk pricing at 25+ caps.
-                </p>
-            </div>
-
-            <!-- CARD 3 -->
-            <div class="scroll-reveal"
-                 style="
-                    background: #111827;
-                    color: #fff;
-                    padding: 20px;
-                    border-radius: 14px;
-                    width: 260px;
-                    text-align: center;
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-                 ">
-
-                <i class="bi bi-robot"
-                   style="font-size: 2rem; color: #ffc107;"></i>
-
-                <h5 style="margin-top: 12px;">AI Customer Care</h5>
-
-                <p style="font-size: 0.9rem; color: #9ca3af;">
-                    Smart support for product, pricing, shipping, and policies.
-                </p>
-            </div>
-
         </div>
-
     </div>
-
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-const revealElements = document.querySelectorAll('.scroll-reveal');
-function revealOnScroll() {
-    const windowHeight = window.innerHeight;
-    revealElements.forEach(el => {
-        const elementTop = el.getBoundingClientRect().top;
-        if (elementTop < windowHeight - 100) {
-            el.classList.add('visible');
-        }
-    });
-}
-window.addEventListener('scroll', revealOnScroll);
-window.addEventListener('load', revealOnScroll);
-</script>
 {% endblock %}

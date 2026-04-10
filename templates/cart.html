@@ -1,192 +1,113 @@
 {% extends "base.html" %}
 
-{% block title %}Cart - {{ Nocap }}{% endblock %}
+{% block title %}Cart - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h2 class="mb-4 text-warning text-center">
-        <i class="bi bi-cart3 me-2"></i>Your Shopping Cart
-    </h2>
-
-    {% if cart_summary["items"] %}
-    <div style="
-    background:#0f172a;
-    border-radius:20px;
-    padding:25px;
-    box-shadow:0 20px 40px rgba(0,0,0,0.5);
-">
-
-    {% for item in cart_summary["items"] %}
-    <div style="
-        display:flex;
-        flex-wrap:wrap;
-        align-items:center;
-        gap:20px;
-        padding:15px;
-        border-bottom:1px solid rgba(255,255,255,0.08);
-    ">
-
-        <!-- IMAGE -->
-        <div style="
-            width:90px;
-            height:90px;
-            background:#0b1220;
-            border-radius:12px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            overflow:hidden;
-            border:1px solid rgba(255,255,255,0.05);
-        ">
-
-            <img src="{{ item.product.image_url }}"
-                alt="{{ item.product.name }}"
-                style="
-                    width:100%;
-                    height:100%;
-                    object-fit:contain;
-                    padding:8px;
-                ">
-        </div>
-        <!-- INFO -->
-        <div style="flex:1; min-width:200px;">
-            <div style="color:#fff; font-weight:600;">
-                {{ item.product.name }}
-            </div>
-            <div style="font-size:0.85rem; color:#9ca3af;">
-                {{ item.variant_label }} • {{ item.available_stock }} left
+<section class="page-shell">
+    <div class="container section-stack">
+        <div class="section-card info-panel scroll-reveal">
+            <div class="section-header mb-0">
+                <div>
+                    <h1 class="page-heading mb-2">Your Shopping Cart</h1>
+                    <p class="page-subtitle mb-0">The cart is now stacked and thumb-friendly on smaller screens, while still keeping wholesale and retail pricing easy to compare.</p>
+                </div>
+                {% if cart_summary['items'] %}
+                <span class="stat-pill">{{ cart_summary.total_quantity }} caps</span>
+                {% endif %}
             </div>
         </div>
 
-        <!-- PRICE -->
-        <div style="min-width:120px;">
-            <div style="font-size:0.8rem; color:#9ca3af;">Retail</div>
-            <div style="color:#ffc107;">{{ item.retail_unit_price|money }}</div>
-        </div>
-
-        <div style="min-width:120px;">
-            <div style="font-size:0.8rem; color:#9ca3af;">Wholesale</div>
-            <div style="color:#9ca3af;">{{ item.wholesale_unit_price|money }}</div>
-        </div>
-
-        <!-- QUANTITY -->
-        <form method="POST"
-              action="{{ url_for('update_cart', cart_key=item.cart_key) }}"
-              style="display:flex; gap:8px; align-items:center;">
-
-            <input type="number"
-                   name="quantity"
-                   value="{{ item.quantity }}"
-                   min="1"
-                   max="{{ item.available_stock }}"
-                   style="
-                        width:60px;
-                        padding:6px;
-                        border-radius:6px;
-                        border:none;
-                        background:#1f2937;
-                        color:#fff;
-                   ">
-
-            <button type="submit"
-                    style="
-                        background:#ffc107;
-                        border:none;
-                        padding:6px 10px;
-                        border-radius:6px;
-                        font-size:0.8rem;
-                    ">
-                Update
-            </button>
-        </form>
-
-        <!-- SUBTOTAL -->
-        <div style="min-width:120px;">
-            <div style="font-size:0.8rem; color:#9ca3af;">Subtotal</div>
-            <div style="color:#fff; font-weight:600;">
-                {{ item.line_total|money }}
-            </div>
-        </div>
-
-        <!-- REMOVE -->
-        <form method="POST"
-              action="{{ url_for('remove_from_cart', cart_key=item.cart_key) }}">
-            <button type="submit"
-                style="
-                    background:#ef4444;
-                    border:none;
-                    padding:6px 12px;
-                    border-radius:8px;
-                    color:#fff;
-                    font-size:0.8rem;
-                ">
-                Remove
-            </button>
-        </form>
-
-    </div>
-    {% endfor %}
-
-</div>
-
-    <div class="row g-4 mt-2">
-        <!-- <div class="col-lg-7">
-            <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h5 class="text-warning">Catalog Integrity</h5>
-                    <div class="row g-3 mt-1">
-                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-images text-warning me-2"></i>Unified product variants</div></div>
-                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-box-seam text-warning me-2"></i>Live stock validation</div></div>
-                        <div class="col-md-4"><div class="trust-tile h-100"><i class="bi bi-shield-check text-warning me-2"></i>Secure UPI, cards, wallets, and COD</div></div>
+        {% if cart_summary['items'] %}
+        <div class="cart-list">
+            {% for item in cart_summary['items'] %}
+            <article class="section-card cart-item-card scroll-reveal">
+                <div class="cart-item-card__top">
+                    <div class="cart-media">
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
                     </div>
-                    <p class="small text-muted mt-3 mb-0">Shop owners should log in before checkout to unlock wholesale pricing once the cart reaches {{ cart_summary.wholesale_threshold }} caps.</p>
+                    <div>
+                        <div class="cart-title">{{ item.product.name }}</div>
+                        <div class="cart-meta">{{ item.variant_label }} | {{ item.available_stock }} left</div>
+                    </div>
+                </div>
+
+                <div class="cart-prices">
+                    <div class="cart-price-box">
+                        <div class="helper-copy small mb-1">Retail</div>
+                        <strong class="text-warning">{{ item.retail_unit_price|money }}</strong>
+                    </div>
+                    <div class="cart-price-box">
+                        <div class="helper-copy small mb-1">Wholesale</div>
+                        <strong>{{ item.wholesale_unit_price|money }}</strong>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('update_cart', cart_key=item.cart_key) }}" class="cart-quantity-form quantity-form">
+                    <label class="form-label mb-0">Quantity</label>
+                    <div class="quantity-form__controls">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.available_stock }}" class="form-control quantity-input" inputmode="numeric">
+                        <button type="submit" class="btn btn-warning">Update</button>
+                    </div>
+                </form>
+
+                <div class="cart-item-card__footer">
+                    <div>
+                        <div class="helper-copy small mb-1">Subtotal</div>
+                        <div class="fw-bold fs-5">{{ item.line_total|money }}</div>
+                    </div>
+                    <form method="POST" action="{{ url_for('remove_from_cart', cart_key=item.cart_key) }}">
+                        <button type="submit" class="btn btn-outline-light">Remove</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="surface-grid surface-grid--2">
+            <div class="section-card info-panel scroll-reveal">
+                <h2 class="section-title">Pricing Notes</h2>
+                <div class="section-stack">
+                    <div class="trust-tile"><i class="bi bi-people text-warning me-2"></i>Shop owners should log in before checkout so the 25-cap wholesale rule can apply automatically.</div>
+                    <div class="trust-tile"><i class="bi bi-box-seam text-warning me-2"></i>Live stock checks still run during checkout, so low-stock variants stay accurate even after browsing.</div>
                 </div>
             </div>
-        </div> -->
-        <div class="col-lg-6 offset-lg-3">
-            <div class="card bg-dark text-light border-0 shadow-sm checkout-summary-card">
-                <div class="card-body text-center">
-                    <h5 class="text-warning">Pricing Summary</h5>
-                    <p class="mb-2">Cart quantity: <strong>{{ cart_summary.total_quantity }}</strong> caps</p>
-                    <p class="mb-2">Retail subtotal: <strong>{{ cart_summary.retail_subtotal|money }}</strong></p>
-                    <p class="mb-2">Discount: <strong class="text-warning">{{ cart_summary.discount_amount|money }}</strong></p>
-                    <p class="mb-3">Final total: <strong class="text-warning fs-5">{{ cart_summary.final_total|money }}</strong></p>
 
-                    {% if current_user and current_user.role == 'shop_owner' and not cart_summary.wholesale_eligible %}
-                    <div class="alert alert-info border-0 small">
-                        Add {{ cart_summary.remaining_to_wholesale }} more caps to unlock wholesale pricing.
-                    </div>
-                    {% elif current_user and current_user.role == 'shop_owner' and cart_summary.wholesale_eligible %}
-                    <div class="alert alert-success border-0 small">
-                        Wholesale pricing is active for this order.
-                    </div>
-                    {% elif not current_user %}
-                    <div class="alert alert-info border-0 small">
-                        For wholesale pricing, log in as a shop owner before checkout.
-                    </div>
-                    {% endif %}
-
-                    <a href="{{ url_for('checkout') }}" class="btn btn-warning btn-lg mt-2 w-100">Proceed to Checkout</a>
+            <div class="section-card summary-card checkout-summary-card scroll-reveal">
+                <h2 class="section-title">Pricing Summary</h2>
+                <div class="summary-totals mb-3">
+                    <div class="summary-row"><span>Cart quantity</span><strong>{{ cart_summary.total_quantity }} caps</strong></div>
+                    <div class="summary-row"><span>Retail subtotal</span><span>{{ cart_summary.retail_subtotal|money }}</span></div>
+                    <div class="summary-row"><span>Discount</span><strong>{{ cart_summary.discount_amount|money }}</strong></div>
+                    <div class="summary-row"><span class="fw-bold">Final total</span><strong class="summary-total">{{ cart_summary.final_total|money }}</strong></div>
                 </div>
+
+                {% if current_user and current_user.role == 'shop_owner' and not cart_summary.wholesale_eligible %}
+                <div class="alert alert-info border-0 small">Add {{ cart_summary.remaining_to_wholesale }} more caps to unlock wholesale pricing.</div>
+                {% elif current_user and current_user.role == 'shop_owner' and cart_summary.wholesale_eligible %}
+                <div class="alert alert-success border-0 small">Wholesale pricing is active for this order.</div>
+                {% elif not current_user %}
+                <div class="alert alert-info border-0 small">Guest checkout is ready. For wholesale pricing, log in as a shop owner before checkout.</div>
+                {% endif %}
+
+                <a href="{{ url_for('checkout') }}" class="btn btn-warning btn-lg w-100 mt-2">Proceed to Checkout</a>
             </div>
         </div>
-    </div>
 
-    <div class="mobile-cta-bar d-md-none">
-        <div>
-            <div class="small text-muted">Total</div>
-            <div class="text-warning fw-semibold">{{ cart_summary.final_total|money }}</div>
+        <div class="mobile-cta-bar d-lg-none scroll-reveal">
+            <div>
+                <div class="small text-muted">Total</div>
+                <div class="text-warning fw-semibold">{{ cart_summary.final_total|money }}</div>
+            </div>
+            <a href="{{ url_for('checkout') }}" class="btn btn-warning">Checkout</a>
         </div>
-        <a href="{{ url_for('checkout') }}" class="btn btn-warning">Checkout</a>
+        {% else %}
+        <div class="section-card info-panel text-center scroll-reveal">
+            <i class="bi bi-cart-x fs-1 mb-3 text-warning"></i>
+            <h3 class="mb-2">Your cart is empty</h3>
+            <p class="section-copy mb-4">Browse the cap collection and add a few styles to compare pricing and stock.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-warning">Continue Shopping</a>
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-cart-x fs-1 mb-3"></i>
-        <h4>Your cart is empty</h4>
-        <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Continue Shopping</a>
-    </div>
-    {% endif %}
-</div>
+</section>
 {% endblock %}
-
-

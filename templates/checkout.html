@@ -1,319 +1,205 @@
 {% extends "base.html" %}
 
-{% block title %}Checkout - {{ Nocap }}{% endblock %}
+{% block title %}Checkout - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-
-    <!-- HEADER -->
-    <div class="mb-4 text-center">
-        <h2 class="text-warning fw-bold">
-            <i class="bi bi-credit-card me-2"></i>Checkout
-        </h2>
-        <p class="text-muted mb-0">
-            Fast checkout with secure payments and real-time stock protection
-        </p>
-    </div>
-
-    {% if cart_summary["items"] %}
-    <div class="row g-4">
-
-        <!-- LEFT: FORM -->
-        <div class="col-lg-7">
-
-            <div style="
-                background: linear-gradient(145deg,#0f172a,#0b1220);
-                border-radius:16px;
-                padding:30px;
-                box-shadow:0 15px 40px rgba(0,0,0,0.6);
-            ">
-
+<section class="page-shell">
+    <div class="container section-stack">
+        <div class="section-card info-panel scroll-reveal">
+            <div class="section-header mb-0">
+                <div>
+                    <h1 class="page-heading mb-2">Checkout</h1>
+                    <p class="page-subtitle mb-0">A one-page checkout flow tuned for mobile. Order details stay readable, billing fields stack cleanly, and payment options are easy to tap.</p>
+                </div>
                 {% if guest_checkout %}
-                <div class="mb-4 p-3 rounded"
-                     style="background: rgba(255,193,7,0.08); border:1px solid rgba(255,193,7,0.3);">
-                    <small>
-                        Buying in bulk? 
-                        <a href="{{ url_for('login') }}" class="text-warning fw-semibold">
-                            Login as shop owner
-                        </a>
-                        to unlock wholesale pricing.
-                    </small>
-                </div>
+                <span class="stat-pill">Guest checkout</span>
                 {% endif %}
-
-                {% if not razorpay_order %}
-                <h5 class="text-light mb-4 fw-semibold">Billing Details</h5>
-
-                <form method="POST" action="{{ url_for('place_order') }}">
-
-                    <!-- NAME -->
-                    <div class="mb-3">
-                        <label class="form-label text-light">Full Name</label>
-                        <input type="text" name="name" required
-                               value="{{ checkout_defaults['name'] }}"
-                               class="form-control"
-                               style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">
-                    </div>
-
-                    <!-- EMAIL -->
-                    <div class="mb-3">
-                        <label class="form-label text-light">Email</label>
-                        <input type="email" name="email" required
-                               value="{{ checkout_defaults['email'] }}"
-                               class="form-control"
-                               style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">
-                    </div>
-
-                    <!-- PHONE -->
-                    <div class="mb-3">
-                        <label class="form-label text-light">Phone</label>
-                        <input type="tel" name="phone" required
-                               value="{{ checkout_phone }}"
-                               class="form-control"
-                               style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">
-                    </div>
-
-                    <!-- ADDRESS -->
-                    <div class="mb-3">
-                        <label class="form-label text-light">Delivery Address</label>
-                        <textarea name="address" rows="3" required
-                                  class="form-control"
-                                  style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">{{ checkout_address }}</textarea>
-                    </div>
-
-                    <!-- CITY STATE PIN -->
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <input type="text" name="city" required placeholder="City"
-                                   value="{{ checkout_city }}"
-                                   class="form-control"
-                                   style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <input type="text" name="state" required placeholder="State"
-                                   value="{{ checkout_state }}"
-                                   class="form-control"
-                                   style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <input type="text" name="pincode" required placeholder="Pincode"
-                                   value="{{ checkout_pincode }}"
-                                   class="form-control"
-                                   style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">
-                        </div>
-                    </div>
-
-                    <!-- PAYMENT -->
-                    <div class="mb-3">
-                        <label class="form-label text-light">Payment Method</label>
-                        <select name="payment_method" required
-                                class="form-select"
-                                style="background:#1f2937;border:none;color:#fff;padding:12px;border-radius:8px;">
-
-                            <option value="cod">Cash on Delivery</option>
-
-                            <option value="upi" {% if not online_payments_available %}disabled{% endif %}>
-                                UPI
-                            </option>
-
-                            <option value="card" {% if not online_payments_available %}disabled{% endif %}>
-                                Card
-                            </option>
-
-                            <option value="wallet" {% if not online_payments_available %}disabled{% endif %}>
-                                Wallet
-                            </option>
-                        </select>
-
-                        <small class="text-white d-block mt-2">
-                            {% if online_payments_available %}
-                            UPI, cards & wallets supported via Razorpay.
-                            {% else %}
-                            Online payments currently unavailable. Use COD.
-                            {% endif %}
-                        </small>
-                    </div>
-
-                    <!-- BUTTON -->
-                    <button type="submit"
-                            class="btn btn-warning w-100"
-                            style="padding:14px;font-weight:600;border-radius:10px;box-shadow:0 0 20px rgba(255,193,7,0.4);">
-                        Place Order
-                    </button>
-
-                </form>
-
-                {% else %}
-                <!-- Razorpay Payment Flow -->
-                <h5 class="text-light mb-4 fw-semibold">Complete Payment</h5>
-                
-                <div class="alert alert-info mb-4" style="background-color: #0c4a6e; border-left: 4px solid #06b6d4;">
-                    <strong>Ready to pay:</strong> Click the button below to complete your payment via {{ selected_payment_method|title }}.
-                </div>
-
-                <button id="razorpayButton"
-                        type="button"
-                        class="btn btn-warning w-100"
-                        style="padding:14px;font-weight:600;border-radius:10px;box-shadow:0 0 20px rgba(255,193,7,0.4);">
-                    <i class="bi bi-credit-card me-2"></i>Pay {{ cart_summary.final_total|money }}
-                </button>
-
-                <form id="paymentSuccessForm" method="POST" action="{{ url_for('payment_success') }}" style="display: none;">
-                    <input type="hidden" name="order_id" value="{{ pending_order_id }}">
-                    <input type="hidden" id="razorpayPaymentId" name="razorpay_payment_id" value="">
-                    <input type="hidden" id="razorpayOrderId" name="razorpay_order_id" value="">
-                    <input type="hidden" id="razorpaySignature" name="razorpay_signature" value="">
-                </form>
-
-                {% endif %}
-
             </div>
         </div>
 
-        <!-- RIGHT: SUMMARY -->
-<div class="col-lg-5">
+        {% if cart_summary['items'] %}
+        <div class="checkout-layout">
+            <div class="checkout-summary-col section-stack">
+                <div class="section-card summary-card checkout-summary-card scroll-reveal">
+                    <h2 class="section-title">Order Summary</h2>
+                    <div class="summary-list mb-3">
+                        {% for item in cart_summary['items'] %}
+                        <div class="summary-item">
+                            <div class="summary-item__copy">
+                                <strong class="d-block mb-1">{{ item.product.name }}</strong>
+                                <div class="helper-copy small">{{ item.variant_label }}</div>
+                                <div class="helper-copy small">{{ item.quantity }} x {{ item.applied_unit_price|money }}</div>
+                            </div>
+                            <strong>{{ item.line_total|money }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="summary-totals">
+                        <div class="summary-row"><span>Quantity</span><span>{{ cart_summary.total_quantity }} caps</span></div>
+                        <div class="summary-row"><span>Retail subtotal</span><span>{{ cart_summary.retail_subtotal|money }}</span></div>
+                        <div class="summary-row"><span>Discount</span><strong>{{ cart_summary.discount_amount|money }}</strong></div>
+                        <div class="summary-row"><span class="fw-bold">Total</span><strong class="summary-total">{{ cart_summary.final_total|money }}</strong></div>
+                    </div>
 
-    <div style="
-        background: linear-gradient(145deg,#0f172a,#0b1220);
-        border-radius:18px;
-        padding:28px;
-        box-shadow:0 20px 50px rgba(0,0,0,0.65);
-        position:sticky;
-        top:100px;
-    ">
-
-        <!-- TITLE -->
-        <h5 class="text-light fw-semibold mb-4" style="letter-spacing:0.5px;">
-            Order Summary
-        </h5>
-
-        <!-- ITEMS -->
-        {% for item in cart_summary["items"] %}
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:flex-start;
-            gap:10px;
-            margin-bottom:16px;
-            padding-bottom:12px;
-            border-bottom:1px solid rgba(255,255,255,0.06);
-        ">
-
-            <!-- LEFT -->
-            <div style="flex:1;">
-                <div style="font-weight:600; color:#e5e7eb;">
-                    {{ item.product.name }}
-                </div>
-
-                <div style="
-                    font-size:13px;
-                    color:#9ca3af;
-                    margin-top:4px;
-                ">
-                    {{ item.quantity }} × {{ item.applied_unit_price|money }}
+                    {% if current_user and current_user.role == 'shop_owner' and not cart_summary.wholesale_eligible %}
+                    <div class="alert alert-info border-0 small mt-3">Add {{ cart_summary.remaining_to_wholesale }} more caps to unlock wholesale pricing on this order.</div>
+                    {% elif current_user and current_user.role == 'shop_owner' and cart_summary.wholesale_eligible %}
+                    <div class="alert alert-success border-0 small mt-3">Wholesale pricing is active for this order.</div>
+                    {% elif guest_checkout %}
+                    <div class="alert alert-info border-0 small mt-3">Guest orders use retail pricing. Log in as a shop owner before checkout if this should be a wholesale order.</div>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- RIGHT -->
-            <div style="
-                font-weight:600;
-                color:#f9fafb;
-                white-space:nowrap;
-            ">
-                {{ item.line_total|money }}
-            </div>
+            <div class="checkout-form-col section-stack">
+                <div class="surface-grid surface-grid--3 scroll-reveal">
+                    <div class="trust-tile"><i class="bi bi-phone text-warning me-2"></i>Thumb-friendly field spacing</div>
+                    <div class="trust-tile"><i class="bi bi-box-seam text-warning me-2"></i>Live stock protected</div>
+                    <div class="trust-tile"><i class="bi bi-shield-check text-warning me-2"></i>UPI, cards, wallets, and COD</div>
+                </div>
 
+                <div class="section-card checkout-form-card scroll-reveal">
+                    {% if guest_checkout %}
+                    <div class="alert alert-info border-0 small mb-4">Buying in bulk for a shop? <a href="{{ url_for('login') }}" class="text-warning fw-semibold">Log in as a shop owner</a> first so the order can qualify for wholesale pricing.</div>
+                    {% endif %}
+
+                    {% if not razorpay_order %}
+                    <form method="POST" action="{{ url_for('place_order') }}" id="checkoutForm" class="section-stack">
+                        <div>
+                            <h2 class="section-title">Billing Details</h2>
+                            <p class="section-copy mb-0">Autofill-friendly fields are kept in a single vertical flow for faster checkout on smaller screens.</p>
+                        </div>
+
+                        <div class="checkout-form-grid checkout-form-grid--2">
+                            <div>
+                                <label class="form-label" for="name">Full Name</label>
+                                <input type="text" id="name" name="name" value="{{ checkout_defaults['name'] }}" autocomplete="name" class="form-control form-control-lg" required>
+                            </div>
+                            <div>
+                                <label class="form-label" for="email">Email</label>
+                                <input type="email" id="email" name="email" value="{{ checkout_defaults['email'] }}" autocomplete="email" inputmode="email" class="form-control form-control-lg" required>
+                            </div>
+                        </div>
+
+                        <div class="checkout-form-grid checkout-form-grid--2">
+                            <div>
+                                <label class="form-label" for="phone">Phone</label>
+                                <input type="tel" id="phone" name="phone" value="{{ checkout_phone }}" autocomplete="tel" inputmode="tel" class="form-control form-control-lg" required>
+                            </div>
+                            <div>
+                                <label class="form-label" for="pincode">Pincode</label>
+                                <input type="text" id="pincode" name="pincode" value="{{ checkout_pincode }}" autocomplete="postal-code" inputmode="numeric" class="form-control form-control-lg" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="address">Delivery Address</label>
+                            <textarea id="address" name="address" rows="4" autocomplete="street-address" class="form-control form-control-lg" required>{{ checkout_address }}</textarea>
+                        </div>
+
+                        <div class="checkout-form-grid checkout-form-grid--2">
+                            <div>
+                                <label class="form-label" for="city">City</label>
+                                <input type="text" id="city" name="city" value="{{ checkout_city }}" autocomplete="address-level2" class="form-control form-control-lg" required>
+                            </div>
+                            <div>
+                                <label class="form-label" for="state">State</label>
+                                <input type="text" id="state" name="state" value="{{ checkout_state }}" autocomplete="address-level1" class="form-control form-control-lg" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label d-block">Payment Method</label>
+                            <div class="payment-options">
+                                <label class="payment-option">
+                                    <input type="radio" name="payment_method" value="cod" {% if selected_payment_method == 'cod' %}checked{% endif %}>
+                                    <span class="payment-option__card">
+                                        <strong>Cash on Delivery</strong>
+                                        <span class="helper-copy small">Best fallback if you want to place the order immediately.</span>
+                                    </span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment_method" value="upi" {% if selected_payment_method == 'upi' %}checked{% endif %} {% if not online_payments_available %}disabled{% endif %}>
+                                    <span class="payment-option__card">
+                                        <strong>UPI</strong>
+                                        <span class="helper-copy small">Pay through Razorpay using your preferred UPI app.</span>
+                                    </span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment_method" value="card" {% if selected_payment_method == 'card' %}checked{% endif %} {% if not online_payments_available %}disabled{% endif %}>
+                                    <span class="payment-option__card">
+                                        <strong>Cards</strong>
+                                        <span class="helper-copy small">Credit and debit card checkout handled by Razorpay.</span>
+                                    </span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment_method" value="wallet" {% if selected_payment_method == 'wallet' %}checked{% endif %} {% if not online_payments_available %}disabled{% endif %}>
+                                    <span class="payment-option__card">
+                                        <strong>Wallets</strong>
+                                        <span class="helper-copy small">Use supported wallets through the Razorpay step.</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="helper-copy small mt-3">
+                                {% if online_payments_available %}
+                                Online payment can be retried if the first attempt fails. If that still does not work, you can come back and switch to COD without losing your cart.
+                                {% else %}
+                                Online payments are temporarily unavailable. Cash on Delivery is still available right now.
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg w-100">Place Order</button>
+                    </form>
+                    {% else %}
+                    <div class="section-stack" id="checkoutForm">
+                        <div>
+                            <h2 class="section-title">Complete Payment</h2>
+                            <p class="section-copy mb-0">Your order is created and stock is reserved. Use the button below to complete payment through Razorpay.</p>
+                        </div>
+                        <div class="alert alert-info border-0 small">Selected payment method: <strong>{{ selected_payment_method|title }}</strong>. Retry is enabled if the first attempt fails.</div>
+                        <button id="razorpayButton" type="button" class="btn btn-warning btn-lg w-100" data-razorpay-launch="true">Pay {{ cart_summary.final_total|money }}</button>
+                        <div class="helper-copy small">If you would rather use Cash on Delivery, close this step and return to checkout from the failure page.</div>
+                        <form id="paymentSuccessForm" method="POST" action="{{ url_for('payment_success') }}" class="d-none">
+                            <input type="hidden" name="order_id" value="{{ pending_order_id }}">
+                            <input type="hidden" id="razorpayPaymentId" name="razorpay_payment_id" value="">
+                            <input type="hidden" id="razorpayOrderId" name="razorpay_order_id" value="{{ razorpay_order.id }}">
+                            <input type="hidden" id="razorpaySignature" name="razorpay_signature" value="">
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        {% endfor %}
 
-        <!-- PRICE BREAKDOWN -->
-        <div style="margin-top:20px;">
-
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                margin-bottom:8px;
-                color:#9ca3af;
-                font-size:14px;
-            ">
-                <span>Subtotal</span>
-                <span style="color:#e5e7eb;">
-                    {{ cart_summary.retail_subtotal|money }}
-                </span>
+        <div class="mobile-cta-bar d-lg-none scroll-reveal">
+            <div>
+                <div class="small text-muted">Total</div>
+                <div class="text-warning fw-semibold">{{ cart_summary.final_total|money }}</div>
             </div>
-
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                margin-bottom:10px;
-                font-size:14px;
-            ">
-                <span style="color:#9ca3af;">Discount</span>
-                <span style="color:#facc15; font-weight:600;">
-                    - {{ cart_summary.discount_amount|money }}
-                </span>
-            </div>
-
-            <div style="
-                border-top:1px solid rgba(255,255,255,0.08);
-                margin-top:12px;
-                padding-top:14px;
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-            ">
-                <span style="
-                    font-size:16px;
-                    font-weight:600;
-                    color:#e5e7eb;
-                ">
-                    Total
-                </span>
-
-                <span style="
-                    font-size:20px;
-                    font-weight:700;
-                    color:#facc15;
-                    letter-spacing:0.5px;
-                ">
-                    {{ cart_summary.final_total|money }}
-                </span>
-            </div>
-
+            {% if not razorpay_order %}
+            <button type="submit" form="checkoutForm" class="btn btn-warning">Place Order</button>
+            {% else %}
+            <button type="button" class="btn btn-warning" data-razorpay-launch="true">Pay now</button>
+            {% endif %}
         </div>
-            <div style="
-                margin-top:20px;
-                padding:12px;
-                border-radius:10px;
-                background:rgba(255,193,7,0.08);
-                border:1px solid rgba(255,193,7,0.2);
-                font-size:13px;
-                color:#d1d5db;
-            ">
-                ✔ Fast dispatch across India <br>
-                ✔ Secure checkout via Razorpay <br>
-                ✔ Easy returns within 7 days
-            </div>
+        {% else %}
+        <div class="section-card info-panel text-center scroll-reveal">
+            <i class="bi bi-cart-x fs-1 mb-3 text-warning"></i>
+            <h3 class="mb-2">Your cart is empty</h3>
+            <p class="section-copy mb-4">Add a few caps first and come back when you are ready to check out.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-warning">Continue Shopping</a>
+        </div>
+        {% endif %}
     </div>
-</div>
-
-    </div>
-
-    {% else %}
-    <div class="text-center py-5">
-        <h4 class="text-light">Your cart is empty</h4>
-        <a href="{{ url_for('index') }}" class="btn btn-warning mt-3">Continue Shopping</a>
-    </div>
-    {% endif %}
-
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 {% if razorpay_order and pending_order_id %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-document.getElementById('razorpayButton').addEventListener('click', function () {
+function launchRazorpayCheckout() {
     const options = {
         key: "{{ razorpay_key_id }}",
         amount: "{{ razorpay_order.amount }}",
@@ -348,8 +234,11 @@ document.getElementById('razorpayButton').addEventListener('click', function () 
 
     const razorpayCheckout = new Razorpay(options);
     razorpayCheckout.open();
+}
+
+document.querySelectorAll('[data-razorpay-launch="true"]').forEach((button) => {
+    button.addEventListener('click', launchRazorpayCheckout);
 });
 </script>
 {% endif %}
 {% endblock %}
-

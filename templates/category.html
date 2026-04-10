@@ -1,27 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{{ category_name }} - {{ Nocap }}{% endblock %}
-
-{% block head %}
-<style>
-.scroll-reveal {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.8s ease-out;
-}
-.scroll-reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-.product-card:hover {
-    transform: translateY(-5px);
-    transition: 0.3s;
-}
-</style>
-{% endblock %}
+{% block title %}{{ category_name }} - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
 {% macro img_url(path, fallback_index=0) -%}
     {%- if path -%}
         {%- if path.startswith('/static/') -%}
@@ -35,210 +16,145 @@
         {{ url_for('static', path=gallery_images[fallback_index % (gallery_images|length)] if gallery_images|length else 'img/logo.jpg') }}
     {%- endif -%}
 {%- endmacro %}
-    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-5 scroll-reveal">
-        <div>
-            <nav aria-label="breadcrumb" class="mb-2">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-white text-decoration-none small uppercase tracking-wider opacity-75">Store</a></li>
-                    <li class="breadcrumb-item active text-warning small uppercase tracking-wider" aria-current="page">{{ category_name }}</li>
+
+<section class="page-shell">
+    <div class="container section-stack">
+        <div class="section-card info-panel scroll-reveal">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Store</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ category_name }}</li>
                 </ol>
             </nav>
-            <h2 class="display-6 fw-bold text-white mb-1">Category: <span class="text-warning">{{ category_name }}</span></h2>
-            <p class="text-white opacity-75 mb-0">Discover our curated collection of {{ category_name }} styles.</p>
+            <div class="section-header mb-0">
+                <div>
+                    <h1 class="page-heading mb-2">{{ category_name }} Caps</h1>
+                    <p class="page-subtitle mb-0">Use search and fast mobile filters to narrow this category without losing your place in the grid.</p>
+                </div>
+                <span class="stat-pill">{{ products|length }} styles</span>
+            </div>
         </div>
-        <span class="badge rounded-pill text-bg-warning text-dark px-4 py-2 fw-bold shadow-sm">{{ products|length }} Styles Available</span>
-    </div>
 
-    <!-- 🛠️ Control Center (Category Exclusive) -->
-    <div class="card bg-dark text-light border-0 shadow-lg p-4 discover-panel mb-5 scroll-reveal">
-        <form method="GET" action="{{ url_for('category', category_name=category_name) }}" class="row g-3 align-items-center bg-white-opacity-5 p-2 rounded-5 shadow-sm inner-glass">
-            <div class="col-lg-5 col-md-12">
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text bg-white border-0 text-dark ps-3"><i class="bi bi-search"></i></span>
-                    <input type="search" class="form-control border-0 ps-2" id="q" name="q" value="{{ filters['q'] }}" placeholder="Search in {{ category_name }}...">
+        <div class="section-card discover-card scroll-reveal">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Refine This Category</h2>
+                    <p class="section-copy mb-0">Keep search lightweight on mobile, then open the filter drawer for price or featured-only browsing.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-0 text-warning px-1"><i class="bi bi-currency-rupee"></i></span>
-                    <select id="max_price" name="max_price" class="form-select form-select-lg border-0 bg-white">
-                        <option value="">Any Price</option>
-                        <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to 650</option>
-                        <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to 750</option>
-                        <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to 850</option>
-                    </select>
+
+            <form method="GET" action="{{ url_for('category', category_name=category_name) }}" class="mobile-search-bar d-md-none">
+                <input type="hidden" name="max_price" value="{{ filters['max_price'] }}">
+                {% if filters['featured'] %}
+                <input type="hidden" name="featured" value="1">
+                {% endif %}
+                <div class="mobile-search-bar__top">
+                    <input type="search" class="form-control form-control-lg" name="q" value="{{ filters['q'] }}" placeholder="Search in {{ category_name }}...">
+                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="offcanvas" data-bs-target="#categoryFilters" aria-controls="categoryFilters">
+                        <i class="bi bi-sliders"></i>
+                    </button>
                 </div>
-            </div>
-            <div class="col-lg-1 col-md-6 text-center">
-                <div class="form-check form-switch d-inline-block ps-0" title="Show featured only">
-                    <label class="d-block small text-warning mb-1 uppercase fw-bold" style="font-size: 0.65rem;">Featured</label>
-                    <input class="form-check-input ms-0" type="checkbox" id="featured" name="featured" value="1" {% if filters['featured'] %}checked{% endif %}>
+                <button type="submit" class="btn btn-warning">Search {{ category_name }}</button>
+            </form>
+
+            <form method="GET" action="{{ url_for('category', category_name=category_name) }}" class="filter-inline-form">
+                <input type="search" class="form-control form-control-lg" name="q" value="{{ filters['q'] }}" placeholder="Search in {{ category_name }}...">
+                <select id="maxPriceDesktop" name="max_price" class="form-select form-select-lg">
+                    <option value="">Any price</option>
+                    <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to 650</option>
+                    <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to 750</option>
+                    <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to 850</option>
+                </select>
+                <div class="form-check form-switch text-center">
+                    <label class="form-check-label text-warning small fw-bold mb-1 d-block" for="categoryFeaturedDesktop">Featured</label>
+                    <input class="form-check-input" type="checkbox" id="categoryFeaturedDesktop" name="featured" value="1" {% if filters['featured'] %}checked{% endif %}>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6 d-flex gap-2">
-                <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold uppercase tracking-wider glow-on-hover">
-                    Apply
-                </button>
-                <a href="{{ url_for('category', category_name=category_name) }}" class="btn btn-outline-light btn-lg border-0 opacity-50 hover-opacity-100" title="Reset filters">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                </a>
-            </div>
-        </form>
-    </div>
+                <button type="submit" class="btn btn-warning btn-lg">Apply</button>
+                <a href="{{ url_for('category', category_name=category_name) }}" class="btn btn-outline-light btn-lg">Clear</a>
+            </form>
+        </div>
 
-    {% if products %}
-    <div class="row g-4 pt-4">
-        {% for product in products %}
-        <div class="col-sm-6 col-lg-3 scroll-reveal">
-            <div style="
-                background:#0f172a;
-                border-radius:18px;
-                padding:20px;
-                height:100%;
-                display:flex;
-                flex-direction:column;
-                box-shadow:0 10px 30px rgba(0,0,0,0.4);
-                text-align:center;
-                border: 1px solid rgba(255,255,255,0.03);
-            ">
-                <!-- 🔥 IMAGE BOX (FIXED) -->
-                <div style="
-                    height:160px;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    margin-bottom:15px;
-                ">
-                    <img src="{{ img_url(product.image_url, loop.index0) }}"
-                         alt="{{ product.name }}"
-                         loading="lazy"
-                         style="
-                            max-height:100%;
-                            max-width:100%;
-                            object-fit:contain;
-                            border-radius:10px;
-                         ">
+        <div class="offcanvas offcanvas-bottom filter-drawer d-md-none" tabindex="-1" id="categoryFilters" aria-labelledby="categoryFiltersLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title text-warning" id="categoryFiltersLabel">{{ category_name }} Filters</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <form method="GET" action="{{ url_for('category', category_name=category_name) }}" class="surface-card p-3">
+                    <div class="section-stack">
+                        <div>
+                            <label class="form-label" for="categoryQueryMobile">Search</label>
+                            <input id="categoryQueryMobile" type="search" class="form-control form-control-lg" name="q" value="{{ filters['q'] }}" placeholder="Search in {{ category_name }}...">
+                        </div>
+                        <div>
+                            <label class="form-label" for="categoryPriceMobile">Price</label>
+                            <select id="categoryPriceMobile" name="max_price" class="form-select form-select-lg">
+                                <option value="">Any price</option>
+                                <option value="650" {% if filters['max_price'] == '650' %}selected{% endif %}>Up to 650</option>
+                                <option value="750" {% if filters['max_price'] == '750' %}selected{% endif %}>Up to 750</option>
+                                <option value="850" {% if filters['max_price'] == '850' %}selected{% endif %}>Up to 850</option>
+                            </select>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="categoryFeaturedMobile" name="featured" value="1" {% if filters['featured'] %}checked{% endif %}>
+                            <label class="form-check-label text-light ms-2" for="categoryFeaturedMobile">Featured only</label>
+                        </div>
+                    </div>
+                    <div class="filter-drawer__actions">
+                        <button type="submit" class="btn btn-warning btn-lg">Apply filters</button>
+                        <a href="{{ url_for('category', category_name=category_name) }}" class="btn btn-outline-light btn-lg">Clear filters</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if products %}
+        <div class="product-grid">
+            {% for product in products %}
+            <article class="section-card catalog-card scroll-reveal">
+                <div class="catalog-card__media">
+                    <img src="{{ img_url(product.image_url, loop.index0) }}" alt="{{ product.name }}">
                 </div>
-
-                <!-- CONTENT -->
-                <div style="flex:1; display:flex; flex-direction:column;">
-                    <span style="
-                        border:1px solid #ffc107;
-                        color:#ffc107;
-                        padding:3px 10px;
-                        border-radius:20px;
-                        font-size:0.75rem;
-                        margin-bottom:10px;
-                        display:inline-block;
-                    ">
-                        {{ product.category }}
-                    </span>
-
-                    <h6 style="color:#fff;">{{ product.name }}</h6>
-
-                    <p style="
-                        color:#9ca3af;
-                        font-size:0.85rem;
-                        margin-bottom:10px;
-                    ">
-                        {{ product.description[:60] }}...
-                    </p>
-
+                <div class="catalog-card__body">
+                    <span class="catalog-card__tag">{{ product.category }}</span>
+                    <h3 class="catalog-card__title">{{ product.name }}</h3>
+                    <p class="catalog-card__desc">{{ product.description[:85] }}{% if product.description|length > 85 %}...{% endif %}</p>
                     {% if product.average_rating %}
-                    <p style="font-size:0.85rem;">
-                        <span style="color:#ffc107; font-weight:600;">
-                            {{ product.average_rating }}/5
-                        </span>
-                        <span style="color:#9ca3af;">
-                            from {{ product.review_count }} review{% if product.review_count != 1 %}s{% endif %}
-                        </span>
-                    </p>
+                    <p class="catalog-card__meta"><span class="text-warning fw-bold">{{ product.average_rating }}/5</span> from {{ product.review_count }} review{% if product.review_count != 1 %}s{% endif %}</p>
                     {% else %}
-                    <p style="font-size:0.85rem; color:#9ca3af;">
-                        Freshly added style
-                    </p>
+                    <p class="catalog-card__hint">Freshly added style</p>
                     {% endif %}
-
-                    <p style="font-size:0.85rem; color:#9ca3af;">
-                        {{ product.variant_count }} variants | {{ product.total_stock }} in stock
-                    </p>
-
-                    <p style="margin-bottom:5px;">
-                        Retail:
-                        <span style="color:#ffc107;">
-                            {{ product.normal_price|money }}
-                        </span>
-                    </p>
-
-                    <p style="font-size:0.85rem; color:#9ca3af;">
-                        Shop owner: {{ product.shop_owner_price|money }}
-                    </p>
-
-                    <!-- BUTTONS -->
-                    <div style="
-                        display:flex;
-                        gap:8px;
-                        justify-content:center;
-                        margin-top:auto;
-                    ">
+                    <p class="catalog-card__meta">{{ product.variant_count }} variants | {{ product.total_stock }} in stock</p>
+                    <div class="price-stack">
+                        <div class="price-stack__block">
+                            <div class="helper-copy small">Retail</div>
+                            <strong>{{ product.normal_price|money }}</strong>
+                        </div>
+                        <div class="price-stack__block">
+                            <div class="helper-copy small">Shop owner</div>
+                            <strong>{{ product.shop_owner_price|money }}</strong>
+                        </div>
+                    </div>
+                    <div class="catalog-card__actions">
                         <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
                             <input type="hidden" name="quantity" value="1">
                             <input type="hidden" name="variant_sku" value="{{ product.default_variant.sku if product.default_variant else '' }}">
-                            <button type="submit"
-                                    {% if not product.in_stock %}disabled{% endif %}
-                                    style="
-                                        background:#ffc107;
-                                        border:none;
-                                        padding:6px 12px;
-                                        border-radius:8px;
-                                        font-size:0.85rem;
-                                        font-weight:600;
-                                    ">
-                                Add
-                            </button>
+                            <button type="submit" class="btn btn-warning" {% if not product.in_stock %}disabled{% endif %}>Add</button>
                         </form>
-
-                        <a href="{{ url_for('product', product_id=product.id) }}"
-                           style="
-                                border:1px solid #ffc107;
-                                color:#ffc107;
-                                padding:6px 12px;
-                                border-radius:8px;
-                                text-decoration:none;
-                                font-size:0.85rem;
-                                font-weight:600;
-                           ">
-                            View
-                        </a>
+                        <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-outline-warning">View</a>
                     </div>
                 </div>
-            </div>
+            </article>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="section-card info-panel text-center scroll-reveal">
+            <i class="bi bi-search text-warning fs-1 d-block mb-3"></i>
+            <h3 class="mb-2">No caps matched those filters.</h3>
+            <p class="section-copy mb-4">Try a broader search or remove the featured and price limits.</p>
+            <a href="{{ url_for('category', category_name=category_name) }}" class="btn btn-warning">Clear Filters</a>
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-exclamation-circle fs-1 mb-3 text-warning"></i>
-        <h4 class="text-light">No caps matched those filters.</h4>
-        <a href="{{ url_for('category', category_name=category_name) }}" class="btn btn-warning mt-3">Clear Filters</a>
-    </div>
-    {% endif %}
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-const revealElements = document.querySelectorAll('.scroll-reveal');
-function revealOnScroll() {
-    const windowHeight = window.innerHeight;
-    revealElements.forEach(el => {
-        const elementTop = el.getBoundingClientRect().top;
-        if (elementTop < windowHeight - 100) {
-            el.classList.add('visible');
-        }
-    });
-}
-window.addEventListener('scroll', revealOnScroll);
-window.addEventListener('load', revealOnScroll);
-</script>
+</section>
 {% endblock %}

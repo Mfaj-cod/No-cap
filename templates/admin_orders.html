@@ -1,25 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}Admin — Orders{% endblock %}
+{% block title %}Admin Orders - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<section class="page-shell">
+    <div class="container section-stack">
+        <div class="section-card info-panel scroll-reveal">
+            <div class="section-header mb-0">
+                <div>
+                    <h1 class="page-heading mb-2">Order Management</h1>
+                    <p class="page-subtitle mb-0">The admin view now uses mobile order cards on small screens and keeps the wider table layout for desktop. Order data still refreshes automatically every 5 seconds.</p>
+                </div>
+                <span class="stat-pill">Auto-refresh every 5s</span>
+            </div>
+        </div>
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-warning fw-bold">Order Management</h2>
-        <span class="text-muted small">Auto-refresh every 5s</span>
-    </div>
+        <div id="ordersCardList" class="admin-card-list">
+            {% for o in orders %}
+            <article class="section-card admin-order-card scroll-reveal" data-order-id="{{ o.id }}">
+                <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                    <div>
+                        <strong class="text-warning">#{{ o.id }}</strong>
+                        <div>{{ o.name }}</div>
+                        <div class="helper-copy small">{{ o.email }}</div>
+                        <div class="helper-copy small mt-1">{{ o.address }}</div>
+                    </div>
+                    <div class="admin-order-card__meta">
+                        <span class="badge-soft">{{ o.payment_method }}</span>
+                        <span class="badge-soft status-badge" data-status="{{ o.status }}">{{ o.status }}</span>
+                    </div>
+                </div>
 
-    <div class="card border-0 shadow-lg"
-         style="background: linear-gradient(145deg,#0f172a,#0b1220); border-radius:16px;">
+                <div class="mini-stat">
+                    <div class="helper-copy small mb-2">Items</div>
+                    <ul class="mb-0 small ps-3">
+                        {% for it in o['items'] %}
+                        <li>{{ it.product_name }} x {{ it.quantity }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
 
-        <div class="card-body p-0">
+                <div class="surface-grid surface-grid--2">
+                    <div class="mini-stat">
+                        <div class="helper-copy small mb-1">Total</div>
+                        <strong class="text-warning">{{ o.total|money }}</strong>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="helper-copy small mb-1">Status</div>
+                        <div class="d-flex gap-2 mt-2">
+                            <select class="form-select form-select-sm status-select">
+                                <option value="pending" {% if o.status == 'pending' %}selected{% endif %}>Pending</option>`r`n                                <option value="confirmed" {% if o.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                <option value="paid" {% if o.status == 'paid' %}selected{% endif %}>Paid</option>
+                                <option value="processing" {% if o.status == 'processing' %}selected{% endif %}>Processing</option>
+                                <option value="on the way" {% if o.status == 'on the way' %}selected{% endif %}>On the Way</option>
+                                <option value="delivered" {% if o.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                            </select>
+                            <button class="btn btn-warning btn-sm update-status">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
 
+        <div class="section-card info-panel admin-table-shell scroll-reveal">
             <div class="table-responsive">
-                <table class="table align-middle text-light mb-0">
-
-                    <thead style="background: rgba(255,255,255,0.05);">
+                <table class="table table-dark align-middle mb-0">
+                    <thead>
                         <tr>
                             <th>#</th>
                             <th>Customer</th>
@@ -27,194 +74,165 @@
                             <th>Total</th>
                             <th>Payment</th>
                             <th>Status</th>
-                            <th style="width:180px;">Action</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
-
                     <tbody id="ordersBody">
-
                         {% for o in orders %}
-                        <tr data-order-id="{{ o.id }}" style="border-bottom:1px solid rgba(255,255,255,0.05);">
-
-                            <!-- ID -->
+                        <tr data-order-id="{{ o.id }}">
                             <td class="fw-bold text-warning">#{{ o.id }}</td>
-
-                            <!-- CUSTOMER -->
                             <td>
                                 <div>{{ o.name }}</div>
                                 <small class="text-muted">{{ o.email }}</small>
-                                <div class="small text-muted mt-1">
-                                    {{ o.address }}
-                                </div>
+                                <div class="small text-muted mt-1">{{ o.address }}</div>
                             </td>
-
-                            <!-- ITEMS -->
-                            <td style="max-width:220px;">
-                                <ul class="mb-0 small">
-                                    {% for it in o["items"] %}
-                                    <li>{{ it.product_name }} × {{ it.quantity }}</li>
+                            <td>
+                                <ul class="mb-0 small ps-3">
+                                    {% for it in o['items'] %}
+                                    <li>{{ it.product_name }} x {{ it.quantity }}</li>
                                     {% endfor %}
                                 </ul>
                             </td>
-
-                            <!-- TOTAL -->
-                            <td class="fw-semibold text-warning">
-                                ₹{{ o.total }}
-                            </td>
-
-                            <!-- PAYMENT -->
-                            <td>
-                                <span class="badge bg-secondary text-uppercase">
-                                    {{ o.payment_method }}
-                                </span>
-                            </td>
-
-                            <!-- STATUS -->
-                            <td>
-                                <span class="badge status-badge text-uppercase"
-                                      data-status="{{ o.status }}">
-                                    {{ o.status }}
-                                </span>
-                            </td>
-
-                            <!-- ACTION -->
+                            <td class="fw-semibold text-warning">{{ o.total|money }}</td>
+                            <td><span class="badge-soft">{{ o.payment_method }}</span></td>
+                            <td><span class="badge-soft status-badge" data-status="{{ o.status }}">{{ o.status }}</span></td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <select class="form-select form-select-sm status-select" style="background:#1f2937;border:none;color:#fff;">
-                                        <option value="placed" {% if o.status == 'placed' %}selected{% endif %}>Placed</option>
+                                    <select class="form-select form-select-sm status-select">
+                                        <option value="pending" {% if o.status == 'pending' %}selected{% endif %}>Pending</option>`r`n                                <option value="confirmed" {% if o.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                        <option value="paid" {% if o.status == 'paid' %}selected{% endif %}>Paid</option>
                                         <option value="processing" {% if o.status == 'processing' %}selected{% endif %}>Processing</option>
                                         <option value="on the way" {% if o.status == 'on the way' %}selected{% endif %}>On the Way</option>
                                         <option value="delivered" {% if o.status == 'delivered' %}selected{% endif %}>Delivered</option>
                                     </select>
-
-                                    <button class="btn btn-warning btn-sm update-status">
-                                        Update
-                                    </button>
+                                    <button class="btn btn-warning btn-sm update-status">Update</button>
                                 </div>
                             </td>
-
                         </tr>
                         {% endfor %}
-
                     </tbody>
-
                 </table>
             </div>
-
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 <script>
+const statusOptions = ['pending', 'confirmed', 'paid', 'processing', 'on the way', 'delivered'];
 
-// 🎯 STATUS COLORS
-function applyStatusColors() {
-    document.querySelectorAll('.status-badge').forEach(el => {
-        const status = el.dataset.status.toLowerCase();
-
-        el.classList.remove('bg-secondary','bg-info','bg-primary','bg-success');
-
-        if (status === 'placed') el.classList.add('bg-secondary');
-        else if (status === 'processing') el.classList.add('bg-info');
-        else if (status === 'on the way') el.classList.add('bg-primary');
-        else if (status === 'delivered') el.classList.add('bg-success');
-    });
+function statusOptionsMarkup(selectedStatus) {
+    return statusOptions.map((status) => {
+        const selected = status === selectedStatus ? 'selected' : '';
+        const label = status === 'on the way' ? 'On the Way' : status.charAt(0).toUpperCase() + status.slice(1);
+        return `<option value="${status}" ${selected}>${label}</option>`;
+    }).join('');
 }
 
-// 🔁 FETCH ORDERS
-async function fetchOrders() {
-    const res = await fetch('/api/admin/orders');
-    if (!res.ok) return;
+function statusBadgeMarkup(status) {
+    return `<span class="badge-soft status-badge" data-status="${status}">${status}</span>`;
+}
 
-    const orders = await res.json();
-    const body = document.getElementById('ordersBody');
+function cardMarkup(order) {
+    return `
+        <article class="section-card admin-order-card" data-order-id="${order.id}">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <strong class="text-warning">#${order.id}</strong>
+                    <div>${order.name}</div>
+                    <div class="helper-copy small">${order.email}</div>
+                    <div class="helper-copy small mt-1">${order.address || ''}</div>
+                </div>
+                <div class="admin-order-card__meta">
+                    <span class="badge-soft">${order.payment_method}</span>
+                    ${statusBadgeMarkup(order.status)}
+                </div>
+            </div>
+            <div class="mini-stat">
+                <div class="helper-copy small mb-2">Items</div>
+                <ul class="mb-0 small ps-3">
+                    ${order.items.map((item) => `<li>${item.product_name} x ${item.quantity}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="surface-grid surface-grid--2">
+                <div class="mini-stat">
+                    <div class="helper-copy small mb-1">Total</div>
+                    <strong class="text-warning">Rs. ${Number(order.total).toFixed(2)}</strong>
+                </div>
+                <div class="mini-stat">
+                    <div class="helper-copy small mb-1">Status</div>
+                    <div class="d-flex gap-2 mt-2">
+                        <select class="form-select form-select-sm status-select">${statusOptionsMarkup(order.status)}</select>
+                        <button class="btn btn-warning btn-sm update-status">Update</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+    `;
+}
 
-    body.innerHTML = '';
-
-    orders.forEach(o => {
-        const tr = document.createElement('tr');
-        tr.dataset.orderId = o.id;
-
-        tr.innerHTML = `
-            <td class="fw-bold text-warning">#${o.id}</td>
-
+function rowMarkup(order) {
+    return `
+        <tr data-order-id="${order.id}">
+            <td class="fw-bold text-warning">#${order.id}</td>
             <td>
-                <div>${o.name}</div>
-                <small class="text-muted">${o.email}</small>
-                <div class="small text-muted mt-1">${o.address || ''}</div>
+                <div>${order.name}</div>
+                <small class="text-muted">${order.email}</small>
+                <div class="small text-muted mt-1">${order.address || ''}</div>
             </td>
-
-            <td style="max-width:220px;">
-                <ul class="mb-0 small">
-                    ${o.items.map(i => `<li>${i.product_name} × ${i.quantity}</li>`).join('')}
+            <td>
+                <ul class="mb-0 small ps-3">
+                    ${order.items.map((item) => `<li>${item.product_name} x ${item.quantity}</li>`).join('')}
                 </ul>
             </td>
-
-            <td class="fw-semibold text-warning">₹${o.total}</td>
-
-            <td>
-                <span class="badge bg-secondary text-uppercase">${o.payment_method}</span>
-            </td>
-
-            <td>
-                <span class="badge status-badge text-uppercase" data-status="${o.status}">
-                    ${o.status}
-                </span>
-            </td>
-
+            <td class="fw-semibold text-warning">Rs. ${Number(order.total).toFixed(2)}</td>
+            <td><span class="badge-soft">${order.payment_method}</span></td>
+            <td>${statusBadgeMarkup(order.status)}</td>
             <td>
                 <div class="d-flex gap-2">
-                    <select class="form-select form-select-sm status-select" style="background:#1f2937;border:none;color:#fff;">
-                        <option value="placed" ${o.status === 'placed' ? 'selected' : ''}>Placed</option>
-                        <option value="processing" ${o.status === 'processing' ? 'selected' : ''}>Processing</option>
-                        <option value="on the way" ${o.status === 'on the way' ? 'selected' : ''}>On the Way</option>
-                        <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
-                    </select>
-
-                    <button class="btn btn-warning btn-sm update-status">
-                        Update
-                    </button>
+                    <select class="form-select form-select-sm status-select">${statusOptionsMarkup(order.status)}</select>
+                    <button class="btn btn-warning btn-sm update-status">Update</button>
                 </div>
             </td>
-        `;
-
-        body.appendChild(tr);
-    });
-
-    attachHandlers();
-    applyStatusColors();
+        </tr>
+    `;
 }
 
-// 🔘 UPDATE STATUS
 function attachHandlers() {
-    document.querySelectorAll('.update-status').forEach(btn => {
-        btn.onclick = async (e) => {
-            const tr = e.target.closest('tr');
-            const id = tr.dataset.orderId;
-            const status = tr.querySelector('.status-select').value;
+    document.querySelectorAll('.update-status').forEach((button) => {
+        button.onclick = async (event) => {
+            const cardOrRow = event.target.closest('[data-order-id]');
+            const id = cardOrRow.dataset.orderId;
+            const status = cardOrRow.querySelector('.status-select').value;
 
             await fetch(`/api/admin/orders/${id}/status`, {
                 method: 'POST',
-                headers: {'content-type': 'application/json'},
-                body: JSON.stringify({status})
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ status })
             });
 
-            const badge = tr.querySelector('.status-badge');
-            badge.textContent = status;
-            badge.dataset.status = status;
-
-            tr.querySelector('.status-select').value = status;
-
-            applyStatusColors();
+            await fetchOrders();
         };
     });
 }
 
-// INIT
-fetchOrders();
-setInterval(fetchOrders, 5000);
+async function fetchOrders() {
+    const response = await fetch('/api/admin/orders');
+    if (!response.ok) return;
 
+    const orders = await response.json();
+    const tableBody = document.getElementById('ordersBody');
+    const cardList = document.getElementById('ordersCardList');
+
+    tableBody.innerHTML = orders.map(rowMarkup).join('');
+    cardList.innerHTML = orders.map(cardMarkup).join('');
+
+    attachHandlers();
+}
+
+attachHandlers();
+setInterval(fetchOrders, 5000);
 </script>
 {% endblock %}
+

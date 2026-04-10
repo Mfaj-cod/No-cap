@@ -1,70 +1,103 @@
 {% extends "base.html" %}
 
-{% block title %}My Account - {{ Nocap }}{% endblock %}
+{% block title %}My Account - {{ store_name }}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h3 class="text-warning">Account</h3>
-                    <p class="mb-2"><strong>Name:</strong> {{ current_user.name }}</p>
-                    <p class="mb-2"><strong>Email:</strong> {{ current_user.email }}</p>
-                    <p class="mb-0"><strong>Role:</strong> {{ current_user.role.replace('_', ' ')|title }}</p>
+<section class="page-shell">
+    <div class="container section-stack">
+        <div class="surface-grid surface-grid--2">
+            <div class="section-card info-panel scroll-reveal">
+                <h1 class="section-title">Account</h1>
+                <div class="section-stack">
+                    <div>
+                        <div class="helper-copy small">Name</div>
+                        <strong>{{ current_user.name }}</strong>
+                    </div>
+                    <div>
+                        <div class="helper-copy small">Email</div>
+                        <strong>{{ current_user.email }}</strong>
+                    </div>
+                    <div>
+                        <div class="helper-copy small">Role</div>
+                        <strong>{{ current_user.role.replace('_', ' ')|title }}</strong>
+                    </div>
                     {% if current_user.role == 'shop_owner' %}
-                    <div class="alert alert-info border-0 mt-3 small mb-0">
-                        Wholesale pricing activates automatically when your cart reaches 25 or more caps.
-                    </div>
+                    <div class="alert alert-info border-0 small mb-0">Wholesale pricing activates automatically when your cart reaches 25 or more caps.</div>
                     {% endif %}
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-8">
-            <div class="card bg-dark text-light border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="text-warning mb-0">Recent Orders</h3>
-                        <a href="{{ url_for('index') }}" class="btn btn-outline-warning btn-sm">Shop More</a>
-                    </div>
-
-                    {% if orders %}
-                    <div class="table-responsive">
-                        <table class="table table-dark align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Order</th>
-                                    <th>Status</th>
-                                    <th>Qty</th>
-                                    <th>Tier</th>
-                                    <th>Discount</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for order in orders %}
-                                <tr>
-                                    <td>#{{ order.id }}<br><span class="small text-muted">{{ order.created_at }}</span></td>
-                                    <td>{{ order.status|title }}</td>
-                                    <td>{{ order.total_quantity }}</td>
-                                    <td>{{ order.pricing_tier.replace('_', ' ')|title }}</td>
-                                    <td>{{ order.discount_amount|money }}</td>
-                                    <td>{{ order.total|money }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4">
-                        <i class="bi bi-bag-x fs-1 text-warning"></i>
-                        <p class="mt-3 mb-0">You have not placed any orders yet.</p>
-                    </div>
-                    {% endif %}
-                </div>
+            <div class="section-card info-panel scroll-reveal">
+                <h2 class="section-title">Recent Orders</h2>
+                <p class="section-copy mb-0">The order history switches to mobile cards on small screens and a table on larger screens, so status and totals stay readable everywhere.</p>
             </div>
         </div>
+
+        {% if orders %}
+        <div class="order-card-list">
+            {% for order in orders %}
+            <article class="section-card order-mini-card scroll-reveal">
+                <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                    <div>
+                        <strong>#{{ order.id }}</strong>
+                        <div class="helper-copy small">{{ order.created_at }}</div>
+                    </div>
+                    <div class="order-mini-card__meta">
+                        <span class="badge-soft">{{ order.status|title }}</span>
+                        <span class="badge-soft">{{ order.pricing_tier.replace('_', ' ')|title }}</span>
+                    </div>
+                </div>
+                <div class="surface-grid surface-grid--2">
+                    <div class="mini-stat">
+                        <div class="helper-copy small mb-1">Quantity</div>
+                        <strong>{{ order.total_quantity }} caps</strong>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="helper-copy small mb-1">Total</div>
+                        <strong class="text-warning">{{ order.total|money }}</strong>
+                    </div>
+                </div>
+                <div class="helper-copy">Discount saved: {{ order.discount_amount|money }}</div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="section-card info-panel order-table-shell scroll-reveal">
+            <div class="table-responsive">
+                <table class="table table-dark align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Qty</th>
+                            <th>Tier</th>
+                            <th>Discount</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>#{{ order.id }}<br><span class="small text-muted">{{ order.created_at }}</span></td>
+                            <td>{{ order.status|title }}</td>
+                            <td>{{ order.total_quantity }}</td>
+                            <td>{{ order.pricing_tier.replace('_', ' ')|title }}</td>
+                            <td>{{ order.discount_amount|money }}</td>
+                            <td>{{ order.total|money }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="section-card info-panel text-center scroll-reveal">
+            <i class="bi bi-bag-x fs-1 text-warning d-block mb-3"></i>
+            <h3 class="mb-2">You have not placed any orders yet.</h3>
+            <p class="section-copy mb-4">Start exploring the catalog and your orders will appear here once you check out.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-warning">Shop More</a>
+        </div>
+        {% endif %}
     </div>
-</div>
+</section>
 {% endblock %}
