@@ -11,4 +11,4 @@ store.db
 *.log
 *.ini
 
-.github/workflows/*.yaml
+scripts/

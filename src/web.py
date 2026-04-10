@@ -51,6 +51,10 @@ templates.env.filters["money"] = money
 
 
 def render_template(request: Request, template_name: str, **context):
+    print("TEMPLATE_NAME:", template_name, type(template_name))
+    if not isinstance(template_name, str):
+        raise ValueError(f"Template name is NOT string: {template_name}")
+    
     base_context = {
         "request": request,
         "flash_messages": pop_flash_messages(request),
