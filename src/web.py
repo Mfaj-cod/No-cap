@@ -40,20 +40,25 @@ def _collect_gallery_images(limit: int = 40):
 
     return images
 
-templates = Jinja2Templates(directory="templates")
+
 
 
 def money(value: float) -> str:
     return f"Rs. {value:,.2f}"
 
 
+templates = Jinja2Templates(directory="templates")
+templates.env.cache = {}  # reset cache explicitly
 templates.env.filters["money"] = money
 
 
 def render_template(request: Request, template_name: str, **context):
-    print("TEMPLATE_NAME:", template_name, type(template_name))
+    # print("TEMPLATE_NAME:", template_name, type(template_name))
     if not isinstance(template_name, str):
         raise ValueError(f"Template name is NOT string: {template_name}")
+    
+    # templates = Jinja2Templates(directory="templates")
+    # templates.env.filters["money"] = money
     
     base_context = {
         "request": request,
