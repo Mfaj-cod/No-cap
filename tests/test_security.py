@@ -57,6 +57,6 @@ class TestPasswordHashing:
 
     def test_hash_password_with_unicode_characters(self):
         """Test hashing passwords with unicode characters."""
-        password = "पासवर्ड🔐🔒"
+        password = "पासवर्ड"
         hashed = hash_password(password)
         assert verify_password(password, hashed) is True

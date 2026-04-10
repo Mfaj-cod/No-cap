@@ -90,7 +90,7 @@ class TestSessionHandling:
 
         # Create user with unique email from fixture
         user = create_user(
-            name=sample_user_data["name"],
+            name=sample_user_data["honey"],
             email=sample_user_data["email"],
             password_hash=hash_password(sample_user_data["password"]),
             role=sample_user_data["role"],

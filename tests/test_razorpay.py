@@ -5,22 +5,20 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
-key_id = os.getenv("RAZORPAY_KEY_ID", "")
-key_secret = os.getenv("RAZORPAY_KEY_SECRET", "")
+test_key_id = "rzp_test_SZutUFttWN5nHT"
+test_key_secret = "fQwjH6avXXG3W9BlXshGpKPp"
 
 print("Testing Razorpay credentials...")
-print(f"Key ID: {key_id[:20]}..." if key_id else "Key ID: NOT SET")
-print(f"Key Secret: {'SET' if key_secret else 'NOT SET'}")
 
-if not key_id or not key_secret:
-    print("Credentials missing in .env!")
+if not test_key_id or not test_key_secret:
+    print("Test credentials missing")
     exit(1)
 
 try:
     import razorpay
     print("razorpay module imported successfully")
     
-    client = razorpay.Client(auth=(key_id, key_secret))
+    client = razorpay.Client(auth=(test_key_id, test_key_secret))
     print("Razorpay client initialized")
     
     print("Creating test order...")
