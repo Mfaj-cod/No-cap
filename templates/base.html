@@ -66,13 +66,13 @@
         </div>
         <div class="offcanvas-body">
             <div class="mobile-nav-links">
-                <a class="btn btn-outline-warning" data-bs-dismiss="offcanvas" href="{{ url_for('index') }}">Home</a>
-                <a class="btn btn-outline-warning" data-bs-dismiss="offcanvas" href="{{ url_for('index') }}#discover">Discover</a>
-                <a class="btn btn-outline-warning" data-bs-dismiss="offcanvas" href="{{ url_for('about') }}">About</a>
-                <a class="btn btn-outline-warning" data-bs-dismiss="offcanvas" href="{{ url_for('contact') }}">Support</a>
-                <a class="btn btn-outline-warning" data-bs-dismiss="offcanvas" href="{{ url_for('customer_care_page') }}">CapAI</a>
+                <a class="btn btn-outline-warning" href="{{ url_for('index') }}">Home</a>
+                <a class="btn btn-outline-warning" href="{{ url_for('index') }}#discover">Discover</a>
+                <a class="btn btn-outline-warning" href="{{ url_for('about') }}">About</a>
+                <a class="btn btn-outline-warning" href="{{ url_for('contact') }}">Support</a>
+                <a class="btn btn-outline-warning" href="{{ url_for('customer_care_page') }}">CapAI</a>
                 {% if current_user %}
-                <a class="btn btn-outline-warning" data-bs-dismiss="offcanvas" href="{{ url_for('account') }}">My Account</a>
+                <a class="btn btn-outline-warning" href="{{ url_for('account') }}">My Account</a>
                 <a class="btn btn-warning" href="{{ url_for('logout') }}">Logout</a>
                 {% else %}
                 <a class="btn btn-outline-warning" href="{{ url_for('login') }}">Login</a>
@@ -91,11 +91,10 @@
     <div class="trust-strip">
         <div class="container">
             <ul class="trust-list">
-                <li class="trust-chip"><i class="bi bi-phone me-1 text-warning"></i>Mobile-first checkout</li>
                 <li class="trust-chip"><i class="bi bi-arrow-repeat me-1 text-warning"></i>7-day replacement policy</li>
                 <li class="trust-chip"><i class="bi bi-truck me-1 text-warning"></i>Fast dispatch across India</li>
                 <li class="trust-chip"><i class="bi bi-shield-check me-1 text-warning"></i>UPI, cards, wallets, and COD</li>
-                <li class="trust-chip"><i class="bi bi-people me-1 text-warning"></i>Dedicated support team</li>
+                <li class="trust-chip"><i class="bi bi-people me-1 text-warning"></i>Customer Support AI Assistant</li>
             </ul>
         </div>
     </div>
