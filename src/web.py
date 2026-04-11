@@ -69,4 +69,4 @@ def render_template(request: Request, template_name: str, **context):
         "gallery_images": _collect_gallery_images(40),
     }
     base_context.update(context)
-    return templates.TemplateResponse(template_name, context=base_context)
+    return templates.TemplateResponse(name=template_name, context=base_context)
