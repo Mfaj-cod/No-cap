@@ -58,8 +58,7 @@ def send_contact_message(
         add_flash(request, "Your message has been sent successfully.", "success")
     except Exception as e:
         print("SMTP ERROR:", e)
-        add_flash(request, f"Error: {str(e)}", "danger")
-        add_flash(request, "Email service temporarily unavailable.", "danger")
+        add_flash(request, "Email service temporarily unavailable. Please try again later.", "danger")
 
     return RedirectResponse(url=str(request.url_for("contact")), status_code=303)
 

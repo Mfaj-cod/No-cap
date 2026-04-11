@@ -34,4 +34,4 @@ def customer_care_message(payload: SupportMessage):
             status_code=503,
         )
 
-    return {"answer": answer}
+    return JSONResponse({"answer": answer})
