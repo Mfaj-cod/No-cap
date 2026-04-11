@@ -21,6 +21,7 @@ class Settings:
     owner_email: str
     groq_api_key: str
     groq_model: str
+    resend_api_key: str
 
 
 settings = Settings(
@@ -36,4 +37,5 @@ settings = Settings(
     owner_email=os.getenv("OWNER_EMAIL"),
     groq_api_key=os.getenv("GROQ_API_KEY", ""),
     groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+    resend_api_key=os.getenv("RESEND_API_KEY", ""),
 )

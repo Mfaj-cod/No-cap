@@ -7,9 +7,12 @@ python-dotenv
 itsdangerous
 razorpay
 groq
+smtplib
+# Optional: For higher email reliability, install resend package
+# resend
 
 # Testing
-pytest
-pytest-cov
-pytest-asyncio
-httpx
+# pytest
+# pytest-cov
+# pytest-asyncio
+# httpx

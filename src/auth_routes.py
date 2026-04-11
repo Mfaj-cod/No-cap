@@ -138,9 +138,14 @@ def request_password_reset(
     
     # Store OTP in database
     if store_reset_otp(email, otp):
-        # Send OTP email
-        send_password_reset_otp_email(email, otp)
-        add_flash(request, "OTP has been sent to your email. Please check your inbox.", "info")
+        # Send OTP email - don't block if it fails (user can request resend)
+        try:
+            send_password_reset_otp_email(email, otp)
+            add_flash(request, "OTP has been sent to your email. Check your inbox.", "info")
+        except Exception as e:
+            # OTP is stored, so user can still reset password
+            add_flash(request, "OTP has been generated. Check your email or request a new one.", "info")
+        
         # Store email in session for next step
         request.session["reset_email"] = email
         return RedirectResponse(url=str(request.url_for("verify_otp")), status_code=303)

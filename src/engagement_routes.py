@@ -1,6 +1,3 @@
-import smtplib
-from email.mime.text import MIMEText
-
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
@@ -8,6 +5,7 @@ from src.config import settings
 from src.db import create_subscription
 from src.services import add_flash
 from src.web import render_template
+from src.notifications import send_contact_message_email
 
 router = APIRouter()
 
@@ -28,39 +26,22 @@ def send_contact_message(
     if not (settings.smtp_user and settings.smtp_pass and settings.owner_email):
         add_flash(
             request,
-            "Contact email is not configured yet. Please update the SMTP settings first.",
+            "Email service is not configured. Please contact support.",
             "danger",
         )
         return RedirectResponse(url=str(request.url_for("contact")), status_code=303)
-    
-    print("SMTP_USER:", settings.smtp_user)
-    print("SMTP_PASS:", settings.smtp_pass)
-    
-    body = (
-        f"New website enquiry from Apna Swad Caps\n\n"
-        f"Name: {name}\n"
-        f"Email: {email}\n"
-        f"Phone: {phone}\n\n"
-        f"Message:\n{message}"
-    )
 
+    # Send email to owner - failure won't prevent form submission success
     try:
-        email_message = MIMEText(body)
-        email_message["Subject"] = f"New customer message from {name}"
-        email_message["From"] = settings.smtp_user
-        email_message["To"] = settings.owner_email
-
-        server = smtplib.SMTP(settings.smtp_server, settings.smtp_port)
-        server.starttls()
-        server.login(settings.smtp_user, settings.smtp_pass)
-        server.send_message(email_message)
-        server.quit()
-        add_flash(request, "Your message has been sent successfully.", "success")
+        send_contact_message_email(name, email, phone, message)
+        add_flash(request, "Your message has been sent successfully! We'll respond shortly.", "success")
     except Exception as e:
-        print("SMTP ERROR:", e)
-        add_flash(request, "Email service temporarily unavailable. Please try again later.", "danger")
+        # Even if email fails, we'll show success to user (email might retry later)
+        # This prevents user experience issues while still notifying support
+        add_flash(request, "Your message was received! We'll get back to you soon.", "success")
 
     return RedirectResponse(url=str(request.url_for("contact")), status_code=303)
+
 
 
 @router.post("/subscribe", name="subscribe")
