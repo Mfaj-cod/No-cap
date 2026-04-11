@@ -205,14 +205,8 @@ def place_order(
         clear_saved_checkout_data(request)
         add_flash(request, "Your order has been placed successfully.", "success")
         
-        # Send email asynchronously - don't block order if it fails
-        try:
-            send_order_placed_email(order_id)
-            print(f"✓ Order confirmation email queued for order #{order_id}", flush=True)
-        except Exception as e:
-            print(f"⚠ Email notification failed for order #{order_id}: {e}", flush=True)
-            logger.warning(f"Failed to send confirmation email for order {order_id}", exc_info=True)
-            # Order is already successfully placed, so we don't fail here
+        # Send confirmation email in background (won't block request)
+        send_order_placed_email(order_id)
         
         success_url = request.url_for("success_page").include_query_params(order_id=order_id)
         return RedirectResponse(url=str(success_url), status_code=303)
@@ -318,14 +312,8 @@ def payment_success(
     clear_saved_checkout_data(request)
     add_flash(request, "Payment received successfully.", "success")
     
-    # Send email asynchronously - don't block payment confirmation if it fails
-    try:
-        send_order_placed_email(order_id)
-        print(f"✓ Order confirmation email queued for order #{order_id}", flush=True)
-    except Exception as e:
-        print(f"⚠ Email notification failed for order #{order_id}: {e}", flush=True)
-        logger.warning(f"Failed to send confirmation email for order {order_id}", exc_info=True)
-        # Order is already successfully paid, so we don't fail here
+    # Send confirmation email in background (won't block request)
+    send_order_placed_email(order_id)
     
     return RedirectResponse(url=str(success_url), status_code=303)
 

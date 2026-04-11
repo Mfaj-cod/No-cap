@@ -1,5 +1,6 @@
 import logging
 import smtplib
+import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -171,30 +172,38 @@ def _get_html_wrapper(content: str) -> str:
 
 
 def _send_email(recipient: str, subject: str, html_content: str) -> None:
-    """Send email using SMTP - won't raise exceptions if delivery fails"""
+    """Send email using SMTP in background thread - never blocks the request"""
     if not (settings.smtp_user and settings.smtp_pass and settings.smtp_server and settings.owner_email):
-        logger.warning(f"SMTP not configured; skipping email to {recipient}")
+        logger.debug(f"SMTP not configured; skipping email to {recipient}")
         return
 
-    try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = settings.smtp_user
-        msg["To"] = recipient
-        
-        # Attach HTML
-        msg.attach(MIMEText(html_content, "html"))
-        
-        server = smtplib.SMTP(settings.smtp_server, settings.smtp_port)
-        server.starttls()
-        server.login(settings.smtp_user, settings.smtp_pass)
-        server.send_message(msg)
-        server.quit()
-        
-        logger.info(f"Email sent successfully to {recipient}")
-    except Exception as exc:
-        logger.error(f"Failed to send email to {recipient}: {type(exc).__name__}: {exc}", exc_info=True)
-        # Don't re-raise - let the order go through even if email fails
+    def _send_in_background():
+        """Internal function to send email in background thread"""
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = settings.smtp_user
+            msg["To"] = recipient
+            
+            # Attach HTML
+            msg.attach(MIMEText(html_content, "html"))
+            
+            # Use timeout to prevent hanging
+            server = smtplib.SMTP(settings.smtp_server, settings.smtp_port, timeout=10)
+            server.starttls()
+            server.login(settings.smtp_user, settings.smtp_pass)
+            server.send_message(msg)
+            server.quit()
+            
+            logger.info(f"✓ Email sent successfully to {recipient}")
+        except Exception as exc:
+            # Log the error but don't raise - order is already placed
+            logger.warning(f"⚠ Email failed for {recipient}: {type(exc).__name__}: {exc}")
+
+    # Send email in background thread - doesn't block request
+    thread = threading.Thread(target=_send_in_background, daemon=True)
+    thread.start()
+    logger.debug(f"Email queued in background for {recipient}")
 
 
 def send_order_placed_email(order_id: int) -> None:

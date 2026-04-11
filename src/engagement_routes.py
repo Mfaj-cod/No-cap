@@ -31,14 +31,9 @@ def send_contact_message(
         )
         return RedirectResponse(url=str(request.url_for("contact")), status_code=303)
 
-    # Send email to owner - failure won't prevent form submission success
-    try:
-        send_contact_message_email(name, email, phone, message)
-        add_flash(request, "Your message has been sent successfully! We'll respond shortly.", "success")
-    except Exception as e:
-        # Even if email fails, we'll show success to user (email might retry later)
-        # This prevents user experience issues while still notifying support
-        add_flash(request, "Your message was received! We'll get back to you soon.", "success")
+    # Send contact message in background (won't block request)
+    send_contact_message_email(name, email, phone, message)
+    add_flash(request, "Your message was received! We'll get back to you soon.", "success")
 
     return RedirectResponse(url=str(request.url_for("contact")), status_code=303)
 
