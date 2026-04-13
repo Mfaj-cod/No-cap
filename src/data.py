@@ -2,11 +2,11 @@ WHOLESALE_THRESHOLD = 25
 WHOLESALE_DISCOUNT = 0.25
 
 CATEGORIES = [
-    {"name": "Sports", "image_url": "/static/img/logo.jpg"},
-    {"name": "Casual", "image_url": "/static/img/placeholder.jpg"},
-    {"name": "Snapback", "image_url": "/static/img/placeholder.jpg"},
-    {"name": "Trucker", "image_url": "/static/img/placeholder.jpg"},
-    {"name": "Dad Cap", "image_url": "/static/img/placeholder.jpg"},
+    {"name": "Sports", "image_url": "/static/img/sport-1.jpeg"},
+    {"name": "Casual", "image_url": "/static/img/casual-2.jpeg"},
+    {"name": "Snapback", "image_url": "/static/img/snapback-1.jpeg"},
+    {"name": "Trucker", "image_url": "/static/img/trucker-1.jpeg"},
+    {"name": "Dad Cap", "image_url": "/static/img/dadcap-1.jpeg"},
     {"name": "Beanie", "image_url": "/static/img/logo.jpg"},
 ]
 
@@ -42,9 +42,7 @@ PRODUCTS = [
         "normal_price": 649.0,
         "image_url": "/static/img/casual/casual-2.jpeg",
         "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/bg2.jpg",
-            "/static/img/logo.jpg",
+            "/static/img/casual/casual-2.jpeg"
         ],
         "category": "Casual",
         "details": ["Washed cotton finish", "Curved visor", "Everyday streetwear styling"],
@@ -71,9 +69,7 @@ PRODUCTS = [
         "normal_price": 899.0,
         "image_url": "/static/img/snapback/snapback-1.jpeg",
         "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/logo.jpg",
-            "/static/img/bg1.jpg",
+            "/static/img/snapback/snapback-1.jpeg"
         ],
         "category": "Snapback",
         "details": ["Flat brim", "Structured front", "Ideal for logo embroidery"],
@@ -96,11 +92,9 @@ PRODUCTS = [
         "name": "Breeze Trucker Cap",
         "description": "Airy trucker-style cap with mesh back panels and a durable front face.",
         "normal_price": 699.0,
-        "image_url": "/static/img/placeholder.jpg",
+        "image_url": "/static/img/trucker-1.jpeg",
         "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/bg2.jpg",
-            "/static/img/logo.jpg",
+            "/static/img/trucker-1.jpeg"
         ],
         "category": "Trucker",
         "details": ["Mesh back", "Foam front panel", "Lightweight road-trip fit"],
@@ -125,9 +119,7 @@ PRODUCTS = [
         "normal_price": 749.0,
         "image_url": "/static/img/Dad-Cap/dadcap-1.jpeg",
         "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/bg1.jpg",
-            "/static/img/logo.jpg",
+            "/static/img/Dad-Cap/dadcap-1.jpeg"
         ],
         "category": "Dad Cap",
         "details": ["Unstructured crown", "Soft cotton twill", "Vintage-inspired fit"],
@@ -148,42 +140,13 @@ PRODUCTS = [
         "featured": True,
     },
     {
-        "id": 6,
-        "name": "Urban Knit Beanie",
-        "description": "Cold-weather beanie with stretch knit comfort for casual and retail bundles.",
-        "normal_price": 599.0,
-        "image_url": "/static/img/placeholder.jpg",
-        "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/bg2.jpg",
-            "/static/img/logo.jpg",
-        ],
-        "category": "Beanie",
-        "details": ["Soft rib knit", "Fold-over cuff", "Unisex styling"],
-        "attributes": {
-            "Material": "Acrylic knit",
-            "Fit": "Stretch free size",
-            "Warmth": "Light-to-medium winter layer",
-            "Best For": "Winter retail, layering, campus merch",
-        },
-        "variants": [
-            {"sku": "UKB-BLK-FS", "color": "Black", "size": "Free Size", "stock_quantity": 40},
-            {"sku": "UKB-MST-FS", "color": "Mustard", "size": "Free Size", "stock_quantity": 18},
-            {"sku": "UKB-CHR-FS", "color": "Charcoal", "size": "Free Size", "stock_quantity": 21},
-        ],
-        "reviews": [],
-        "featured": False,
-    },
-    {
         "id": 7,
         "name": "Clubhouse Sports Visor Cap",
         "description": "Low-profile sports cap with a sleek look for clubs, academies, and event uniforms.",
         "normal_price": 829.0,
-        "image_url": "/static/img/placeholder.jpg",
+        "image_url": "/static/img/sports/sport-1.jpg",
         "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/bg1.jpg",
-            "/static/img/logo.jpg",
+            "/static/img/sports/sport-1.jpg"
         ],
         "category": "Sports",
         "details": ["Quick-dry fabric", "Slim profile", "Event-ready finish"],
@@ -206,11 +169,9 @@ PRODUCTS = [
         "name": "Canvas Casual Camp Cap",
         "description": "Five-panel camp cap with sturdy canvas texture for modern casual drops.",
         "normal_price": 779.0,
-        "image_url": "/static/img/placeholder.jpg",
+        "image_url": "/static/img/casual/casual-1.jpeg",
         "media_gallery": [
-            "/static/img/placeholder.jpg",
-            "/static/img/bg2.jpg",
-            "/static/img/logo.jpg",
+            "/static/img/casual/casual-1.jpeg"
         ],
         "category": "Casual",
         "details": ["Five-panel design", "Canvas body", "Clean front for branding"],

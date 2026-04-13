@@ -35,7 +35,6 @@ def api_list_orders(request: Request):
                 "id": o["id"],
                 "name": o["name"],
                 "email": o["email"],
-                # "address": f"{o.get('address')}, {o.get('city')} - {o.get('pincode')}",
                 "address": ", ".join(filter(None, [
                     o.get("address"),
                     o.get("city"),
