@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service - {{ store_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mx-auto" style="max-width: 900px;">
+
+        <h1 class="mb-4">Terms of Service</h1>
+        <p class="text-muted">Last updated: 13th April 2026</p>
+
+        <p>
+            By accessing or using <strong>{{ store_name }}</strong>, you agree to the following terms.
+        </p>
+
+        <h4 class="mt-4">1. Use of Website</h4>
+        <p>
+            You agree to use this platform only for lawful purposes and not engage in misuse or exploitation.
+        </p>
+
+        <h4 class="mt-4">2. Account Responsibility</h4>
+        <p>
+            You are responsible for maintaining the confidentiality of your account and all activities under it.
+        </p>
+
+        <h4 class="mt-4">3. Orders & Products</h4>
+        <ul>
+            <li>All orders are subject to availability</li>
+            <li>We reserve the right to cancel orders</li>
+            <li>Pricing may change without notice</li>
+        </ul>
+
+        <h4 class="mt-4">4. Payments</h4>
+        <ul>
+            <li>Payments are processed via secure third-party providers</li>
+            <li>We do not store payment details</li>
+        </ul>
+
+        <h4 class="mt-4">5. Shipping</h4>
+        <p>
+            Delivery timelines are estimates and may vary depending on location and external factors.
+        </p>
+
+        <h4 class="mt-4">6. Returns & Refunds</h4>
+        <p>
+            Returns are subject to our refund policy. Items must meet eligibility conditions.
+        </p>
+
+        <h4 class="mt-4">7. Intellectual Property</h4>
+        <p>
+            All content on this website (logos, images, text) is owned by {{ store_name }} and protected by law.
+        </p>
+
+        <h4 class="mt-4">8. Limitation of Liability</h4>
+        <p>
+            We are not liable for indirect or incidental damages arising from the use of our platform.
+        </p>
+
+        <h4 class="mt-4">9. Termination</h4>
+        <p>
+            We reserve the right to suspend or terminate accounts that violate these terms.
+        </p>
+
+        <h4 class="mt-4">10. Governing Law</h4>
+        <p>
+            These terms are governed by the laws of India.
+        </p>
+
+        <h4 class="mt-4">11. Changes to Terms</h4>
+        <p>
+            We may update these terms at any time without prior notice.
+        </p>
+
+        <h4 class="mt-4">12. Contact</h4>
+        <p>
+            Email: support@nocaps.com <br>
+            Location: Delhi, India
+        </p>
+
+    </div>
+</div>
+{% endblock %}

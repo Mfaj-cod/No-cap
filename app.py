@@ -13,6 +13,7 @@ from src.orders_routes import router as orders_router
 from src.storefront_routes import router as storefront_router
 from src.support_routes import router as support_router
 from src.admin_routes import router as admin_router
+from src.legal_routes import router as legal_router
 
 
 @asynccontextmanager
@@ -32,6 +33,7 @@ app.include_router(orders_router)
 app.include_router(engagement_router)
 app.include_router(support_router)
 app.include_router(admin_router)
+app.include_router(legal_router)
 
 
 @app.get("/health", name="healthcheck")

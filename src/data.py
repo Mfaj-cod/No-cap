@@ -92,9 +92,9 @@ PRODUCTS = [
         "name": "Breeze Trucker Cap",
         "description": "Airy trucker-style cap with mesh back panels and a durable front face.",
         "normal_price": 699.0,
-        "image_url": "/static/img/trucker-1.jpeg",
+        "image_url": "/static/img/trucker/trucker-1.jpeg",
         "media_gallery": [
-            "/static/img/trucker-1.jpeg"
+            "/static/img/trucker/trucker-1.jpeg"
         ],
         "category": "Trucker",
         "details": ["Mesh back", "Foam front panel", "Lightweight road-trip fit"],

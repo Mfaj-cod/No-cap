@@ -17,7 +17,7 @@
     <nav class="navbar site-navbar sticky-top" style="background-color: rgba(6, 12, 20, 0.88);">
         <div class="container py-2">
             <a class="navbar-brand site-brand m-0" href="{{ url_for('index') }}">
-                <i class="bi bi-mortarboard-fill site-brand__icon" style="color: yellow;"></i>
+                <i class="bi bi-mortarboard-fill site-brand__icon" style="color: goldenrod;"></i>
                 <span style="color: white;">NO<span class="site-brand__accent">Cap</span></span>
             </a>
 
@@ -120,7 +120,7 @@
             <div class="footer-grid">
                 <div>
                     <h5 class="site-brand fs-4 mb-3">
-                        <i class="bi bi-mortarboard-fill site-brand__icon"></i>
+                        <i class="bi bi-mortarboard-fill site-brand__icon" style="color: goldenrod;"></i>
                         <span>NO<span class="site-brand__accent">Cap</span></span>
                     </h5>
                     <p class="footer-copy mb-3">Curated caps for everyday customers, teams, retailers, and shop owners who want bulk-ready pricing without the usual friction.</p>
@@ -161,8 +161,8 @@
             <div class="footer-bottom">
                 <div class="footer-meta">&copy; {{ current_year }} {{ store_name }}. All rights reserved.</div>
                 <div class="footer-links d-flex gap-3 flex-wrap justify-content-start justify-content-md-end">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                    <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms_of_service') }}">Terms of Service</a>
                 </div>
             </div>
         </div>
