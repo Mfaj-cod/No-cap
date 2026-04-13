@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Request
+from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
 from src.web import render_template

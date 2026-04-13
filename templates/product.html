@@ -17,6 +17,31 @@
     {%- endif -%}
 {%- endmacro %}
 
+<style>
+
+.table {
+    --bs-table-bg: transparent !important;
+}
+
+.accordion-body {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+}
+
+.table > :not(caption) > * > * {
+    background-color: transparent !important;
+}
+
+.spec-label-cell {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.table td {
+    color: #fff;
+}
+</style>
+
 <section class="page-shell">
     <div class="container section-stack">
         <div class="product-layout">
@@ -127,7 +152,7 @@
                                         <tbody>
                                             {% for label, value in product.attributes.items() %}
                                             <tr>
-                                                <th class="fw-normal spec-label-cell">{{ label }}</th>
+                                                <th class="fw-normal spec-label-cell text-white">{{ label }}</th>
                                                 <td class="text-end fw-semibold">{{ value }}</td>
                                             </tr>
                                             {% endfor %}
