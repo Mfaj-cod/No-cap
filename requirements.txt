@@ -12,7 +12,7 @@ groq
 # resend
 
 # Testing
-# pytest
-# pytest-cov
-# pytest-asyncio
-# httpx
+pytest
+pytest-cov
+pytest-asyncio
+httpx

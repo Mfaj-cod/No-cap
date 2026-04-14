@@ -1,6 +1,6 @@
 # NoCaps - E-Commerce Cap Store
 
-<!-- [![Tests](https://img.shields.io/badge/tests-183%20passing-green)]() -->
+[![Tests](https://img.shields.io/badge/tests-154%20passing-brightgreen)]()
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue)]()
 [![FastAPI](https://img.shields.io/badge/fastapi-0.100%2B-green)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
@@ -89,7 +89,7 @@ Visit: `http://localhost:8000`
 | **Payments** | Razorpay API |
 | **AI/LLM** | Groq API (llama-3.3-70b) |
 | **Email** | SMTP (threading) |
-| **Testing** | pytest + pytest-asyncio |
+| **Testing** | pytest + pytest-cov + httpx |
 | **Deployment** | Docker + Render/Heroku |
 
 ### System Flow
@@ -167,6 +167,20 @@ Nocap/
 │   ├── customer_care.html # AI support chat
 │   ├── success.html       # Payment success
 │   └── failure.html       # Payment failure
+│
+└── tests/                  # Automated test suite (154 tests)
+    ├── conftest.py         # Shared fixtures, isolated test DB
+    ├── test_health.py      # Health-check endpoint
+    ├── test_security.py    # Password hashing unit tests
+    ├── test_services.py    # Cart helpers, flash messages
+    ├── test_db.py          # Database CRUD & OTP reset flow
+    ├── test_auth.py        # Register, login, logout, account guard
+    ├── test_storefront.py  # Product filters, search, HTTP routes
+    ├── test_cart.py        # Add / update / remove cart items
+    ├── test_orders.py      # Checkout (COD), success/failure pages
+    ├── test_engagement.py  # Contact form, newsletter subscribe
+    ├── test_admin.py       # Admin routes & 403 enforcement
+    └── test_pricing.py     # Wholesale / retail pricing logic
 
 ```
 
@@ -272,7 +286,7 @@ python-dotenv==1.0+      # Environment variables
 
 # Testing
 pytest==7.4+
-pytest-asyncio==0.21+
+pytest-cov==4.0+
 httpx==0.24+
 ```
 
@@ -444,7 +458,6 @@ cd Nocap
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-python -m pytest tests/
 ```
 
 ### Making Changes
@@ -460,6 +473,63 @@ python -m pytest tests/
 
 ---
 
+## Testing
+
+The project ships with a full automated test suite covering every feature area. Tests use an isolated in-project SQLite database so the production `store.db` is never touched.
+
+### Run Locally
+
+```bash
+# Install dependencies (includes pytest, pytest-cov, httpx)
+pip install -r requirements.txt
+
+# Run all tests
+pytest tests/
+
+# Run with coverage report
+pytest tests/ --cov=src --cov-report=term-missing
+
+# Run only a specific feature area
+pytest tests/ -m auth        # auth tests
+pytest tests/ -m cart        # cart tests
+pytest tests/ -m unit        # unit tests only (no HTTP)
+pytest tests/ -m integration # integration / HTTP tests
+```
+
+### Test Coverage
+
+| File | What is tested |
+|---|---|
+| `test_health.py` | `/health` endpoint |
+| `test_security.py` | PBKDF2 hashing, salt uniqueness, verify correct/wrong/malformed |
+| `test_services.py` | Cart key helpers, flash messages, session cart save/get/clear |
+| `test_db.py` | Product queries, variant helpers, user CRUD, OTP reset, subscriptions |
+| `test_auth.py` | Register validation, login/logout, account auth guard, forgot-password flow |
+| `test_storefront.py` | Product filters, search relevance scoring, index/product/category routes |
+| `test_cart.py` | Add, update (zero→remove), remove; stock-capping, unknown product |
+| `test_orders.py` | COD checkout, cart cleared after order, success/failure page access control |
+| `test_engagement.py` | Contact form (with/without SMTP), newsletter subscription |
+| `test_admin.py` | 403 for non-admin, orders page, JSON API shape, status update |
+| `test_pricing.py` | Wholesale threshold, 25% discount math, retail fallback, guest pricing |
+
+### CI Pipeline
+
+Tests run automatically on every push and pull request to `main` via GitHub Actions:
+
+```
+push / PR to main
+    ↓
+[Install Python 3.12 + dependencies]
+    ↓
+[pytest tests/ --cov=src]  ← must pass before deploy
+    ↓
+[Upload coverage.xml artifact]
+    ↓
+[Trigger Render deploy hook]  ← only on main branch push
+```
+
+---
+
 ## Project Status
 
 | Component | Status |
@@ -471,7 +541,8 @@ python -m pytest tests/
 | AI Support | ✅ Groq Integration |
 | Admin Dashboard | ✅ Order Management |
 | Mobile Responsive | ✅ Bootstrap Compatible |
-| Testing | ✅ 183 Tests Passing |
+| Testing | ✅ 154 Tests — All Passing |
+| CI/CD | ✅ GitHub Actions (push + PR) |
 
 ---
 
@@ -492,4 +563,4 @@ MIT License - See LICENSE file for details
 
 **Last Updated**: April 2026
 **Maintainer**: https://github.com/Mfaj-cod
-**Version**: 1.0.0
+**Version**: 1.0.1

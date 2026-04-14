@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   continuous-integration:
@@ -20,8 +23,24 @@ jobs:
       - name: Install deps
         run: pip install --no-cache-dir -r requirements.txt
 
+      - name: Run tests with coverage
+        run: |
+          python -m pytest tests/ \
+            --tb=short \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
   continuous-deployment:
     needs: continuous-integration
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger API deploy hook
@@ -33,3 +52,4 @@ jobs:
             exit 0
           fi
           curl -fsS -X POST "$HOOK"
+

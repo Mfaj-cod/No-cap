@@ -12,4 +12,4 @@ store.db
 *.ini
 
 scripts/
-tests/
+tests/.test_store.db
