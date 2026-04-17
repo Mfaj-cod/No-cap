@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -24,6 +24,15 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="Nocaps", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=settings.session_secret)
+
+@app.middleware("http")
+async def add_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        # Cache static assets for 1 year (31536000 seconds)
+        response.headers["Cache-Control"] = "public, max-age=31536000"
+    return response
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(storefront_router)
